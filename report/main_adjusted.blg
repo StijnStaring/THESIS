@@ -1,0 +1,13 @@
+This is BibTeX, Version 0.99dThe top-level auxiliary file: main_adjusted.aux
+The style file: IEEEtran.bst
+Database file #1: Thesis_ref.bib
+Warning--I didn't find a database entry for "h2g2"
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+Name 1 in "{Brian D. Ziebart, Andrew Maas, J.Andrew Bagnell}, and Anind K. Dey" has a comma at the end for entry BrianD.ZiebartAndrewMaasJ.AndrewBagnell2008
+while executing---line 2403 of file IEEEtran.bst
+Warning--empty journal in Palan2019
+
+Done.
+(There was 1 error message)

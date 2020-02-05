@@ -1,0 +1,21 @@
+\babel@toc {dutch}{}
+\babel@toc {dutch}{}
+\contentsline {chapter}{\chapternumberline {1}titelpagina}{i}% 
+\babel@toc {dutch}{}
+\babel@toc {dutch}{}
+\babel@toc {english}{}
+\babel@toc {dutch}{}
+\contentsline {chapter}{Voorwoord}{iii}% 
+\contentsline {chapter}{Abstract}{iv}% 
+\contentsline {chapter}{Inhoudsopgave}{v}% 
+\contentsline {chapter}{Lijst van symbolen}{vi}% 
+\contentsline {chapter}{Lijst van figuren}{vii}% 
+\contentsline {chapter}{Lijst van tabellen}{viii}% 
+\contentsline {chapter}{\chapternumberline {2}Inleiding}{1}% 
+\contentsline {chapter}{\chapternumberline {3}Het echte werk}{2}% 
+\contentsline {section}{\numberline {3.1}Titel om hier iets te hebben}{2}% 
+\contentsline {section}{\numberline {3.2}Geschiedenis van het proefschrift}{3}% 
+\contentsline {section}{\numberline {3.3}Verwante onderwerpen}{3}% 
+\contentsline {section}{\numberline {3.4}Titel om hier iets te hebben}{3}% 
+\contentsline {section}{\numberline {3.5}Geschiedenis van het proefschrift}{4}% 
+\contentsline {section}{\numberline {3.6}Verwante onderwerpen}{4}% 

@@ -1,0 +1,90 @@
+\documentclass[a4paper,11pt,twoside,openany,fleqn]{memoir} % gebruik A4 papier, 11pt lettergrootte, en een apparte titelpagina. Een nieuw hoofdstuk begint op eender welke kant (links of rechts). Vergelijkingen komen op een kleine identatie van de linker kant, en de nummering staat rechts
+% Template voor een LaTeX thesis op ESAT. 
+% Auteur: Dirk Van Hertem: dirk.vanhertem@ieee.org
+% Verander eraan wat je wil, en stuur opmerkingen door, dan houd ik de
+% versie up to date
+% lees README voor meer uitleg, of kijk naar http://homes.esat.kuleuven.be/~dvherten/esatthesis.html
+%for subsections
+
+%% Language
+% !TeX spellcheck = en_GB 
+\usepackage[english]{babel}
+\selectlanguage{english}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Maak de titelpagina
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\NAAM}{Stijn Staring}
+\newcommand{\NAAMb}{}% ook titelpagina.tex aanpassen als je dit invult (% teken weghalen)
+\newcommand{\TITEL}{Model identification and learning control in autonomous driving}
+\newcommand{\SUBTITEL}{Identification of comfort parameters during lane change.}
+\newcommand{\PROMOTOR}{Prof.\,dr.\,Jan Swevers}
+%\newcommand{\PROMOTORb}{Prof.\,dr.\,Weet~Ook~Alles}% ook titelpagina.tex aanpassen (% teken weghalen)
+\newcommand{\RICHTING}{Master of Science in de ingenieurswetenschappen, richting
+	Werktuigkunde, optie Voertuigtechnieken}
+\newcommand{\BEGELEIDER}{dr.\,ir.\, Son Tong}
+\newcommand{\JAAR}{2019---2020}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header file
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\input{header_esat}
+
+\begin{document}
+	\subfile{titelpagina}
+	\pagenumbering{roman}
+	\pagestyle{plain} %%%% hier toevoegen 
+	\subfile{copyright} % deze file zit al in de zip-file zitten
+	% include de volgende gedeelten per hoofdstuk. Werk best niet vanuit 1 file
+	
+	\subfile{voorwoord}
+	\subfile{abstract}\clearpage
+	\tableofcontents\clearpage
+	\subfile{symbolenlijst}\clearpage
+	\def\listfigurename{List of Figures}
+	\listoffigures\clearpage
+	\def\listtablename{List of Tables}
+	\listoftables
+	%\def\lstlistlistingname{Lijst van codeblokken}
+	
+	\cleardoublepage
+	\pagenumbering{arabic}
+	\pagestyle{ruled}
+	
+	\subfile{inleiding}
+	\subfile{hoofdstuk2}
+	\subfile{hoofdstuk3}
+	%\include{besluit}
+	
+	
+	% \nocite{eenboek} % refereert naar eenboek, zonder dat er in de tekst naar verwezen wordt
+	% \nocite{*} % verwijst naar alles in uw bibfile zonder dat er naar verwezen moet worden in de tekst
+	
+	\cite{BrianD.ZiebartAndrewMaasJ.AndrewBagnell2008}
+	\cite{Kuderer2015a}
+	\cite{Palan2019}
+	\cite{Abbeel2004}
+	\cite{turner1999}
+	
+	
+	
+	
+	\bibliographystyle{IEEEtran}   %    citeren   zoals    door   ieee   aangeraden    wordt.   Leest
+	% IEEEtran_bst_HOWTO.pdf voor  meer inlichtingen. IEEEtran_nl is een
+	% aangepaste versie van IEEEtran, waarbij de bindwoorden, maanden en
+	% dergelijke in het nederlands gezet zijn.
+	%\bibliographystyle{IEEEtran} % originele versie, te gebruiken als je uw tekst in het engels doet 
+	% \bibliography{referenties} 
+	\bibliography{Thesis_ref}
+	%  maak een eindwerk.bib bestand aan met uw referenties (dit is iets waar je best direct mee begint en niet op het einde doet)
+	
+	
+	%\appendix % indien gewenst
+	%\include{appendix1}
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

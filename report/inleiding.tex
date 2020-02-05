@@ -1,0 +1,197 @@
+% !TeX spellcheck = en_GB 
+\documentclass[main_adjusted]{subfiles}
+% !TeX root = inleiding
+\begin{document}
+\chapter{Inleiding}
+\label{cha:inleiding}
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\KwResult{$\bm{\theta}_{opti}$ }
+	initialization: \\
+	$\bm{\theta} = [1,1,...,1,1] $\\
+	$\bm{\tilde{f}} = \frac{1}{m} \sum_{i=1}^{m}\bm{f}(\bm{r}_{obs,i}) $ \;
+	\While{Not converged}{
+		\For{i = 1...m}{	
+		$\smash{\displaystyle\min_{r_{exp}}} \hspace{3 mm} \bm{\theta}^T\cdot\bm{f}(\bm{r}_{exp})$ \;
+		\vspace{2 mm} 
+		constraints: \\
+		\hspace{5 mm}$opti.begin = initial(observed_i)$\;
+		\hspace{5 mm}$opti.end = [y = lane\_distance_{i}, vy = 0, ay = 0, jy = 0]$\;		
+		} \\
+		
+		$E_{p(\bm{r}|\bm{\theta})}(\bm{f}) = \frac{1}{m} \sum_{i=1}^{m}\bm{f}(\bm{r}_{exp,i})$ \;
+		$\Delta \bm{\theta} = \alpha\cdot(E_{p(\bm{r}|\bm{\theta})}(\bm{f})-\bm{\tilde{f}})$\;
+		$\bm{\theta} = \bm{\theta} + \Delta \bm{\theta}$\;
+		\If{$\Delta \bm{\theta} \leq \epsilon$}{
+			$return \hspace{1 mm}\bm{\theta}$\;		
+		}
+	}
+	\caption{\textbf{Learning algorithm}}
+\end{algorithm}
+
+\vspace{3 mm}
+
+
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\KwResult{$\bm{\theta}_{opti}$ }
+	initialization: \\
+	$\bm{\theta} = [\frac{1}{nf},\frac{1}{nf},...,\frac{1}{nf},\frac{1}{nf}] $, nf: number of features\\
+	$\bm{\tilde{f}} = \frac{1}{m} \sum_{i=1}^{m}\bm{f}(\bm{r}_{obs,i}) $ \;
+	\While{Not converged}{	
+		\textbf{start opti 1:}\\
+		$\bm{r}_{exp,i} = argmin(\bm{\theta}^T\cdot\bm{f}(\bm{r}_{exp,i})) , \forall i \in 1:m$\;
+		constraints: \\
+		\hspace{5 mm}$opti_{1}.time = fixed\_time$\;
+		\hspace{5 mm}$opti_{1}.begin = initial(observed_i)$\;
+		\hspace{5 mm}$opti_{1}.end = [y = lane\_distance, vy = 0, ay = 0, jy = 0]$\;		
+		\textbf{end} \\
+		\vspace{1.5 mm}
+		$E_{p(\bm{r}|\bm{\theta})}(\bm{f}) = \frac{1}{m} \sum_{i=1}^{m}\bm{f}(\bm{r}_{exp,i})$ \;
+		\vspace{1.5 mm}
+		\textbf{start opti 2:}\\
+		$\Delta \bm{\theta} = argmin\sum_{i=1}^{nf}-\Delta\theta_{i}\cdot(f_{i}-\tilde{f}_{i})$\;	
+		constraints: \\
+		\hspace{5mm}$opti_{2}.subject\_to(\Delta\theta_{i}\cdot(f_{i}-\tilde{f}_{i})\geq 0)$ \;
+		\hspace{5 mm}$opti_{2}.subject\_to(\sum_{i=1}^{nf}\Delta\theta_{i} == 0)$ \;
+		\textbf{end} \\
+		
+		
+		$\bm{\theta} = \bm{\theta} + \Delta \bm{\theta}$\;
+		\If{$\Delta \bm{\theta} \leq \epsilon$}{
+			$return(\bm{\theta}$)\;		
+		}
+	}
+	\caption{\textbf{Double optimization}}
+\end{algorithm}
+
+
+
+\vspace{2cm}
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\KwResult{$\bm{\theta}_{new}$ }
+	$\Delta \bm{\theta} = [0,0...0]$\;
+	\For{i = [1...nf]}{	
+		\eIf{$\bm{f_{diff}}[i]>0$}{
+			$\Delta \bm{\theta}[i] = \Delta \bm{\theta}[i] + \bm{f_{diff}}[i]$
+		}{
+		\For{k = [1...nf]}{
+			\If{k!=i}{
+			$\Delta \bm{\theta}[i] = \Delta \bm{\theta}[i] - \bm{f_{diff}}[i]$
+			}
+		}
+		}
+	}
+	$\bm{\theta} = \frac{\bm{\theta}}{norm_{2}(\bm{\theta})} $
+	\caption{\textbf{Update theta}}
+\end{algorithm}
+
+
+
+
+
+
+\begin{figure}
+  \centering
+%  \includegraphics[width=0.4\textwidth]{kul_logo.PNG}
+  \caption{Dit is de sedes van  de kul. Der staat trouwens bij dat de KUL  in 1425 ontstaan is. Deze
+    caption is  uitzonderlijk lang om te  testen ofdat het werkt  om de caption over  twee lijnen te
+    zetten op 0.8 tekstbreedte.}
+  \label{fig:sedes}
+\end{figure}
+
+
+
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	$total\_trajectory = $\\
+	$[[0,[punt_1x,punt_1y],[punt_2x,punt_2y]],$\\
+	$[1,[centre_x,centre_y],radius,start\_degree,end\_degree]]$\;
+	$current\_state = intitial\_state\_system$\;
+	$N = 2$\;
+	\For{i in [0:1:len(total\_trajectory)]}{
+		$seed\_trajectory = total\_trajectory[i:i+N]$\;
+		$[next\_inputs,calculated\_states, calculated\_controls] = \bm{inner\_ optimization(seed\_trajectory, current\_state)}$
+		$history\_states = calculated\_states$\;
+		$history\_control = calculated\_control$\;
+		$current\_state = next\_inputs$\;
+	}	
+	\caption{\textbf{MPC loop}}
+	\label{alg:3}
+\end{algorithm}
+
+
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	$\bm{function}(seed\_trajectory, current\_state)$\;
+	Define stage master(template stage):\\
+	$assign\_vehicle\_model\_and\_extra\_variables$\;
+	$assign\_path\_constraints:limitations\_vehicle$\;
+	$assign\_path\_objective\_and\_solving\_method$\;
+	Create stage:
+	$stage = stage\_master$
+	$stage\_start\_condition = current\_state$\;
+	\eIf{$line\_segment$}{
+		$set\_guess(x,y)$\;
+		$set\_stay\_on\_lane\_constraint$\;
+		$set\_end\_stage\_requirement$
+	}{
+		$set\_guess(x,y)$\;
+		$set\_stay\_on\_lane\_constraint$\;
+		$set\_end\_stage\_requirement$	
+	}
+	$Stage\_previous = stage$\;
+	\For{i in [0:1:len(total\_trajectory)]}{
+		$end\_constraints\_stage\_previous = start\_constraints\_stage$\;
+		\eIf{$line\_segment$}{
+			$set\_guess(x,y)$\;
+			$set\_stay\_on\_lane\_constraint$\;
+			$set\_end\_stage\_requirement$
+		}{
+			$set\_guess(x,y)$\;
+			$set\_stay\_on\_lane\_constraint$\;
+			$set\_end\_stage\_requirement$	
+		}
+		$Stage\_previous = stage$\;
+	}
+	$Final\_constraints$\;
+	$sol = ocp.solve()$		
+	\caption{\textbf{Inner optimization}}
+	\label{alg:3}
+\end{algorithm}
+
+
+
+
+
+
+
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\KwResult{$\bm{r}_{opti}$ }
+	Initialization: \\
+	$\bm{\theta} = [1,1,...,1,1] $
+	Objective: \\
+	$\bm{r}_{opti} = argmin(\bm{\theta}^T\cdot\bm{f}(\bm{r}))$\;
+	Constraints: \\
+	\hspace{5 mm}$\bm{\dot{X}}(t) = \bm{f}(\bm{X}(t), \bm{u}(t))$\;
+	\hspace{5 mm}$opti.time = T$\; 
+	\hspace{5 mm}$opti.begin = [vx = V, other\_states = 0]$\;
+	\hspace{5 mm}$opti.end = [y = lane\_distance, vy = 0, ay = 0, jy = 0]$\;
+	
+	\caption{\textbf{Path generation}}
+	\label{alg:1}
+\end{algorithm}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "eindwerk_template"
+%%% End: 
