@@ -6,22 +6,29 @@ close all
 
 %% Files
 end_value = 1001;
+% files = {'Dataset_Xchange130.3244_V0=95.4982.csv',;
+%          'Dataset_Xchange133.1118_V0=95.0987.csv',;
+%          'Dataset_Xchange136.7518_V0=82.6395.csv',;
+%          'Dataset_Xchange141.0329_V0=99.4119.csv',;
+%          'Dataset_Xchange144.6254_V0=94.1856.csv',;
+%          'Dataset_Xchange147.8353_V0=84.4808.csv',;
+%          'Dataset_Xchange153.1601_V0=88.4862.csv',;
+%          'Dataset_Xchange159.801_V0=92.8889.csv',;
+%          'Dataset_Xchange162.2641_V0=95.4032.csv',;
+%          'Dataset_Xchange166.5747_V0=99.8741.csv',;
+%          'Dataset_Xchange171.6427_V0=85.2442.csv',;
+%          'Dataset_Xchange175.9018_V0=80.7142.csv',;
+%          'Dataset_Xchange178.9122_V0=83.9562.csv',;
+%          'Dataset_Xchange185.2974_V0=86.3705.csv',;
+%          'Dataset_Xchange189.4391_V0=98.6799.csv',;
+%          'Dataset_Xchange195.0198_V0=94.6066.csv',;
+%          'Dataset_Xchange199.9356_V0=83.4224.csv'};
 files = {'Dataset_Xchange130.3244_V0=95.4982.csv',;
-         'Dataset_Xchange133.1118_V0=95.0987.csv',;
-         'Dataset_Xchange136.7518_V0=82.6395.csv',;
-         'Dataset_Xchange141.0329_V0=99.4119.csv',;
          'Dataset_Xchange144.6254_V0=94.1856.csv',;
-         'Dataset_Xchange147.8353_V0=84.4808.csv',;
-         'Dataset_Xchange153.1601_V0=88.4862.csv',;
          'Dataset_Xchange159.801_V0=92.8889.csv',;
          'Dataset_Xchange162.2641_V0=95.4032.csv',;
-         'Dataset_Xchange166.5747_V0=99.8741.csv',;
-         'Dataset_Xchange171.6427_V0=85.2442.csv',;
-         'Dataset_Xchange175.9018_V0=80.7142.csv',;
          'Dataset_Xchange178.9122_V0=83.9562.csv',;
          'Dataset_Xchange185.2974_V0=86.3705.csv',;
-         'Dataset_Xchange189.4391_V0=98.6799.csv',;
-         'Dataset_Xchange195.0198_V0=94.6066.csv',;
          'Dataset_Xchange199.9356_V0=83.4224.csv'};
      
 %% Initialization
@@ -93,7 +100,7 @@ for i = 1:1:length
 end
  legend(Legend)
  
-% Lateral acceleration
+% Lateral acceleration - this is the local acceleration.
 figure('name', 'Lateral acceleration')
 title('Lateral acceleration','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)

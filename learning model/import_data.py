@@ -36,7 +36,7 @@ def import_data(plot):
         data = pd.read_csv(file)
 
         # Clipping and plotting the observed lane change
-        [time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, init, data_cl] =clip_lane_change(data)
+        [time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, init, data_cl] =clip_lane_change(data,file)
         jerk_y, jerk_x = calc_jerk(data_cl, 0) # jerk is calculated in local axis.
 
         # Assign initial and desired conditions
@@ -84,28 +84,28 @@ def import_data(plot):
         # Plotting in figures
         if plot == 1:
 
-            ax1a.plot(data_cl['time_cl'], data_cl['x_cl'], '.-',label = files[index],linewidth = 3.0)
-            ax1b.plot(data_cl['time_cl'], data_cl['y_cl'], '.-',label = files[index],linewidth = 3.0)
-            ax2.plot(data_cl['x_cl'], data_cl['y_cl'], '.-',label = files[index],linewidth = 3.0)
+            ax1a.plot(data_cl['time_cl'], data_cl['x_cl'], '-',label = files[index],linewidth = 3.0)
+            ax1b.plot(data_cl['time_cl'], data_cl['y_cl'], '-',label = files[index],linewidth = 3.0)
+            ax2.plot(data_cl['x_cl'], data_cl['y_cl'], '-',label = files[index],linewidth = 3.0)
 
             # The vx and vy velocities are as seen in the global axis (fixed).
-            ax3a.plot(data_cl['time_cl'], data_cl['vx_proj_cl'], '.-',label = files[index],linewidth = 3.0)
-            ax3b.plot(data_cl['time_cl'], data_cl['vy_proj_cl'], '.-',label = files[index],linewidth = 3.0)
+            ax3a.plot(data_cl['time_cl'], data_cl['vx_proj_cl'], '-',label = files[index],linewidth = 3.0)
+            ax3b.plot(data_cl['time_cl'], data_cl['vy_proj_cl'], '-',label = files[index],linewidth = 3.0)
 
             # The ax and ay accelerations are as seen in the global axis (fixed).
-            ax4a.plot(data_cl['time_cl'], data_cl['ax_proj_cl'], '.-',label = files[index],linewidth = 3.0)
-            ax4b.plot(data_cl['time_cl'], data_cl['ay_proj_cl'], '.-',label = files[index],linewidth = 3.0)
+            ax4a.plot(data_cl['time_cl'], data_cl['ax_proj_cl'], '-',label = files[index],linewidth = 3.0)
+            ax4b.plot(data_cl['time_cl'], data_cl['ay_proj_cl'], '-',label = files[index],linewidth = 3.0)
 
             # The jerk_x and jerk_y are as seen in the global axis (fixed).
-            ax5a.plot(data_cl['time_cl'], jerk_x, '.-',label = files[index],linewidth = 3.0)
-            ax5b.plot(data_cl['time_cl'], jerk_y, '.-',label = files[index],linewidth = 3.0)
+            ax5a.plot(data_cl['time_cl'], jerk_x, '-',label = files[index],linewidth = 3.0)
+            ax5b.plot(data_cl['time_cl'], jerk_y, '-',label = files[index],linewidth = 3.0)
 
             # The yaw and yaw_rate in degrees.
-            ax6a.plot(data_cl['time_cl'], data_cl['yaw_cl']*180/plt.pi, '.-', label=files[index], linewidth=3.0)
-            ax6b.plot(data_cl['time_cl'], data_cl['r_cl'], '.-', label=files[index], linewidth=3.0)
+            ax6a.plot(data_cl['time_cl'], data_cl['yaw_cl']*180/plt.pi, '-', label=files[index], linewidth=3.0)
+            ax6b.plot(data_cl['time_cl'], data_cl['r_cl'], '-', label=files[index], linewidth=3.0)
 
             # The steerwheelangle in degees
-            ax7.plot(data_cl['time_cl'], data_cl['steering_deg_cl'], '.-', label=files[index], linewidth=3.0)
+            ax7.plot(data_cl['time_cl'], data_cl['steering_deg_cl'], '-', label=files[index], linewidth=3.0)
 
             ax1a.legend()
             ax1b.legend()

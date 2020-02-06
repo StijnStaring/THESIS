@@ -1,4 +1,4 @@
-def clip_lane_change(data):
+def clip_lane_change(data,file):
     """
     % Finite difference scheme used: central difference scheme Differentiation
     Remarks:
@@ -16,7 +16,7 @@ def clip_lane_change(data):
     dt = time_d[1, 0]- time_d[0, 0]
     throw_away = 15
     vy_th = 0.0001 # sensitivity
-    sleep = 20 # to notice a trend in data and avoid decision on single outlier
+    sleep = 10 # to notice a trend in data and avoid decision on single outlier
     index_start = 0
     index_end = 0
 
@@ -36,6 +36,11 @@ def clip_lane_change(data):
             index_end = i
             break
 
+    # End of the lane change is calculated based on the offset in the generation of the dataset.
+    # Ts = 0.01
+    # offset = round((float(file[15:-15]) - 140) / ((80 / 3.6) * Ts))
+    # buffer = 20
+    # index_end = int(140 / (80 / 3.6 * 0.01)) + int(offset) + buffer
 
     # Assign clipped data to a dictionary
     data_cl = dict()

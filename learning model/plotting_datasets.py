@@ -11,13 +11,13 @@ def plotting_datasets():
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal distance [m]", fontsize=14)
     plt.grid(True)
-    plt.title('x(t) dataset', fontsize=14)
+    plt.title('x(t) dataset (global)', fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax1b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical distance [m]", fontsize=14)
-    plt.title('y(t) dataset', fontsize=14)
+    plt.title('y(t) dataset (global)', fontsize=14)
     plt.grid(True)
 
     # Path
@@ -25,7 +25,7 @@ def plotting_datasets():
     ax2 = plt.gca()
     plt.xlabel("x [m]", fontsize=14)
     plt.ylabel("y [m]", fontsize=14)
-    plt.title('Path [m] dataset', fontsize=14)
+    plt.title('Path [m] dataset (global)', fontsize=14)
     plt.grid(True)
 
     # Vx(t)/Vy(t)
@@ -51,13 +51,13 @@ def plotting_datasets():
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal acceleration [m/s^2]", fontsize=14)
     plt.grid(True)
-    plt.title('Ax(t) dataset', fontsize=14)
+    plt.title('Ax(t) dataset (global)', fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax4b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical acceleration [m/s^2]", fontsize=14)
-    plt.title('Ay(t) dataset', fontsize=14)
+    plt.title('Ay(t) dataset (global)', fontsize=14)
     plt.grid(True)
 
     # Jx(t)/Jy(t)
@@ -68,13 +68,13 @@ def plotting_datasets():
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal jerk [m/s^3]", fontsize=14)
     plt.grid(True)
-    plt.title('jx(t) dataset', fontsize=14)
+    plt.title('jx(t) dataset (global)', fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax5b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical jerk [m/s^3]", fontsize=14)
-    plt.title('jy(t) dataset', fontsize=14)
+    plt.title('jy(t) dataset (global)', fontsize=14)
     plt.grid(True)
 
     # yaw(t)/r(t) -> radians should be transformed to degrees
