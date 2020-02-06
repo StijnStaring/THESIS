@@ -80,4 +80,21 @@ def define_plots(theta_iter):
     plt.title('jy(t) calculated',fontsize=14)
     plt.grid(True)
 
-    return ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b
+    # ux(t)/uy(t)
+
+    plt.figure("Jounce (input): iter "+ theta_iter,figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    ax6a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Horizontal jounce [m/s^4]", fontsize=14)
+    plt.grid(True)
+    plt.title('ux(t) calculated',fontsize=14)
+
+    plt.subplot(1, 2, 2)
+    ax6b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Vertical jounce [m/s^4]", fontsize=14)
+    plt.title('uy(t) calculated',fontsize=14)
+    plt.grid(True)
+
+    return ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b

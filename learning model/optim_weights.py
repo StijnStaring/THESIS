@@ -18,7 +18,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
     IP = 1
     amount = len(dict_list)
     if plot == 1:
-        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b] = define_plots(theta_iter)
+        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b] = define_plots(theta_iter)
 
     his_x = plt.zeros((init_matrix.shape[0],CP+1))
     his_vx = plt.zeros((init_matrix.shape[0], CP + 1))
@@ -37,11 +37,10 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
 
     # Optimization
     ##############
-    # Time has to be set equal to the time of the lane change.
-    #     ocp = Ocp(T=FreeTime(des_matrix[k,2]))
+        # ocp = Ocp(T=FreeTime(des_matrix[k,2]))
         ocp = Ocp(T=des_matrix[k,2])
 
-        # States
+        # States (global axis)
         x = ocp.state()
         y = ocp.state()
         vx = ocp.state()
@@ -70,16 +69,19 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
 
         # Lagrange objective term
         # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
-        # ocp.add_objective(theta[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1,0] * ocp.integral(ay ** 2) + theta[2,0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3,0] * ocp.integral(jy ** 2) + theta[4,0] * ocp.integral(((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)) + theta[5,0] * ocp.integral((des_matrix[k, 1] - vx) ** 2) + theta[6,0] * ocp.integral((des_matrix[k, 0] - y) ** 2))
-        ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral(((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
-        # ocp.add_objective(theta[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2)+ theta[4, 0] * ocp.integral(((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)))
-
+        ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
 
     # Path constraints
         #  (must be valid on the whole time domain running from `t0` to `tf=t0+T`,
         #   grid options available such as `grid='inf'`)
-        ocp.subject_to(y >= 0)
+
+        # The same constraints as taken into the dataset (except for the throttle)
+        ocp.subject_to(-1 <= (y <= 4.5 ))
         # ocp.subject_to(-1 <= (u <= 1 ))
+
+        # Boundary on the max curvature of the vehicle
+        curv_2 = (vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3
+        ocp.subject_to(curv_2 <= 6e-4)
 
         # Boundary constraints
         ocp.subject_to(ocp.at_t0(x) == init_matrix[k,0])
@@ -91,8 +93,8 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
         ocp.subject_to(ocp.at_t0(ay) == init_matrix[k,6])
         ocp.subject_to(ocp.at_t0(jy) == init_matrix[k,7])
 
+        ocp.subject_to(ocp.at_tf(y) == delta_lane)
         ocp.subject_to(ocp.at_tf(vy) == 0)
-        ocp.subject_to(ocp.at_tf(y) == des_matrix[k,0])
         ocp.subject_to(ocp.at_tf(ay) == 0)
         ocp.subject_to(ocp.at_tf(jy) == 0)
 
@@ -100,7 +102,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
 
         # Guess the solution
         ####################
-        [x_guess, y_guess, vx_guess, vy_guess, ax_guess,ay_guess,jx_guess, jy_guess] = guess_states(dict_list[k],des_matrix[k,1],CP)
+        [x_guess, y_guess, vx_guess, vy_guess, ax_guess,ay_guess,jx_guess, jy_guess] = guess_states(dict_list[k],desired_speed,CP)
 
         ocp.set_initial(x,x_guess)
         ocp.set_initial(vx,vx_guess)
@@ -141,7 +143,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
         # Vx(t)/Vy(t)
         tvx_i, vx_i = sol.sample(vx, grid='integrator')
         tvy_i, vy_i = sol.sample(vy, grid='integrator')
-        vx_i = plt.around(vx_i,2)
+
         # Ax(t)/Ay(t)
         tax_i, ax_i = sol.sample(ax, grid='integrator')
         tay_i, ay_i = sol.sample(ay, grid='integrator')
@@ -149,6 +151,10 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
         # Jx(t)/Jy(t)
         tjx_i, jx_i = sol.sample(jx, grid='integrator')
         tjy_i, jy_i = sol.sample(jy, grid='integrator')
+
+        # Jouncex(t)/Jouncey(t)
+        tjx_i, ux_i = sol.sample(ux, grid='integrator')
+        tjy_i, uy_i = sol.sample(uy, grid='integrator')
 
         # storage of calculated path
         his_x[k,:] = x_i
@@ -164,23 +170,23 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
         his_time_cal_lc[k,0] = tx_i[-1]
         his_time_cal_lc[k, 1] = tx_i[1] - tx_i[0]
 
-        # VS
-        #######
-        vx_i = plt.around(vx_i, 2)
-        #######
-
         # Plotting in figures
         if plot == 1:
 
-            ax1a.plot(tx_i, x_i, '.-',label = files[k],linewidth = 3.0)
-            ax1b.plot(ty_i, y_i, '.-',label = files[k],linewidth = 3.0)
-            ax2.plot(x_i, y_i, '.-',label = files[k],linewidth = 3.0)
-            ax3a.plot(tvx_i, vx_i, '.-',label = files[k],linewidth = 3.0)
-            ax3b.plot(tvy_i, vy_i, '.-',label = files[k],linewidth = 3.0)
-            ax4a.plot(tax_i, ax_i, '.-',label = files[k],linewidth = 3.0)
-            ax4b.plot(tay_i, ay_i, '.-',label = files[k],linewidth = 3.0)
-            ax5a.plot(tjx_i, jx_i, '.-',label = files[k],linewidth = 3.0)
-            ax5b.plot(tjy_i, jy_i, '.-',label = files[k],linewidth = 3.0)
+            # states
+            ax1a.plot(tx_i, x_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax1b.plot(ty_i, y_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax2.plot(x_i, y_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax3a.plot(tvx_i, vx_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax3b.plot(tvy_i, vy_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax4a.plot(tax_i, ax_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax4b.plot(tay_i, ay_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax5a.plot(tjx_i, jx_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax5b.plot(tjy_i, jy_i, '.-',label = files[k][10:],linewidth = 3.0)
+
+            # controls
+            ax6a.plot(tjx_i, ux_i, '.-', label=files[k][10:], linewidth=3.0)
+            ax6b.plot(tjy_i, uy_i, '.-', label=files[k][10:], linewidth=3.0)
 
             ax1a.legend()
             ax1b.legend()
@@ -191,6 +197,8 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
             ax4b.legend()
             ax5a.legend()
             ax5b.legend()
+            ax6a.legend()
+            ax6b.legend()
 
     return his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc
 

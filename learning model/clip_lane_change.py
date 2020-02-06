@@ -1,11 +1,12 @@
-def clip_lane_change(data,file):
+def clip_lane_change(data):
     """
     % Finite difference scheme used: central difference scheme Differentiation
     Remarks:
     1. throw away first 0.15 s --> bad data
     """
-
     import pylab as plt
+    from calc_jerk import calc_jerk
+
     # initializing
     time_d = plt.array([data.time]).T
     x = plt.array([data.X]).T
@@ -65,7 +66,7 @@ def clip_lane_change(data,file):
     delta_lane = data_cl['y_cl'][-1]
 
     dt_grid = dt
-    # data_cl['ax_cl] should be the acceleration when looked from the local axis.
+
     ax_loc_tot = data_cl['ax_cl'] - data_cl['r_cl']*data_cl['vy_cl']
     ay_loc_tot = data_cl['ay_cl'] + data_cl['r_cl'] * data_cl['vx_cl']
 
@@ -74,15 +75,23 @@ def clip_lane_change(data,file):
     data_cl['ax_proj_cl'] = plt.cos(data_cl['yaw_cl'])* ax_loc_tot - plt.sin(data_cl['yaw_cl'])* ax_loc_tot
     data_cl['ay_proj_cl'] = plt.sin(data_cl['yaw_cl'])* ay_loc_tot  + plt.cos(data_cl['yaw_cl'])* ay_loc_tot
 
+    # calculating jerks
+    jerk_y, jerk_x = calc_jerk(data_cl, 0)  # jerk is calculated in local axis.
+    data_cl['jx_cl'] = jerk_x
+    data_cl['jy_cl'] = jerk_y
+
+    # setting desired speed and intitial values
     desired_speed = data_cl['vx_proj_cl'][-1]
 
-    init = plt.zeros((6,1))
+    init = plt.zeros((8,1))
     init[0] = data_cl['x_cl'][0]
     init[1] = data_cl['vx_proj_cl'][0]
     init[2] = data_cl['ax_proj_cl'][0]
+    init[3] = data_cl['jx_cl'][0]
 
-    init[3] = data_cl['y_cl'][0]
-    init[4] = data_cl['vy_proj_cl'][0]
-    init[5] = data_cl['ay_proj_cl'][0]
+    init[4] = data_cl['y_cl'][0]
+    init[5] = data_cl['vy_proj_cl'][0]
+    init[6] = data_cl['ay_proj_cl'][0]
+    init[7] = data_cl['jy_cl'][0]
 
     return time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, init,data_cl
