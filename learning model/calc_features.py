@@ -39,7 +39,6 @@ def calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,h
         for i in plt.arange(0, len(integrand) - 1, 1):
             f2 = f2 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
 
-
         # f3: total jerk
         integrand = jx ** 2 + jy ** 2
         for i in plt.arange(0, len(integrand) - 1, 1):

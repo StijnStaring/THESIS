@@ -10,7 +10,7 @@ import pylab as plt
 from rockit import *
 # init_matrix = [x,vx,ax,jx,y,vy,ay,jy]
 # des_matrix = [delta_lane, desired speed, time_lane_change]
-def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
+def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,ax7):
 
     # Opti variables
     ################
@@ -18,7 +18,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
     IP = 1
     amount = len(dict_list)
     if plot == 1:
-        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b] = define_plots(theta_iter)
+        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b,ax8] = define_plots(theta_iter,dict_list)
 
     his_x = plt.zeros((init_matrix.shape[0],CP+1))
     his_vx = plt.zeros((init_matrix.shape[0], CP + 1))
@@ -70,6 +70,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
         # Lagrange objective term
         # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
         ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
+        # ocp.add_objective(theta[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) +0 * ocp.integral((delta_lane - y) ** 2))
 
     # Path constraints
         #  (must be valid on the whole time domain running from `t0` to `tf=t0+T`,
@@ -80,8 +81,11 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
         # ocp.subject_to(-1 <= (u <= 1 ))
 
         # Boundary on the max curvature of the vehicle
-        curv_2 = (vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3
-        ocp.subject_to(curv_2 <= 6e-4)
+        curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3/2)
+        ocp.subject_to(curv <= 0.025)
+        ocp.subject_to(jx <= 5)
+        ocp.subject_to(jy <= 40)
+
 
         # Boundary constraints
         ocp.subject_to(ocp.at_t0(x) == init_matrix[k,0])
@@ -156,7 +160,10 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
         tjx_i, ux_i = sol.sample(ux, grid='integrator')
         tjy_i, uy_i = sol.sample(uy, grid='integrator')
 
-        # storage of calculated path
+        # curvature with global axis information
+        curv = (vx_i * ay_i -  vy_i* ax_i) / (vx_i** 2 + vy_i** 2) ** (3 / 2)
+
+    # storage of calculated path
         his_x[k,:] = x_i
         his_vx[k,:] = vx_i
         his_ax[k,:] = ax_i
@@ -183,10 +190,13 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
             ax4b.plot(tay_i, ay_i, '.-',label = files[k][10:],linewidth = 3.0)
             ax5a.plot(tjx_i, jx_i, '.-',label = files[k][10:],linewidth = 3.0)
             ax5b.plot(tjy_i, jy_i, '.-',label = files[k][10:],linewidth = 3.0)
-
-            # controls
             ax6a.plot(tjx_i, ux_i, '.-', label=files[k][10:], linewidth=3.0)
             ax6b.plot(tjy_i, uy_i, '.-', label=files[k][10:], linewidth=3.0)
+            if k == 0:
+                ax7.plot(x_i, y_i, '.-',label = "iter" + theta_iter,linewidth = 3.0)
+                ax7.legend()
+
+            ax8.plot(tx_i, curv, '.-', label=files[k][10:], linewidth=3.0)
 
             ax1a.legend()
             ax1b.legend()
@@ -199,6 +209,8 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot):
             ax5b.legend()
             ax6a.legend()
             ax6b.legend()
+            ax8.legend()
+
 
     return his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc
 

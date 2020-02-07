@@ -11,7 +11,7 @@ def import_data(plot):
 
     # plotting of the datasets
     if plot == 1:
-        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b,ax7] = plotting_datasets()
+        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b,ax7,ax8] = plotting_datasets()
 
     # initialise the init state conditions:
     init_matrix = plt.zeros((length,8))
@@ -105,6 +105,9 @@ def import_data(plot):
             # The steerwheelangle in degees
             ax7.plot(data_cl['time_cl'], data_cl['steering_deg_cl'], '-', label=file, linewidth=3.0)
 
+            # The steerwheelangle in degees
+            ax8.plot(data_cl['time_cl'], data_cl['curvature_cl'], '-', label=file, linewidth=3.0)
+
             ax1a.legend()
             ax1b.legend()
             ax2.legend()
@@ -117,6 +120,7 @@ def import_data(plot):
             ax6a.legend()
             ax6b.legend()
             ax7.legend()
+            ax8.legend()
 
         dict_list.append(data_cl)
         index = index + 1

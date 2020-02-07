@@ -101,5 +101,13 @@ def plotting_datasets():
     plt.grid(True)
     plt.title('Steerwheelangle dataset', fontsize=14)
 
-    return ax1a, ax1b, ax2, ax3a, ax3b, ax4a, ax4b, ax5a, ax5b, ax6a, ax6b, ax7
+    # Curvature
+    plt.figure("Curvature")
+    ax8 = plt.gca()
+    plt.xlabel("t [s]", fontsize=14)
+    plt.ylabel("Curvature [1/m]", fontsize=14)
+    plt.title('Curvature of the dataset (global)', fontsize=14)
+    plt.grid(True)
+
+    return ax1a, ax1b, ax2, ax3a, ax3b, ax4a, ax4b, ax5a, ax5b, ax6a, ax6b, ax7, ax8
 

@@ -80,6 +80,9 @@ def clip_lane_change(data):
     data_cl['jx_cl'] = jerk_x
     data_cl['jy_cl'] = jerk_y
 
+    # curvature with global axis information
+    data_cl['curvature_cl'] = (data_cl['vx_proj_cl']*data_cl['ay_proj_cl']-data_cl['vy_proj_cl']*data_cl['ax_proj_cl'])/(data_cl['vx_proj_cl']**2+data_cl['vy_proj_cl']**2)**(3/2)
+
     # setting desired speed and intitial values
     desired_speed = data_cl['vx_proj_cl'][-1]
 

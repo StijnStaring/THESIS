@@ -1,8 +1,9 @@
-def define_plots(theta_iter):
+def define_plots(theta_iter,dict_list):
     """"
     Theta_iter is a string
     """
     import pylab as plt
+    data_cl = dict_list[0]
 
     # X(t)/Y(t)
     plt.figure("Path vs Time: iter " + theta_iter,figsize=(10, 4))
@@ -20,8 +21,7 @@ def define_plots(theta_iter):
     plt.title('y(t) calculated',fontsize=14)
     plt.grid(True)
 
-    # sphinx_gallery_thumbnail_number = 2
-
+    # path
     plt.figure("Path: iter "+ theta_iter)
     ax2 = plt.gca()
     plt.xlabel("x [m]",fontsize=14)
@@ -97,4 +97,12 @@ def define_plots(theta_iter):
     plt.title('uy(t) calculated',fontsize=14)
     plt.grid(True)
 
-    return ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b
+    # Curvature
+    plt.figure("Curvature: iter " + theta_iter,figsize=(10, 4))
+    ax8 = plt.gca()
+    plt.xlabel("t [s]", fontsize=14)
+    plt.ylabel("Curvature [1/m]", fontsize=14)
+    plt.title('Curvature calculated', fontsize=14)
+    plt.grid(True)
+
+    return ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b,ax8
