@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../../../Master 2/Optimization/.idea/Optimization.iml" filepath="$PROJECT_DIR$/../../../../Master 2/Optimization/.idea/Optimization.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Thesis_local_repository.iml" filepath="$PROJECT_DIR$/.idea/Thesis_local_repository.iml" />
     </modules>
   </component>

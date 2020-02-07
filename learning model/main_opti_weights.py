@@ -20,6 +20,7 @@ from comparing_features import comparing_features
 # Defining weights
 ##################
 his_f_diff_perc = []
+his_weights = []
 amount_features = 7
 rec = 1
 plot_datasets = 1
@@ -27,6 +28,7 @@ plot_datasets = 1
 alpha = 0.5
 # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
 theta = plt.ones((amount_features,1))
+his_weights.append([str(rec)+"//",theta])
 [f1_o,f2_o,f3_o,f4_o,f5_o,f6_o,f7_o,init_matrix,des_matrix,dict_list,files] = import_data(plot_datasets)
 [axf,ax7,acw] = comparing_features(str(rec),dict_list)
 axf.plot([f1_o,f2_o,f3_o,f4_o,f5_o,f6_o,f7_o],'-', marker='o', markersize=6, label = "Observed features")
@@ -35,7 +37,7 @@ f_obs = plt.array([f1_o,f2_o,f3_o,f4_o,f5_o,f6_o,f7_o])
 
 # Optimization loop
 # Change this to convergence of feature calc array
-while rec < 3:
+while rec < 10:
     [his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc] = optim_weights(theta, init_matrix,des_matrix,dict_list, files,str(rec),1,ax7)
     [f1, f2, f3, f4, f5, f6, f7] = calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,his_time_cal_lc, des_matrix)
     # don't plot the second iterate --> has very big feature values
@@ -49,13 +51,19 @@ while rec < 3:
 
     # Update theta
     theta = theta + alpha*(f_calc - f_obs)
-    for i in plt.arange(0,len(theta),1):
-        if theta[i] < 0:
-            theta[i] = 0
+    # for i in plt.arange(0,len(theta),1):
+    #     if theta[i] < 0:
+    #         theta[i] = 0
 
     rec = rec + 1
+    his_weights.append([str(rec) + "//", theta])
     acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4], theta[5], theta[6]], '-', marker='o', markersize=6,label="iter " + str(rec))
     acw.legend()
+print("This is the history of the used weights.")
+print("------------------------------------------")
+print('\n')
+for i in plt.arange(0,len(his_weights),1):
+    print(his_weights[i])
 
 plt.show()
 

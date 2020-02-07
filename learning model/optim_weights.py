@@ -69,8 +69,10 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,a
 
         # Lagrange objective term
         # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
-        ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
-        # ocp.add_objective(theta[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) +0 * ocp.integral((delta_lane - y) ** 2))
+        # ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
+
+        # LAST FEATURE IS REMOVED - y(t) is lane change desired
+        ocp.add_objective(theta[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2))
 
     # Path constraints
         #  (must be valid on the whole time domain running from `t0` to `tf=t0+T`,
@@ -82,9 +84,9 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,a
 
         # Boundary on the max curvature of the vehicle
         curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3/2)
-        ocp.subject_to(curv <= 0.025)
-        ocp.subject_to(jx <= 5)
-        ocp.subject_to(jy <= 40)
+        ocp.subject_to(-0.025<=(curv <= 0.025))
+        ocp.subject_to(jx <= 10)
+        ocp.subject_to(jy <= 50)
 
 
         # Boundary constraints
