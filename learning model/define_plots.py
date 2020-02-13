@@ -6,7 +6,7 @@ def define_plots(theta_iter,dict_list):
     data_cl = dict_list[0]
 
     # X(t)/Y(t)
-    plt.figure("Path vs Time: iter " + theta_iter,figsize=(10, 4))
+    plt.figure("Path vs Time (G): iter " + theta_iter,figsize=(10, 4))
     plt.subplot(1, 2, 1)
     ax1a = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
@@ -22,7 +22,7 @@ def define_plots(theta_iter,dict_list):
     plt.grid(True)
 
     # path
-    plt.figure("Path: iter "+ theta_iter)
+    plt.figure("Path (G): iter "+ theta_iter)
     ax2 = plt.gca()
     plt.xlabel("x [m]",fontsize=14)
     plt.ylabel("y [m]",fontsize=14)
@@ -31,7 +31,7 @@ def define_plots(theta_iter,dict_list):
 
     # Vx(t)/Vy(t)
 
-    plt.figure("Speeds: iter "+ theta_iter,figsize=(10, 4))
+    plt.figure("Speeds (L): iter "+ theta_iter,figsize=(10, 4))
     plt.subplot(1, 2, 1)
     ax3a = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
@@ -48,7 +48,7 @@ def define_plots(theta_iter,dict_list):
 
 
     # Ax(t)/Ay(t)
-    plt.figure("Accelerations: iter "+ theta_iter,figsize=(10, 4))
+    plt.figure("Accelerations (L): iter "+ theta_iter,figsize=(10, 4))
     plt.subplot(1, 2, 1)
     ax4a = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
@@ -65,7 +65,7 @@ def define_plots(theta_iter,dict_list):
 
     # Jx(t)/Jy(t)
 
-    plt.figure("Jerks: iter "+ theta_iter,figsize=(10, 4))
+    plt.figure("Jerks (L): iter "+ theta_iter,figsize=(10, 4))
     plt.subplot(1, 2, 1)
     ax5a = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
@@ -80,29 +80,45 @@ def define_plots(theta_iter,dict_list):
     plt.title('jy(t) calculated',fontsize=14)
     plt.grid(True)
 
-    # ux(t)/uy(t)
-
-    plt.figure("Jounce (input): iter "+ theta_iter,figsize=(10, 4))
-    plt.subplot(1, 2, 1)
-    ax6a = plt.gca()
-    plt.xlabel("Time [s]", fontsize=14)
-    plt.ylabel("Horizontal jounce [m/s^4]", fontsize=14)
-    plt.grid(True)
-    plt.title('ux(t) calculated',fontsize=14)
-
-    plt.subplot(1, 2, 2)
-    ax6b = plt.gca()
-    plt.xlabel("Time [s]", fontsize=14)
-    plt.ylabel("Vertical jounce [m/s^4]", fontsize=14)
-    plt.title('uy(t) calculated',fontsize=14)
-    plt.grid(True)
-
     # Curvature
     plt.figure("Curvature: iter " + theta_iter,figsize=(10, 4))
-    ax8 = plt.gca()
+    ax6 = plt.gca()
     plt.xlabel("t [s]", fontsize=14)
     plt.ylabel("Curvature [1/m]", fontsize=14)
     plt.title('Curvature calculated', fontsize=14)
     plt.grid(True)
 
-    return ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b,ax8
+    # yaw(t)/r(t) -> radians should be transformed to degrees
+    plt.figure("yaw/r: iter " + theta_iter, figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    ax7a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("[degrees]", fontsize=14)
+    plt.grid(True)
+    plt.title('yaw(t) calculated', fontsize=14)
+
+    plt.subplot(1, 2, 2)
+    ax7b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("[degrees/s]", fontsize=14)
+    plt.title('yaw(t)/s calculated', fontsize=14)
+    plt.grid(True)
+
+    # throttle between -1 and 1
+    plt.figure("Inputs: iter "+theta_iter, figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    ax8a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("[-]", fontsize=14)
+    plt.grid(True)
+    plt.title('throttle calculated', fontsize=14)
+
+    # steerwheelangle -> is already given in degrees
+    plt.subplot(1, 2, 2)
+    ax8b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("[degrees]", fontsize=14)
+    plt.grid(True)
+    plt.title('Steerwheelangle calculated', fontsize=14)
+
+    return ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6,ax7a,ax7b,ax8a,ax8b

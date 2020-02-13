@@ -46,28 +46,13 @@ def post_processing_plots(his_f_calc_rel,his_weights):
     plt.grid(True)
     plt.title('Convergence of features 5', fontsize=14)
 
-    plt.subplot(2, 4, 6)
-    ac6 = plt.gca()
-    plt.xlabel("Iteration [-]", fontsize=14)
-    plt.ylabel("Normalized calculated feature 6 [-]", fontsize=14)
-    plt.grid(True)
-    plt.title('Convergence of features 6', fontsize=14)
-
-    plt.subplot(2, 4, 7)
-    ac7 = plt.gca()
-    plt.xlabel("Iteration [-]", fontsize=14)
-    plt.ylabel("Normalized calculated feature 7 [-]", fontsize=14)
-    plt.grid(True)
-    plt.title('Convergence of features 7', fontsize=14)
-
     for i in plt.arange(0,length,1):
         ac1.plot(iterations[i], his_f_calc_rel[i][1][0], 'o', label= "iteration "+str(i+1), linewidth=3.0)
         ac2.plot(iterations[i], his_f_calc_rel[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         ac3.plot(iterations[i], his_f_calc_rel[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         ac4.plot(iterations[i], his_f_calc_rel[i][1][3], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         ac5.plot(iterations[i], his_f_calc_rel[i][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac6.plot(iterations[i], his_f_calc_rel[i][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac7.plot(iterations[i], his_f_calc_rel[i][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+
 
 
 # Weights over iterations
@@ -108,28 +93,12 @@ def post_processing_plots(his_f_calc_rel,his_weights):
     plt.grid(True)
     plt.title('Weight of feature 5', fontsize=14)
 
-    plt.subplot(2, 4, 6)
-    ac6 = plt.gca()
-    plt.xlabel("Iteration [-]", fontsize=14)
-    plt.ylabel("Weight value [-]", fontsize=14)
-    plt.grid(True)
-    plt.title('Weight of feature 6', fontsize=14)
-
-    plt.subplot(2, 4, 7)
-    ac7 = plt.gca()
-    plt.xlabel("Iteration [-]", fontsize=14)
-    plt.ylabel("Weight value [-]", fontsize=14)
-    plt.grid(True)
-    plt.title('Weight of feature 7', fontsize=14)
-
     for i in plt.arange(0,length,1):
         ac1.plot(iterations[i], his_weights[i][1][0], 'o', label= "iteration "+str(i+1), linewidth=3.0)
         ac2.plot(iterations[i], his_weights[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         ac3.plot(iterations[i], his_weights[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         ac4.plot(iterations[i], his_weights[i][1][3], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         ac5.plot(iterations[i], his_weights[i][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac6.plot(iterations[i], his_weights[i][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac7.plot(iterations[i], his_weights[i][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)
 
 
     # Plotting update of theta
@@ -169,19 +138,7 @@ def post_processing_plots(his_f_calc_rel,his_weights):
     plt.grid(True)
     plt.title('Update of theta 5', fontsize=14)
 
-    plt.subplot(2, 4, 6)
-    ac6 = plt.gca()
-    plt.xlabel("Iteration [-]", fontsize=14)
-    plt.ylabel("delta weight value [-]", fontsize=14)
-    plt.grid(True)
-    plt.title('Update of theta 6', fontsize=14)
 
-    plt.subplot(2, 4, 7)
-    ac7 = plt.gca()
-    plt.xlabel("Iteration [-]", fontsize=14)
-    plt.ylabel("delta weight value [-]", fontsize=14)
-    plt.grid(True)
-    plt.title('Update of theta 7', fontsize=14)
 
     for i in plt.arange(1, length, 1):
         ac1.plot(iterations[i], his_weights[i][1][0]-his_weights[i-1][1][0], 'o', label="iteration " + str(i + 1), linewidth=3.0)
@@ -189,6 +146,5 @@ def post_processing_plots(his_f_calc_rel,his_weights):
         ac3.plot(iterations[i], his_weights[i][1][2]-his_weights[i-1][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         ac4.plot(iterations[i], his_weights[i][1][3]-his_weights[i-1][1][3], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         ac5.plot(iterations[i], his_weights[i][1][4]-his_weights[i-1][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac6.plot(iterations[i], his_weights[i][1][5]-his_weights[i-1][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac7.plot(iterations[i], his_weights[i][1][6]-his_weights[i-1][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+
 
