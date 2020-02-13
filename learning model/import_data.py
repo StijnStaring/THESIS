@@ -102,10 +102,10 @@ def import_data(plot):
             ax6a.plot(data_cl['time_cl'], data_cl['yaw_cl']*180/plt.pi, '-', label=file, linewidth=3.0)
             ax6b.plot(data_cl['time_cl'], data_cl['r_cl']*180/plt.pi, '-', label=file, linewidth=3.0)
 
-            # The steerwheelangle in degees
+            # The steerwheelangle in degrees
             ax7.plot(data_cl['time_cl'], data_cl['steering_deg_cl'], '-', label=file, linewidth=3.0)
 
-            # The steerwheelangle in degees
+            # The curvature
             ax8.plot(data_cl['time_cl'], data_cl['curvature_cl'], '-', label=file, linewidth=3.0)
 
             ax1a.legend()
