@@ -81,11 +81,8 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
          # equations of the model
         vx_glob = vx * plt.cos(psi) - vy * plt.sin(psi)
         vy_glob = vx * plt.sin(psi) + vy * plt.cos(psi)
-        # slipangle_f = m.atan2(vy + dpsi * a, vx) - delta
-        # slipangle_r = m.atan2(vy - dpsi * b, vx)
-        # linearization of the slipangle! --> got error that couldn't handle atan2(...)
-        slipangle_f = (vy + dpsi * a)/ vx - delta
-        slipangle_r = (vy - dpsi * b)/ vx
+        slipangle_f = plt.arctan2(vy + dpsi * a, vx) - delta
+        slipangle_r = plt.arctan2(vy - dpsi * b, vx)
         Fxf = throttle * Tmax / (2 * rw)
         Fxr = Fxf
         Fyf = -2 * Kyf * slipangle_f

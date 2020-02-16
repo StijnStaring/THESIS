@@ -43,6 +43,7 @@ def import_data(plot):
 
         # Calculate observed feature values --> Cranck-Nicolson integration
 
+        # OUDE INTEGRATIE METHODE!
         # f1: total acceleration
         integrand = data_cl['ax_cl']**2+data_cl['ay_cl']**2
         for i in plt.arange(0,len(integrand)-1,1):
