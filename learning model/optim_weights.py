@@ -16,7 +16,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
     ################
     # Per sample --> vehicel moved +- 1 meter --> is minimum accuracy
     # CP = 399
-    CP = 150
+    CP = 50
     IP = 1
     amount = len(dict_list)
     if plot == 1:
@@ -74,28 +74,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         # ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
         # THE VX FEATURE IS REMOVED!!
         # ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * 1 / f_obs[5, 0] * ocp.integral((desired_speed - vx) ** 2)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
-        ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)+ theta[5, 0] * 1 / f_obs[5, 0] * ocp.integral((desired_speed - vx) ** 2)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
-
-
-
-
-
-    ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[
-        1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[
-                          3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[
-                          4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * 1 /
-                      f_obs[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * 1 / f_obs[
-                          6, 0] * ocp.integral((delta_lane - y) ** 2))
-
-
-
-
-
-
-
-
-
-
+        ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
 
     # LAST FEATURE IS REMOVED - y(t) is lane change desired
     #     ocp.add_objective(theta[0, 0] *1/f_obs[0,0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] *1/f_obs[1,0]* ocp.integral(ay ** 2) + theta[2, 0] * 1/f_obs[2,0]*ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1/f_obs[3,0]*ocp.integral(jy ** 2) + theta[4, 0] * 1/f_obs[4,0]*ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * 1/f_obs[5,0]*ocp.integral((desired_speed - vx) ** 2))
@@ -104,17 +83,28 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         #  (must be valid on the whole time domain running from `t0` to `tf=t0+T`,
         #   grid options available such as `grid='inf'`)
 
-        # The same constraints as taken into the dataset (except for the throttle)
-        ocp.subject_to(-1 <= (y <= 4.5 ))
+        # # The same constraints as taken into the dataset (except for the throttle)
+        # ocp.subject_to(-1 <= (y <= 4.5 ))
+        # # ocp.subject_to(-1 <= (u <= 1 ))
+        #
+        # # Boundary on the max curvature of the vehicle
+        # curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3/2)
+        # ocp.subject_to(-0.040<=(curv <= 0.040))
+        # ocp.subject_to(-1<=(ax <= 1))
+        # ocp.subject_to(-20 <= (ay <= 20))
+        # ocp.subject_to(-10<=(jx <= 10))
+        # ocp.subject_to(-70<=(jy <= 70))
+
+        ocp.subject_to(-1 <= (y <= 4.5))
         # ocp.subject_to(-1 <= (u <= 1 ))
 
         # Boundary on the max curvature of the vehicle
-        curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3/2)
-        ocp.subject_to(-0.040<=(curv <= 0.040))
-        ocp.subject_to(-1<=(ax <= 1))
+        curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3 / 2)
+        ocp.subject_to(-0.025 <= (curv <= 0.025))
+        ocp.subject_to(-1 <= (ax <= 1))
         ocp.subject_to(-20 <= (ay <= 20))
-        ocp.subject_to(-10<=(jx <= 10))
-        ocp.subject_to(-70<=(jy <= 70))
+        ocp.subject_to(-1 <= (jx <= 10))
+        ocp.subject_to(-60 <= (jy <= 40))
 
 
         # Boundary constraints
@@ -133,7 +123,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         ocp.subject_to(ocp.at_tf(jy) == 0)
 
         # DIT MOET NU WEL AANGEZET OMDAT NU GEEN SOFT CONSTRAINT MEER
-        # ocp.subject_to(ocp.at_tf(vx) == des_matrix[k,1])
+        ocp.subject_to(ocp.at_tf(vx) == des_matrix[k,1])
 
         # Guess the solution
         ####################
@@ -271,4 +261,3 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
 
 
     return his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc
-

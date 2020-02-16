@@ -27,7 +27,7 @@ his_weights = []
 his_f_calc_rel = []
 amount_features = 7
 rec = 1
-plot_datasets = 1
+plot_datasets = 0
 plot_opti_weights = 0
 # alpha = 0.2*1e-5 # learing rate between 0 and 1
 alpha = 0.5
@@ -47,7 +47,7 @@ f_obs = f_obs[:,plt.newaxis]
 
 # Optimization loop
 # Change this to convergence of feature calc array
-while rec < 2:
+while rec < 10:
     [his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc] = optim_weights(theta, init_matrix,des_matrix,dict_list, files,str(rec),plot_opti_weights,f_obs,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7)
     [f1, f2, f3, f4, f5, f6, f7] = calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,his_time_cal_lc, des_matrix)
     # don't plot the second iterate --> has very big feature values
@@ -57,6 +57,7 @@ while rec < 2:
 
     # Normalization
     f_calc_rel = plt.array([f1/f1_o, f2/f2_o, f3/f3_o, f4/f4_o, f5/f5_o, f6/f6_o, f7/f7_o])
+    f_calc_rel = f_calc_rel[:,plt.newaxis]
     his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
     print("********************************************************************************************")
 

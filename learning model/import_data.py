@@ -38,7 +38,7 @@ def import_data(plot):
         # Clipping and plotting the observed lane change
         [time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, init, data_cl] =clip_lane_change(data)
 
-        local_calc_jerk(data_cl, 1)
+        local_calc_jerk(data_cl, 0)
 
         # Assign initial and desired conditions
         # init_matrix = [x,vx,ax,jx,y,vy,ay,jy]
