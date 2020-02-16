@@ -55,8 +55,8 @@ while rec < 10:
     #     axf.plot([f1,f2,f3,f4,f5,f6,f7],'-', marker='o', markersize=6,label = "Calc Features iter: " + str(rec))
     #     axf.legend()
 
-    # Normalization
-    f_calc_rel = plt.array([f1/f1_o, f2/f2_o, f3/f3_o, f4/f4_o, f5/f5_o, f6/f6_o, f7/f7_o])
+    # NO NORMALIZATION!!!
+    f_calc_rel = plt.array([f1, f2, f3, f4, f5, f6, f7])
     f_calc_rel = f_calc_rel[:,plt.newaxis]
     his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
     print("********************************************************************************************")
@@ -64,7 +64,7 @@ while rec < 10:
     # Update theta
 
     # difference = (f_calc_rel - plt.ones((amount_features,1)))
-    theta = theta + alpha*(f_calc_rel - plt.ones((amount_features,1)))
+    theta = theta + alpha*(f_calc_rel - f_obs)
     # for i in plt.arange(0,len(theta),1):
     #     if theta[i] < 0:
     #         theta[i] = 0
