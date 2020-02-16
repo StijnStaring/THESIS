@@ -16,7 +16,7 @@ from post_processing_plots import post_processing_plots
 # 21-01-20
 # Need also to use a yaw angle in the point model --> bad path planning if don't know the orientation of the vehicle.
 # Best to follow thesis lay out of example thesis --> know how to start.
-# Waarom is het nodig om zo een simpel point model te gebruiken? Het is toch een offline berekening --> kan ook
+# Waarom is het nodig om zo een simpel point model te gebruiken? Het is toch een ofline berekening --> kan ook
 # een complexer model gebruiken?
 
 # Defining weights
@@ -27,10 +27,10 @@ his_weights = []
 his_f_calc_rel = []
 amount_features = 7
 rec = 1
-plot_datasets = 0
+plot_datasets = 1
 plot_opti_weights = 0
 # alpha = 0.2*1e-5 # learing rate between 0 and 1
-alpha = 0.01
+alpha = 0.5
 # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
 theta = 1*plt.ones((amount_features,1))
 his_weights.append([str(rec)+"//",theta])
@@ -42,11 +42,12 @@ axf.plot([f1_o/f1_o,f2_o/f2_o,f3_o/f3_o,f4_o/f4_o,f5_o/f5_o,f6_o/f6_o,f7_o/f7_o]
 axfn.plot([f1_o,f2_o,f3_o,f4_o,f5_o,f6_o,f7_o],'-', marker='*', markersize=6, label = "Observed features")
 acw.plot([theta[0],theta[1],theta[2],theta[3],theta[4],theta[5],theta[6]],'-', marker='o', markersize=6, label = "iter " + str(rec))
 f_obs = plt.array([f1_o,f2_o,f3_o,f4_o,f5_o,f6_o,f7_o])
+f_obs = f_obs[:,plt.newaxis]
 ###########
 
 # Optimization loop
 # Change this to convergence of feature calc array
-while rec < 3:
+while rec < 2:
     [his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc] = optim_weights(theta, init_matrix,des_matrix,dict_list, files,str(rec),plot_opti_weights,f_obs,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7)
     [f1, f2, f3, f4, f5, f6, f7] = calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,his_time_cal_lc, des_matrix)
     # don't plot the second iterate --> has very big feature values

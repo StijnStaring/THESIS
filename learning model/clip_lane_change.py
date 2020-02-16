@@ -67,16 +67,17 @@ def clip_lane_change(data):
 
     dt_grid = dt
 
+    # Check of dit klopt in het amesim model
     ax_loc_tot = data_cl['ax_cl'] - data_cl['r_cl']*data_cl['vy_cl']
     ay_loc_tot = data_cl['ay_cl'] + data_cl['r_cl'] * data_cl['vx_cl']
 
     # State of vehicle at the start of the lane change
     data_cl['vx_proj_cl'] = plt.cos(data_cl['yaw_cl'])* data_cl['vx_cl'] - plt.sin(data_cl['yaw_cl'])* data_cl['vy_cl']
-    data_cl['ax_proj_cl'] = plt.cos(data_cl['yaw_cl'])* ax_loc_tot - plt.sin(data_cl['yaw_cl'])* ax_loc_tot
-    data_cl['ay_proj_cl'] = plt.sin(data_cl['yaw_cl'])* ay_loc_tot  + plt.cos(data_cl['yaw_cl'])* ay_loc_tot
+    data_cl['ax_proj_cl'] = plt.cos(data_cl['yaw_cl'])* ax_loc_tot - plt.sin(data_cl['yaw_cl'])* ay_loc_tot
+    data_cl['ay_proj_cl'] = plt.sin(data_cl['yaw_cl'])* ax_loc_tot  + plt.cos(data_cl['yaw_cl'])* ay_loc_tot
 
     # calculating jerks
-    jerk_y, jerk_x = calc_jerk(data_cl, 0)  # jerk is calculated in local axis.
+    jerk_y, jerk_x = calc_jerk(data_cl, 0)  # jerk is calculated in global axis.
     data_cl['jx_cl'] = jerk_x
     data_cl['jy_cl'] = jerk_y
 
@@ -96,5 +97,15 @@ def clip_lane_change(data):
     init[5] = data_cl['vy_proj_cl'][0]
     init[6] = data_cl['ay_proj_cl'][0]
     init[7] = data_cl['jy_cl'][0]
+
+    # local plot van de jerk
+    # X(t)/Y(t)
+    plt.figure("Local plot van jerks ", figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    ax1a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Horizontal distance [m]", fontsize=14)
+    plt.grid(True)
+    plt.title('x(t) calculated', fontsize=14)
 
     return time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, init,data_cl

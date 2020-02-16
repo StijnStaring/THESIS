@@ -2,6 +2,9 @@ def import_data(plot):
     import glob
     from clip_lane_change import clip_lane_change
     from plotting_datasets import plotting_datasets
+    from local_calc_jerk import local_calc_jerk
+    import scipy
+    from scipy import integrate
     import pylab as plt
     import pandas as pd
 
@@ -35,48 +38,57 @@ def import_data(plot):
         # Clipping and plotting the observed lane change
         [time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, init, data_cl] =clip_lane_change(data)
 
+        local_calc_jerk(data_cl, 1)
 
         # Assign initial and desired conditions
         # init_matrix = [x,vx,ax,jx,y,vy,ay,jy]
         init_matrix[index,:] = plt.squeeze(plt.array([init[0],init[1],init[2],init[3],init[4],init[5],init[6],init[7]]))
         des_matrix[index,:] = plt.squeeze(plt.array([delta_lane, desired_speed,time_lane_change]))
 
-        # Calculate observed feature values --> Cranck-Nicolson integration
+        # Calculate observed feature values --> Simpson integration rule
+        time_vector = plt.arange(0, time_lane_change + dt_grid, dt_grid)
 
         # f1: total acceleration
-        integrand = data_cl['ax_proj_cl']**2+data_cl['ay_proj_cl']**2
-        for i in plt.arange(0,len(integrand)-1,1):
-            f1 = f1 + 0.5*(integrand[i]+integrand[i+1])*dt_grid
+        integrand = plt.squeeze(data_cl['ax_proj_cl']**2+data_cl['ay_proj_cl']**2)
+        f1_cal = scipy.integrate.simps(integrand, time_vector)
+        f1 = f1 + f1_cal
+        # print('f1: ',f1)
 
         # f2: lateral acceleration
-        integrand = data_cl['ay_proj_cl']**2
-        for i in plt.arange(0,len(integrand)-1,1):
-            f2 = f2 + 0.5*(integrand[i]+integrand[i+1])*dt_grid
+        integrand = plt.squeeze(data_cl['ay_proj_cl']**2)
+        f2_cal = scipy.integrate.simps(integrand, time_vector)
+        f2 = f2 + f2_cal
+        # print('f2: ', f2)
 
         #f3: total jerk
-        integrand = data_cl['jx_cl']**2+data_cl['jy_cl']**2
-        for i in plt.arange(0,len(integrand)-1,1):
-            f3 = f3 + 0.5*(integrand[i]+integrand[i+1])*dt_grid
+        integrand = plt.squeeze(data_cl['jx_cl']**2+data_cl['jy_cl']**2)
+        f3_cal = scipy.integrate.simps(integrand, time_vector)
+        f3 = f3 + f3_cal
+        # print('f3: ', f3)
 
         # f4: lateral jerk
-        integrand = data_cl['jy_cl']** 2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f4 = f4 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze(data_cl['jy_cl']** 2)
+        f4_cal = scipy.integrate.simps(integrand, time_vector)
+        f4 = f4 + f4_cal
+        # print('f4: ', f4)
 
         # f5: curvature
-        integrand = (data_cl['vx_proj_cl']*data_cl['ay_proj_cl']-data_cl['vy_proj_cl']*data_cl['ax_proj_cl'])**2/(data_cl['vx_proj_cl']**2+data_cl['vy_proj_cl']**2)**3
-        for i in plt.arange(0,len(integrand)-1,1):
-            f5 = f5 + 0.5*(integrand[i]+integrand[i+1])*dt_grid
+        integrand = plt.squeeze((data_cl['vx_proj_cl']*data_cl['ay_proj_cl']-data_cl['vy_proj_cl']*data_cl['ax_proj_cl'])**2/(data_cl['vx_proj_cl']**2+data_cl['vy_proj_cl']**2)**3)
+        f5_cal = scipy.integrate.simps(integrand, time_vector)
+        f5 = f5 + f5_cal
+        # print('f5: ', f5)
 
         # f6: desired speed
-        integrand = (desired_speed-data_cl['vx_proj_cl'])**2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f6 = f6 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze((desired_speed-data_cl['vx_proj_cl'])**2)
+        f6_cal = scipy.integrate.simps(integrand, time_vector)
+        f6 = f6 + f6_cal
+        # print('f6: ', f6)
 
         # f7: desired lane change
-        integrand = (delta_lane - data_cl['y_cl'])**2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f7 = f7 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze((delta_lane - data_cl['y_cl'])**2)
+        f7_cal = scipy.integrate.simps(integrand, time_vector)
+        f7 = f7 + f7_cal
+        # print('f7: ', f7)
 
         # Plotting in figures
         if plot == 1:
@@ -133,6 +145,14 @@ def import_data(plot):
     f5 = f5/length
     f6 = f6/length
     f7 = f7/length
+    print(f1)
+    print(f2)
+    print(f3)
+    print(f4)
+    print(f5)
+    print(f6)
+    print(f7)
+
 
 
     return f1,f2,f3,f4,f5,f6,f7,init_matrix,des_matrix,dict_list,files

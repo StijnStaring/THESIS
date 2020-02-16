@@ -1,4 +1,6 @@
 import pylab as plt
+import scipy
+from scipy import integrate
 
 def calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,his_time_cal_lc,des_matrix):
     length = his_x.shape[0]
@@ -22,7 +24,12 @@ def calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,h
         ay = his_ay[k, :,plt.newaxis]
         jy = his_jy[k, :,plt.newaxis]
 
+        end_time = round(his_time_cal_lc[k,0],4)
         dt_grid = his_time_cal_lc[k,1]
+        list = []
+        for i in plt.arange(0,len(ax),1):
+            list.append(i*dt_grid)
+        time_vector = plt.array(list)
         delta_lane = des_matrix[k,0]
         desired_speed = des_matrix[k,1]
 
@@ -30,39 +37,46 @@ def calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,h
         # Calculate integration features --> Cranck-Nicolson integration
 
         # f1: total acceleration
-        integrand = ax** 2 + ay** 2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f1 = f1 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze(ax** 2 + ay** 2)
+        f1_cal = scipy.integrate.simps(integrand,time_vector)
+        f1 = f1+ f1_cal
+        # print('f1: ',f1)
 
         # f2: lateral acceleration
-        integrand = ay** 2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f2 = f2 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze(ay** 2)
+        f2_cal = scipy.integrate.simps(integrand, time_vector)
+        f2 = f2 + f2_cal
+        # print('f2: ', f2)
 
         # f3: total jerk
-        integrand = jx ** 2 + jy ** 2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f3 = f3 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze(jx ** 2 + jy ** 2)
+        f3_cal = scipy.integrate.simps(integrand, time_vector)
+        f3 = f3 + f3_cal
+        # print('f3: ', f3)
 
         # f4: lateral jerk
-        integrand = jy ** 2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f4 = f4 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze(jy ** 2)
+        f4_cal = scipy.integrate.simps(integrand, time_vector)
+        f4 = f4 + f4_cal
+        # print('f4: ', f4)
 
         # f5: curvature
-        integrand = (vx * ay - vy* ax) ** 2 / (vx ** 2 + vy ** 2) ** 3
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f5 = f5 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze((vx * ay - vy* ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)
+        f5_cal = scipy.integrate.simps(integrand, time_vector)
+        f5 = f5 + f5_cal
+        # print('f5: ', f5)
 
         # f6: desired speed
-        integrand = (desired_speed - vx) ** 2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f6 = f6 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze((desired_speed - vx) ** 2)
+        f6_cal = scipy.integrate.simps(integrand, time_vector)
+        f6 = f6 + f6_cal
+        # print('f6: ', f6)
 
         # f7: desired lane change
-        integrand = (delta_lane - y) ** 2
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f7 = f7 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_grid
+        integrand = plt.squeeze((delta_lane - y) ** 2)
+        f7_cal = scipy.integrate.simps(integrand, time_vector)
+        f7 = f7 + f7_cal
+        # print('f7: ', f7)
 
     # Devide featuers by m
     f1 = f1/length

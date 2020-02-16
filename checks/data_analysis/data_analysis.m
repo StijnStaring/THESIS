@@ -23,13 +23,7 @@ end_value = 1001;
 %          'Dataset_Xchange189.4391_V0=98.6799.csv',;
 %          'Dataset_Xchange195.0198_V0=94.6066.csv',;
 %          'Dataset_Xchange199.9356_V0=83.4224.csv'};
-files = {'Dataset_Xchange130.3244_V0=95.4982.csv',;
-         'Dataset_Xchange144.6254_V0=94.1856.csv',;
-         'Dataset_Xchange159.801_V0=92.8889.csv',;
-         'Dataset_Xchange162.2641_V0=95.4032.csv',;
-         'Dataset_Xchange178.9122_V0=83.9562.csv',;
-         'Dataset_Xchange185.2974_V0=86.3705.csv',;
-         'Dataset_Xchange199.9356_V0=83.4224.csv'};
+files = {'Dataset_Xchange130.8331_V0=86.7425.csv'};
      
 %% Initialization
 length = size(files,1);
@@ -66,6 +60,14 @@ for i = 1:1:length
     ax_d(:,i) = data(:,11);
     ay_d(:,i) = data(:,12);
 end
+
+ay_loc_tot = ay_d + r_d * vx_d;
+
+data_cl['vx_proj_cl'] = plt.cos(data_cl['yaw_cl'])* data_cl['vx_cl'] - plt.sin(data_cl['yaw_cl'])* data_cl['vy_cl']
+data_cl['ax_proj_cl'] = plt.cos(data_cl['yaw_cl'])* ax_loc_tot - plt.sin(data_cl['yaw_cl'])* ax_loc_tot
+data_cl['ay_proj_cl'] = plt.sin(data_cl['yaw_cl'])* ay_loc_tot  + plt.cos(data_cl['yaw_cl'])* ay_loc_tot
+
+
 %% Calculations
 % Lateral Jerk
 % Finite difference scheme used: central difference scheme
