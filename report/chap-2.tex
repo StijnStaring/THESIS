@@ -1,0 +1,106 @@
+\chapter{The Next Chapter}
+\label{cha:2}
+Herinner de lezer nog even de structuur die gaat worden gevolgd. 
+Learning, planning, tracking, validatie.
+Dit hoofdstuk zal over het learning gaan.
+Hoe is algorithm opgebouwd? Wrm wordt dit zo gedaan?
+Welke vehicle modellen wordt er gebruikt? Wrm mag men hier een simple vehicle mode gebruiken?
+Dit is gemachtigd omdat men hier de omgeving wil scannen voor een feasible pad --> dit wordt trager gedaan dan de tracking.(tracking zal gebruik maken van een meer complex model) Path planning ligt focus vooral op de omgeving.
+Goed refereren naar het rapport en VS rapport
+Wat zijn de assumpties die werden genomen?
+
+Hoe zal de methode gevalideerd worden? Leg de twee methodes uit: code generatie en kijken of de wegings factoren terug gevonden kunnen worden? Mappen de feature values met de values van het geobserveerde pad? --> is het doel dat gevolgd probeert te worden haalbaar? 
+
+Ga hier niet meer te diep in op de entropie. Leg het hier meer intuitief uit om de lezer niet te verwaren. 
+
+Vermeld afleiding van algortihm. Leg uit in Thesis hoe komt aan gradient die gebruikt. Zie papers: Ziebart et al and Kretzschmar et al.
+
+Modeleer een andere bestuurder. Can try to reproduce a data set with a change of parameters which represents a different driver. Can check that the learned model is also different. Hiermee aantonen dat er ook echt andere wegingsfactoren worden gegenereerd en dat de specifieke driving characteristics worden meegenomen.
+
+Ligt een tipje van de sluier op : hoe zal de data gegenereerd worden? (dit moet kort blijven)
+Plot simulink model en duidt de blokken aan die zullen worden ingevuld. Hier gaat dieper in gegaan worden in de volgende hoofdstukken. 
+
+\section{The First Topic of this Chapter}
+
+
+\subsection{An item}
+A master's thesis is never an isolated work. This means that your text must
+contain references. On-line documents\cite{wiki} as well as
+books\cite{pratchett06:_good_omens} can be referenced.
+
+\section{Figures}
+Figures are used to add illustrations to the text. The \fref{fig:logo} shows
+the KU~Leuven logo as an illustration.
+\begin{figure}
+  \centering
+  \includegraphics{logokul}
+  \caption{The KU~Leuven logo.}
+  \label{fig:logo}
+\end{figure}
+
+\section{Tables}
+Tables are used to present data neatly arranged. A table is normally
+not a spreadsheet! Compare \tref{tab:wrong} en \tref{tab:ok}: which table do
+you prefer?
+
+\begin{table}
+  \centering
+  \begin{tabular}{||l|lr||} \hline
+    gnats     & gram      & \$13.65 \\ \cline{2-3}
+              & each      & .01 \\ \hline
+    gnu       & stuffed   & 92.50 \\ \cline{1-1} \cline{3-3}
+    emu       &           & 33.33 \\ \hline
+    armadillo & frozen    & 8.99 \\ \hline
+  \end{tabular}
+  \caption{A table with the wrong layout.}
+  \label{tab:wrong}
+\end{table}
+
+\begin{table}
+  \centering
+  \begin{tabular}{@{}llr@{}} \toprule
+    \multicolumn{2}{c}{Item} \\ \cmidrule(r){1-2}
+    Animal    & Description & Price (\$)\\ \midrule
+    Gnat      & per gram    & 13.65 \\
+              & each        & 0.01 \\
+    Gnu       & stuffed     & 92.50 \\
+    Emu       & stuffed     & 33.33 \\
+    Armadillo & frozen      & 8.99 \\ \bottomrule
+  \end{tabular}
+  \caption{A table with the correct layout.}
+  \label{tab:ok}
+\end{table}
+
+\section{Lorem Ipsum}
+This section is added to check headers and footers. So this chapter must at
+least contain three pages. To make sure that we get the required amount,
+the \textsf{lipsum} package isn't used but the text is put directly in the
+text.
+
+\subsection{Lorem ipsum dolor sit amet, consectetur adipiscing elit}
+Se
+
+\subsection{Praesent auctor venenatis posuere}
+Seec sollicitudin sem urna eu magna. Nunc sed est urna, euismod congue
+mi.
+
+\subsection{Cras vulputate ultricies venenatis}
+Vivam
+
+\subsection{Donec nibh ante, consectetur et posuere id, tempus nec arcu}
+Curab
+
+\subsection{Morbi et mauris tempus purus ornare vehicula}
+Mauris 
+
+\section{Conclusion}
+The final section of the chapter gives an overview of the important results
+of this chapter. This implies that the introductory chapter and the
+concluding chapter don't need a conclusion.
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "thesis"
+%%% End: 
