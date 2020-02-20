@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7300 64-bit) (preloaded format=pdflatex 2020.2.19)  20 FEB 2020 00:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7300 64-bit) (preloaded format=pdflatex 2020.2.19)  20 FEB 2020 21:31
 entering extended mode
 **./masterproef.tex
 (masterproef.tex
@@ -802,7 +802,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `kulemtfpf' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-<logokuleng.pdf, id=151, 159.33528pt x 85.358pt>
+<logokuleng.pdf, id=147, 159.33528pt x 85.358pt>
 File: logokuleng.pdf Graphic file (type pdf)
 <use logokuleng.pdf>
 Package pdftex.def Info: logokuleng.pdf  used on input line 34.
@@ -912,87 +912,104 @@ niverse, and Everything''
 
 
 
-] [3]) [4]
+]
+Overfull \hbox (511.33234pt too wide) in paragraph at lines 16--36
+\T1/lmr/m/n/10.95 (-20) https://reader.elsevier.com/reader/sd/pii/0370269387911
+97X?token=71567B7640C402F2FF578E34E3BB7914CA14E4A1A29DE88D9534D96C9305E13DA52D0
+424FF1475A822FCE784725196D3 
+ []
+
+[3]) [4]
 \openout2 = `chap-2.aux'.
 
  (chap-2.tex
-<logokul.pdf, id=284, 159.33528pt x 56.90298pt>
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `\\' on input line 1.
+
+<logokul.pdf, id=280, 159.33528pt x 56.90298pt>
 File: logokul.pdf Graphic file (type pdf)
 <use logokul.pdf>
 Package pdftex.def Info: logokul.pdf  used on input line 36.
 (pdftex.def)             Requested size: 159.33487pt x 56.90283pt.
- [5
-
-
-
-]
-LaTeX Font Info:    Trying to load font information for T1+lmss on input line 7
-7.
-
-("C:\Users\t2vosx\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\t1lmss.fd"
-File: t1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `lmss' (encoding: T1).
-(microtype)             For optimal results, create family-specific settings.
-(microtype)             See the microtype manual for details.
-
-[6 <C:/Users/t2vosx/AppData/Local/MiKTeX/2.9/tex/latex/kulemt/logokul.pdf>])
-[7]
-\openout2 = `chap-3.aux'.
-
- (chap-3.tex [8
+[5
 
 
 
 ])
+
+Class memoir Warning: The material used in the headers is too large
+(27.2pt) for the given head height (13.6pt), it is recommended to
+either increase the head height or redesign the header
+(in both cases you will find help in the memoir manual). on input line 95.
+
+
+Overfull \vbox (13.59999pt too high) has occurred while \output is active []
+
+
+[6 <C:/Users/t2vosx/AppData/Local/MiKTeX/2.9/tex/latex/kulemt/logokul.pdf>]
+\openout2 = `chap-3.aux'.
+
+
+(chap-3.tex)
 Underfull \vbox (badness 1590) has occurred while \output is active []
 
- [9]
-[10]
+ [7
+
+
+
+]
+[8]
 \openout2 = `chap-4.aux'.
 
- (chap-4.tex) [11
+ (chap-4.tex) [9
 
 
 
 ]
 \openout2 = `chap-5.aux'.
 
- (chap-5.tex [12
+ (chap-5.tex [10
 
 
 
-]) [13]
+]) [11]
 \openout2 = `conclusion.aux'.
 
- (conclusion.tex [14
+ (conclusion.tex [12
 
 
 
-]) [15]
-[16
+]) [13] [14
 
 
-] [17] [18]
+]
+[15] [16]
 \openout2 = `app-A.aux'.
 
- (app-A.tex) [19
+ (app-A.tex) [17
 
 
 ]
 \openout2 = `app-n.aux'.
 
- (app-n.tex [20
+ (app-n.tex [18
 
 
 
-]) [21] [22
+]) [19] [20
 
 
 ] (masterproef.bbl
 bibitemlist
-) [23
+)
+
+Class memoir Warning: The material used in the headers is too large
+(27.2pt) for the given head height (13.6pt), it is recommended to
+either increase the head height or redesign the header
+(in both cases you will find help in the memoir manual). on input line 114.
+
+[21
 
 ]
 \tf@toc=\write5
@@ -1011,20 +1028,20 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 114.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 114.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 114.
 Package rerunfilecheck Info: File `masterproef.out' has not changed.
-(rerunfilecheck)             Checksum: 16BDFA14C9C6F450244D4CA9DCECA1CE;2164.
+(rerunfilecheck)             Checksum: 0F66AB10BCE9391F9CE4A1C980B99B22;2127.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 114.
  ) 
 Here is how much of TeX's memory you used:
- 12526 strings out of 481518
- 205036 string characters out of 2911616
- 806829 words of memory out of 3000000
- 27329 multiletter control sequences out of 15000+200000
- 601411 words of font info for 96 fonts, out of 3000000 for 9000
+ 12478 strings out of 481518
+ 204127 string characters out of 2911616
+ 806910 words of memory out of 3000000
+ 27296 multiletter control sequences out of 15000+200000
+ 598522 words of font info for 94 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  42i,12n,42p,451b,586s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-ec.e
-nc}{C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mat
-hit.enc}{C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/l
+{C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm-math
+it.enc}{C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/lm
+-ec.enc}{C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/lm/l
 m-ts1.enc}{C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/ba
 se/8r.enc}<C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public
 /lm/lmbx10.pfb><C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/p
@@ -1033,13 +1050,12 @@ pe1/public/lm/lmcsc10.pfb><C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2.9/fo
 nts/type1/public/lm/lmmi10.pfb><C:/Users/t2vosx/AppData/Local/Programs/MiKTeX 2
 .9/fonts/type1/public/lm/lmr10.pfb><C:/Users/t2vosx/AppData/Local/Programs/MiKT
 eX 2.9/fonts/type1/public/lm/lmri10.pfb><C:/Users/t2vosx/AppData/Local/Programs
-/MiKTeX 2.9/fonts/type1/public/lm/lmss10.pfb><C:/Users/t2vosx/AppData/Local/Pro
-grams/MiKTeX 2.9/fonts/type1/public/lm/lmtt10.pfb><C:/Users/t2vosx/AppData/Loca
-l/Programs/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/t2vosx/AppD
-ata/Local/Programs/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvr8a.pfb>
-Output written on masterproef.pdf (33 pages, 276922 bytes).
+/MiKTeX 2.9/fonts/type1/public/lm/lmtt10.pfb><C:/Users/t2vosx/AppData/Local/Pro
+grams/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/t2vosx/AppData/L
+ocal/Programs/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvr8a.pfb>
+Output written on masterproef.pdf (31 pages, 258957 bytes).
 PDF statistics:
- 454 PDF objects out of 1000 (max. 8388607)
- 104 named destinations out of 1000 (max. 500000)
- 21299 words of extra memory for PDF output out of 24883 (max. 10000000)
+ 431 PDF objects out of 1000 (max. 8388607)
+ 96 named destinations out of 1000 (max. 500000)
+ 19243 words of extra memory for PDF output out of 20736 (max. 10000000)
 

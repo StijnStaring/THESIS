@@ -1,4 +1,4 @@
-\chapter{The First Chapter}
+\chapter{Comfort definition and modelling}
 \label{cha:1}
 
 Dan komt de vraag wat is comfort precies? Literatuur studie...
@@ -11,6 +11,28 @@ Bij de uitleg van de features en waarom er versnelling en acceleratie wordt gebr
 Wat wordt er in de literatuur al gebruikt om comfort te modelleren en geef een overzicht.
 
 Leg uit hoe komt aan entropy distribution komt --> kan beroep doen op ref 2 en 20 van het hoofdrapport (both are assuming an exponential distribution) (IMPORTANT)
+
+
+Dit is de reden voor het gebruik van de maximum entropie distributie: 
+	To learn observed behavior, we aim to model the distribution
+	that underlies the empirical sample trajectories.
+	Following Abbeel and Ng [1], we aim to find a model that
+	induces distributions that match, in expectation, the feature
+	values fD of the empirical trajectories D, yielding
+	Ep(x)[f (x)] = fD =
+	1
+	jDj
+	X
+	xk2D
+	f (xk): (1)
+	In general, however, there is not a unique distribution that
+	matches the features. Ziebart et al. [24] resolve this ambiguity
+	by applying the principle of maximum entropy [10], which
+	states that the distribution with the highest entropy represents
+	the given information best since it does not favor any
+	particular outcome besides the observed constraints. (this is the least baised distribution)
+	Modelling expected featueres by hybrid monte carlo method: https://reader.elsevier.com/reader/sd/pii/037026938791197X?token=71567B7640C402F2FF578E34E3BB7914CA14E4A1A29DE88D9534D96C9305E13DA52D0424FF1475A822FCE784725196D3
+%	ref: C:\Users\t2vosx\OneDrive\Documenten\Leuven\Thesis\References2\Citations on main %paper\Learning to Predict Trajectories of Cooperatively Navigating Agents.pdf>
 
 
 
