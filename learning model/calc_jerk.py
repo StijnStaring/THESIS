@@ -12,7 +12,7 @@ def calc_jerk(data_cl,fig):
     jerk_d = plt.zeros((lengte, 1))
     jerk_dx = plt.zeros((lengte, 1))
 
-    # calculate lateral jerk
+    # calculate lateral jerk (using the central scheme)
     for i in plt.arange(1,lengte-1,1):
         jerk_d[i] = (ay_d[i + 1] - ay_d[i - 1]) / (2 * dt)
 

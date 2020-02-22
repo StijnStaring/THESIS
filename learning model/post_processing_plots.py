@@ -3,6 +3,7 @@ def post_processing_plots(his_f_calc_rel,his_weights):
     Theta_iter is a string
     """
     import pylab as plt
+
     # Plot 1: normalized calculated features
     length = len(his_f_calc_rel)
     iterations = plt.arange(1,length+1,1)

@@ -67,7 +67,7 @@ def clip_lane_change(data):
 
     dt_grid = dt
 
-    # Check of dit klopt in het amesim model
+    # Amesim model produceert signals in de tangent vehicle axis
     ax_loc_tot = data_cl['ax_cl'] - data_cl['r_cl']*data_cl['vy_cl']
     ay_loc_tot = data_cl['ay_cl'] + data_cl['r_cl'] * data_cl['vx_cl']
 
@@ -97,15 +97,5 @@ def clip_lane_change(data):
     init[5] = data_cl['vy_proj_cl'][0]
     init[6] = data_cl['ay_proj_cl'][0]
     init[7] = data_cl['jy_cl'][0]
-
-    # local plot van de jerk
-    # X(t)/Y(t)
-    plt.figure("Local plot van jerks ", figsize=(10, 4))
-    plt.subplot(1, 2, 1)
-    ax1a = plt.gca()
-    plt.xlabel("Time [s]", fontsize=14)
-    plt.ylabel("Horizontal distance [m]", fontsize=14)
-    plt.grid(True)
-    plt.title('x(t) calculated', fontsize=14)
 
     return time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, init,data_cl

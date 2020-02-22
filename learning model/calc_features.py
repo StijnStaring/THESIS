@@ -24,17 +24,17 @@ def calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,h
         ay = his_ay[k, :,plt.newaxis]
         jy = his_jy[k, :,plt.newaxis]
 
-        end_time = round(his_time_cal_lc[k,0],4)
         dt_grid = his_time_cal_lc[k,1]
         list = []
         for i in plt.arange(0,len(ax),1):
             list.append(i*dt_grid)
         time_vector = plt.array(list)
+        # des_matrix = [delta_lane, desired_speed, time_lane_change]
         delta_lane = des_matrix[k,0]
         desired_speed = des_matrix[k,1]
 
 
-        # Calculate integration features --> Cranck-Nicolson integration
+        # Calculate integration features --> Simpson integration
 
         # f1: total acceleration
         integrand = plt.squeeze(ax** 2 + ay** 2)

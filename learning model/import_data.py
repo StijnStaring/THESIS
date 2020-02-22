@@ -7,6 +7,8 @@ def import_data(plot):
     from scipy import integrate
     import pylab as plt
     import pandas as pd
+    # Simpson rule is designed for numerical integration --> approxiates the integrand by a quadrant and integrates this.
+    # This is an update of the trapezium rule
 
     files = glob.glob("used_data/*.csv")
     print("The amount of m fils are: ", len(files))
