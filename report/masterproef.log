@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7300 64-bit) (preloaded format=pdflatex 2020.2.19)  21 FEB 2020 22:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7300 64-bit) (preloaded format=pdflatex 2020.2.19)  22 FEB 2020 14:09
 entering extended mode
 **./masterproef.tex
 (masterproef.tex
@@ -843,36 +843,36 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 
 ] (masterproef.toc
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 8
-.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
+0.
 
 ("C:\Users\t2vosx\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\ot1lmr.fd"
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 8
-.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
+0.
 
 ("C:\Users\t2vosx\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omllmm.fd"
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-8.
+10.
 
 ("C:\Users\t2vosx\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omslmsy.fd"
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-8.
+10.
 
 ("C:\Users\t2vosx\AppData\Local\Programs\MiKTeX 2.9\tex/latex/lm\omxlmex.fd"
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 8.
+(Font)              <10.95> on input line 10.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 8.
+(Font)              <8> on input line 10.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 8.
+(Font)              <6> on input line 10.
 
 [2
 
@@ -937,9 +937,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 23--24
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 25--26
 
- [5
+ []
+
+[5
 
 
 
@@ -947,20 +949,22 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 <logokul.pdf, id=284, 159.33528pt x 56.90298pt>
 File: logokul.pdf Graphic file (type pdf)
 <use logokul.pdf>
-Package pdftex.def Info: logokul.pdf  used on input line 43.
+Package pdftex.def Info: logokul.pdf  used on input line 52.
 (pdftex.def)             Requested size: 159.33487pt x 56.90283pt.
 
 
 Class memoir Warning: The material used in the headers is too large
 (27.2pt) for the given head height (13.6pt), it is recommended to
 either increase the head height or redesign the header
-(in both cases you will find help in the memoir manual). on input line 86.
+(in both cases you will find help in the memoir manual). on input line 95.
 
 
 Overfull \vbox (13.59999pt too high) has occurred while \output is active []
 
 
-[6 <C:/Users/t2vosx/AppData/Local/MiKTeX/2.9/tex/latex/kulemt/logokul.pdf>])
+[6
+
+ <C:/Users/t2vosx/AppData/Local/MiKTeX/2.9/tex/latex/kulemt/logokul.pdf>])
 [7]
 \openout2 = `chap-3.aux'.
 
@@ -1050,15 +1054,8 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 114.
 (chap-4.aux) (chap-5.aux) (conclusion.aux) (app-A.aux) (app-n.aux))
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 114.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 114.
-
-
-Package rerunfilecheck Warning: File `masterproef.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `masterproef.out':
-(rerunfilecheck)             Before: 98CEF89DD7FD6BE1CD72225F517E053B;2123
-(rerunfilecheck)             After:  0F66AB10BCE9391F9CE4A1C980B99B22;2127.
+Package rerunfilecheck Info: File `masterproef.out' has not changed.
+(rerunfilecheck)             Checksum: 0F66AB10BCE9391F9CE4A1C980B99B22;2127.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 114.
  ) 
 Here is how much of TeX's memory you used:
@@ -1083,7 +1080,7 @@ eX 2.9/fonts/type1/public/lm/lmri10.pfb><C:/Users/t2vosx/AppData/Local/Programs
 /MiKTeX 2.9/fonts/type1/public/lm/lmtt10.pfb><C:/Users/t2vosx/AppData/Local/Pro
 grams/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvb8a.pfb><C:/Users/t2vosx/AppData/L
 ocal/Programs/MiKTeX 2.9/fonts/type1/urw/helvetic/uhvr8a.pfb>
-Output written on masterproef.pdf (33 pages, 261087 bytes).
+Output written on masterproef.pdf (33 pages, 261160 bytes).
 PDF statistics:
  440 PDF objects out of 1000 (max. 8388607)
  98 named destinations out of 1000 (max. 500000)
