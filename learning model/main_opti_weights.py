@@ -1,5 +1,6 @@
 """
 stijnstaring@hotmail.com
+________________________
 
 The program automatically uses all the csv files stored in the 'used_data' folder.
 """
