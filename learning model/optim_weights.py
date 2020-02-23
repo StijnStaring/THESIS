@@ -168,7 +168,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         tjy_i, uy_i = sol.sample(uy, grid='integrator')
 
         # Approximate space between samples by a quintic spline:
-        [x, vx, ax, jx, y, vy, ay, jy]  = spline_evalution(3, tx_i, x_i, vx_i, ax_i, jx_i, y_i, vy_i, ay_i, jy_i)
+        # [x, vx, ax, jx, y, vy, ay, jy]  = spline_evalution(3, tx_i, x_i, vx_i, ax_i, jx_i, y_i, vy_i, ay_i, jy_i)
 
         # curvature with global axis information
         curv = (vx_i * ay_i -  vy_i* ax_i) / (vx_i** 2 + vy_i** 2) ** (3 / 2)

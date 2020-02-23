@@ -1,0 +1,1 @@
+It seems as the spline based method has difficulties of approximating constant pieces of the signal.
