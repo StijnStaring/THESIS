@@ -1,6 +1,7 @@
 """
 stijnstaring@hotmail.com
 """
+# It is possible to use the spline based approuch as is done in the paper but can also increase directly the amount of control points.
 # Importations
 # local functions
 from define_plots import define_plots
@@ -16,7 +17,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
     ################
     # 200 samples --> manoeuvre +- 4 s --> dt = 0.02s --> +- 0.5 m per sample
 
-    CP = 200
+    CP = 400
     IP = 1
     amount = len(dict_list)
     if plot == 1:
@@ -49,16 +50,12 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         vy = ocp.state()
         ax = ocp.state()
         ay = ocp.state()
-        jx = ocp.state()
-        jy = ocp.state()
 
         # Controls
-        ux= ocp.control()
-        uy= ocp.control()
+        jx = ocp.control()
+        jy = ocp.control()
 
         # Specify differential equations for states
-        ocp.set_der(jx, ux)
-        ocp.set_der(jy, uy)
         ocp.set_der(ax, jx)
         ocp.set_der(ay, jy)
         ocp.set_der(vx, ax)
@@ -132,12 +129,12 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         ocp.set_initial(x,x_guess)
         ocp.set_initial(vx,vx_guess)
         ocp.set_initial(ax,ax_guess)
-        ocp.set_initial(jx,jx_guess)
+        # ocp.set_initial(jx,jx_guess) --> beter niet beperken omdat het de input is.
 
         ocp.set_initial(y,y_guess)
         ocp.set_initial(vy,vy_guess)
         ocp.set_initial(ay,ay_guess)
-        ocp.set_initial(jy,jy_guess)
+        # ocp.set_initial(jy,jy_guess)
 
         # Solving the problem
         # -------------------
@@ -184,7 +181,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         # curvature with global axis information
         curv = (vx_i * ay_i -  vy_i* ax_i) / (vx_i** 2 + vy_i** 2) ** (3 / 2)
 
-    # storage of calculated path
+        # storage of calculated path
         his_x[k,:] = x_i
         his_vx[k,:] = vx_i
         his_ax[k,:] = ax_i
