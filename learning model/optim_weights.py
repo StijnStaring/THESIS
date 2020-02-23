@@ -1,11 +1,11 @@
 """
 stijnstaring@hotmail.com
 """
-# It is possible to use the spline based approuch as is done in the paper but can also increase directly the amount of control points.
 # Importations
 # local functions
 from define_plots import define_plots
 from guess_states import guess_states
+from spline_evaluation import spline_evalution
 # global functions
 import pylab as plt
 from rockit import *
@@ -17,7 +17,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
     ################
     # 200 samples --> manoeuvre +- 4 s --> dt = 0.02s --> +- 0.5 m per sample
 
-    CP = 400
+    CP = 200
     IP = 1
     amount = len(dict_list)
     if plot == 1:
@@ -43,19 +43,23 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         ocp = Ocp(T=FreeTime(des_matrix[k,2]))
         # ocp = Ocp(T=des_matrix[k,2])
 
-        # States (global axis)
+        # States (global axis) --> path is 5th order as in paper
         x = ocp.state()
         y = ocp.state()
         vx = ocp.state()
         vy = ocp.state()
         ax = ocp.state()
         ay = ocp.state()
+        jx = ocp.state()
+        jy = ocp.state()
 
-        # Controls
-        jx = ocp.control()
-        jy = ocp.control()
+        # Controls --> jounce need to be control because want jerk a continuous function. (is second order)
+        ux= ocp.control(order= 1)
+        uy= ocp.control(order= 1)
 
         # Specify differential equations for states
+        ocp.set_der(jx, ux)
+        ocp.set_der(jy, uy)
         ocp.set_der(ax, jx)
         ocp.set_der(ay, jy)
         ocp.set_der(vx, ax)
@@ -73,24 +77,9 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         # THE VX FEATURE IS REMOVED!!
         # ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
 
-    # LAST FEATURE IS REMOVED - y(t) is lane change desired
-    #     ocp.add_objective(theta[0, 0] *1/f_obs[0,0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] *1/f_obs[1,0]* ocp.integral(ay ** 2) + theta[2, 0] * 1/f_obs[2,0]*ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1/f_obs[3,0]*ocp.integral(jy ** 2) + theta[4, 0] * 1/f_obs[4,0]*ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * 1/f_obs[5,0]*ocp.integral((desired_speed - vx) ** 2))
-
     # Path constraints
         #  (must be valid on the whole time domain running from `t0` to `tf=t0+T`,
         #   grid options available such as `grid='inf'`)
-
-        # # The same constraints as taken into the dataset (except for the throttle)
-        # ocp.subject_to(-1 <= (y <= 4.5 ))
-        # # ocp.subject_to(-1 <= (u <= 1 ))
-        #
-        # # Boundary on the max curvature of the vehicle
-        # curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3/2)
-        # ocp.subject_to(-0.040<=(curv <= 0.040))
-        # ocp.subject_to(-1<=(ax <= 1))
-        # ocp.subject_to(-20 <= (ay <= 20))
-        # ocp.subject_to(-10<=(jx <= 10))
-        # ocp.subject_to(-70<=(jy <= 70))
 
         ocp.subject_to(-1 <= (y <= 4.5))
         # ocp.subject_to(-1 <= (u <= 1 ))
@@ -129,12 +118,12 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         ocp.set_initial(x,x_guess)
         ocp.set_initial(vx,vx_guess)
         ocp.set_initial(ax,ax_guess)
-        # ocp.set_initial(jx,jx_guess) --> beter niet beperken omdat het de input is.
+        ocp.set_initial(jx,jx_guess)
 
         ocp.set_initial(y,y_guess)
         ocp.set_initial(vy,vy_guess)
         ocp.set_initial(ay,ay_guess)
-        # ocp.set_initial(jy,jy_guess)
+        ocp.set_initial(jy,jy_guess)
 
         # Solving the problem
         # -------------------
@@ -178,6 +167,9 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         tjx_i, ux_i = sol.sample(ux, grid='integrator')
         tjy_i, uy_i = sol.sample(uy, grid='integrator')
 
+        # Approximate space between samples by a quintic spline:
+        [x, vx, ax, jx, y, vy, ay, jy]  = spline_evalution(3, tx_i, x_i, vx_i, ax_i, jx_i, y_i, vy_i, ay_i, jy_i)
+
         # curvature with global axis information
         curv = (vx_i * ay_i -  vy_i* ax_i) / (vx_i** 2 + vy_i** 2) ** (3 / 2)
 
@@ -214,7 +206,6 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
 
             axcom1a.legend()
             axcom1b.legend()
-            test = 5
             axcom2.legend()
             axcom3a.legend()
             axcom3b.legend()
