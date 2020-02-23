@@ -1,9 +1,8 @@
-def define_plots(theta_iter,dict_list):
+def define_plots(theta_iter):
     """"
     Theta_iter is a string
     """
     import pylab as plt
-    data_cl = dict_list[0]
 
     # X(t)/Y(t)
     plt.figure("Path vs Time: iter " + theta_iter,figsize=(10, 4))

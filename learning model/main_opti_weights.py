@@ -52,9 +52,7 @@ while rec < 2:
     [f1, f2, f3, f4, f5, f6, f7] = calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,his_time_cal_lc, des_matrix)
 
 
-    # Update of theta --> RPROP algorithm
-
-
+    # # Update of theta --> RPROP algorithm
 
     # Normalization
     f_calc_rel = plt.array([f1/f1_o, f2/f2_o, f3/f3_o, f4/f4_o, f5/f5_o, f6/f6_o, f7/f7_o])

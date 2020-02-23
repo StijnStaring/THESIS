@@ -16,11 +16,12 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
     ################
     # 200 samples --> manoeuvre +- 4 s --> dt = 0.02s --> +- 0.5 m per sample
 
-    CP = 200
+    data_cl = dict_list[0]
+    CP = len(data_cl['x_cl'])
     IP = 1
     amount = len(dict_list)
     if plot == 1:
-        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b,ax8] = define_plots(theta_iter,dict_list)
+        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b,ax8] = define_plots(theta_iter)
 
     his_x = plt.zeros((init_matrix.shape[0],CP+1))
     his_vx = plt.zeros((init_matrix.shape[0], CP + 1))
@@ -36,6 +37,7 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
 
 
     for k in plt.arange(0,amount,1):
+
 
     # Optimization
     ##############
@@ -66,30 +68,41 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         ocp.set_der(x, vx)
         ocp.set_der(y, vy)
 
-        delta_lane = des_matrix[k, 0]
+        # delta_lane = des_matrix[k, 0]
         desired_speed = des_matrix[k,1]
 
-        # Lagrange objective term
-        # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
-        # ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
-        ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral(ax ** 2 + ay ** 2) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral(jx ** 2 + jy ** 2) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * 1 / f_obs[5, 0] * ocp.integral((desired_speed - vx) ** 2)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
-        # THE VX FEATURE IS REMOVED!!
-        # ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
+        # Define a placeholder for concrete waypoints to be defined on edges of the control grid
+        waypoints = ocp.parameter(2, grid='control')
 
-    # Path constraints
-        #  (must be valid on the whole time domain running from `t0` to `tf=t0+T`,
-        #   grid options available such as `grid='inf'`)
+        ocp.add_objective(ocp.integral((x - waypoints[0]) ** 2 + (y - waypoints[1]) ** 2, grid='control'))
 
-        ocp.subject_to(-1 <= (y <= 4.5))
-        # ocp.subject_to(-1 <= (u <= 1 ))
+        waypoints_num = plt.squeeze(plt.array([data_cl['x_cl'],data_cl['y_cl']]))
+        ocp.set_value(waypoints, waypoints_num)
 
-        # Boundary on the max curvature of the vehicle
-        curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3 / 2)
-        ocp.subject_to(-0.030 <= (curv <= 0.030))
-        ocp.subject_to(-2 <= (ax <= 2))
-        ocp.subject_to(-20 <= (ay <= 20))
-        ocp.subject_to(-10 <= (jx <= 10))
-        ocp.subject_to(-60 <= (jy <= 60))
+        # # Give concerte numerical values for waypoints
+        # waypoints_num = np.array([(i, cos(i)) for i in range(N)]).T
+        # ocp.set_value(waypoints, waypoints_num)
+
+
+
+
+        # # Lagrange objective term
+        # # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
+        # # ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
+        # ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral(ax ** 2 + ay ** 2) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral(jx ** 2 + jy ** 2) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * 1 / f_obs[5, 0] * ocp.integral((desired_speed - vx) ** 2)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
+        # # THE VX FEATURE IS REMOVED!!
+        # # ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
+
+        # ocp.subject_to(-1 <= (y <= 4.5))
+        # # ocp.subject_to(-1 <= (u <= 1 ))
+        #
+        # # Boundary on the max curvature of the vehicle
+        # curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3 / 2)
+        # ocp.subject_to(-0.030 <= (curv <= 0.030))
+        # ocp.subject_to(-2 <= (ax <= 2))
+        # ocp.subject_to(-20 <= (ay <= 20))
+        # ocp.subject_to(-10 <= (jx <= 10))
+        # ocp.subject_to(-60 <= (jy <= 60))
 
 
         # Boundary constraints
@@ -102,10 +115,10 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         ocp.subject_to(ocp.at_t0(ay) == init_matrix[k,6])
         ocp.subject_to(ocp.at_t0(jy) == init_matrix[k,7])
 
-        ocp.subject_to(ocp.at_tf(y) == delta_lane)
-        ocp.subject_to(ocp.at_tf(vy) == 0)
-        ocp.subject_to(ocp.at_tf(ay) == 0)
-        ocp.subject_to(ocp.at_tf(jy) == 0)
+        # ocp.subject_to(ocp.at_tf(y) == delta_lane)
+        # ocp.subject_to(ocp.at_tf(vy) == 0)
+        # ocp.subject_to(ocp.at_tf(ay) == 0)
+        # ocp.subject_to(ocp.at_tf(jy) == 0)
 
         # DIT MOET NU WEL AANGEZET OMDAT NU GEEN SOFT CONSTRAINT MEER
         # ocp.subject_to(ocp.at_tf(vx) == des_matrix[k,1])
