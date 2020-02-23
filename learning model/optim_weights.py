@@ -5,7 +5,6 @@ stijnstaring@hotmail.com
 # local functions
 from define_plots import define_plots
 from guess_states import guess_states
-from spline_evaluation import spline_evalution
 # global functions
 import pylab as plt
 from rockit import *
