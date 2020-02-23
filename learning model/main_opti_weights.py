@@ -11,10 +11,6 @@ from calc_features import calc_features
 from comparing_features import comparing_features
 from post_processing_plots import post_processing_plots
 
-
- # DIT IS EEN TEST OF DE MERGING WERKT!!!!
-
- 
 # Remarks
 # ########
 # 22-02-20
