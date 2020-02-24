@@ -28,6 +28,7 @@ alpha = 0.5
 rec = 1
 plot_datasets = 0
 plot_opti_weights = 0
+calculated_features = plt.zeros([7,1])
 
 # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
 theta = 1*plt.ones((amount_features,1))
@@ -50,7 +51,7 @@ while rec < 2:
     [his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc] = optim_weights(theta, init_matrix,des_matrix,dict_list, files,str(rec),plot_opti_weights,f_obs,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7)
     # his_time_cal[time_lane_change, dt]
     [f1, f2, f3, f4, f5, f6, f7] = calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,his_time_cal_lc, des_matrix)
-
+    calculated_features = plt.array([f1,f2,f3,f4,f5,f6,f7])
 
     # # Update of theta --> RPROP algorithm
 
@@ -82,6 +83,12 @@ while rec < 2:
     ###########################
 
 # Post - processing
+print("These are the calculted features.")
+print("------------------------------------------")
+print('\n')
+for i in plt.arange(0,len(calculated_features),1):
+    print(calculated_features[i])
+
 print("This is the history of f_calc_rel.")
 print("------------------------------------------")
 print('\n')

@@ -67,9 +67,13 @@ def clip_lane_change(data):
 
     dt_grid = dt
 
-    # Amesim model produceert signals in de tangent vehicle axis
-    ax_loc_tot = data_cl['ax_cl'] - data_cl['r_cl']*data_cl['vy_cl']
-    ay_loc_tot = data_cl['ay_cl'] + data_cl['r_cl'] * data_cl['vx_cl']
+    # Amesim model produceert signals in de tangent vehicle axis (Dit is niet correct!!)
+    # ax_loc_tot = data_cl['ax_cl'] - data_cl['r_cl']*data_cl['vy_cl']
+    # ay_loc_tot = data_cl['ay_cl'] + data_cl['r_cl'] * data_cl['vx_cl']
+
+    # The Amesim model is producing the total acceleration: tangent acceleration + normal acceleration!!
+    ax_loc_tot = data_cl['ax_cl']
+    ay_loc_tot = data_cl['ay_cl']
 
     # State of vehicle at the start of the lane change
     data_cl['vx_proj_cl'] = plt.cos(data_cl['yaw_cl'])* data_cl['vx_cl'] - plt.sin(data_cl['yaw_cl'])* data_cl['vy_cl']
