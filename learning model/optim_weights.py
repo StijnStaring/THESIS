@@ -5,6 +5,7 @@ stijnstaring@hotmail.com
 # local functions
 from define_plots import define_plots
 from guess_states import guess_states
+from jerk_vehicle_model import jerk_vehicle_model
 # global functions
 import pylab as plt
 from rockit import *
@@ -42,31 +43,56 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
     # Optimization
     ##############
         ocp = Ocp(T=FreeTime(des_matrix[k,2]))
-        # ocp = Ocp(T=des_matrix[k,2])
 
-        # States (global axis) --> path is 5th order as in paper
-        x = ocp.state()
-        y = ocp.state()
-        vx = ocp.state()
-        vy = ocp.state()
-        ax = ocp.state()
-        ay = ocp.state()
-        jx = ocp.state()
-        jy = ocp.state()
+        # Parameters
+        # Remark !x and y are coordinates in global axis!
+        M = 1430
+        Izz = 1300
+        a = 1.056
+        b = 1.344
+        Kyf = 41850.8527587
+        Kyr = 51175.775017
+        Cr0 = 0.6
+        Cr2 = 0.1
+        rw = 0.292
+        Tmax = 584
+        pi = 3.14159265359
 
-        # Controls --> jounce need to be control because want jerk a continuous function. (is second order)
-        ux= ocp.control(order= 1)
-        uy= ocp.control(order= 1)
+        # Optimization variables
+        # States
+        x = ocp.state()  # in global axis
+        y = ocp.state()  # in global axis
+        vx = ocp.state()  # in local axis
+        vy = ocp.state()  # in local axis
+        psi = ocp.state()  # yaw  angle in radials
+        dpsi = ocp.state()  # rate of yaw angle in radials per second
 
-        # Specify differential equations for states
-        ocp.set_der(jx, ux)
-        ocp.set_der(jy, uy)
-        ocp.set_der(ax, jx)
-        ocp.set_der(ay, jy)
-        ocp.set_der(vx, ax)
-        ocp.set_der(vy, ay)
-        ocp.set_der(x, vx)
-        ocp.set_der(y, vy)
+        # Controls
+        throttle = ocp.control()  # bounded between -1 and 1
+        delta = ocp.control(order= 1)  # steerwheelangle in radians
+
+        # equations of the model
+        vx_glob = vx * plt.cos(psi) - vy * plt.sin(psi)
+        vy_glob = vx * plt.sin(psi) + vy * plt.cos(psi)
+        slipangle_f = plt.arctan2(vy + dpsi * a, vx) - delta
+        slipangle_r = plt.arctan2(vy - dpsi * b, vx)
+        Fxf = throttle * Tmax / (2 * rw)
+        Fxr = Fxf
+        Fyf = -2 * Kyf * slipangle_f
+        Fyr = -2 * Kyr * slipangle_r
+        F_d = Cr0 + Cr2 * vx * vx
+        # Local accelerations --> not total ones wrt global axis!
+        ax_con = (plt.cos(delta) * Fxf - plt.sin(delta) * Fyf + Fxr - F_d) / M + vy * dpsi
+        ay_con = (plt.sin(delta) * Fxf + plt.cos(delta) * Fyf + Fyr) / M - vx * dpsi
+        ddpsi = (plt.sin(delta) * Fxf * a + plt.cos(delta) * Fyf * a - b * Fyr) / Izz
+
+        # Path closing constraints
+        ocp.set_der(x, vx_glob)
+        ocp.set_der(y, vy_glob)
+        ocp.set_der(vx, ax_con)
+        ocp.set_der(vy, ay_con)
+        ocp.set_der(psi, dpsi)
+        ocp.set_der(dpsi, ddpsi)
 
         # delta_lane = des_matrix[k, 0]
         desired_speed = des_matrix[k,1]
@@ -78,13 +104,6 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
 
         waypoints_num = plt.squeeze(plt.array([data_cl['x_cl'],data_cl['y_cl']]))
         ocp.set_value(waypoints, waypoints_num)
-
-        # # Give concerte numerical values for waypoints
-        # waypoints_num = np.array([(i, cos(i)) for i in range(N)]).T
-        # ocp.set_value(waypoints, waypoints_num)
-
-
-
 
         # # Lagrange objective term
         # # theta = plt.array([total_acc, lateral_acc, total_jerk, lat_jerk, curvature, speed_feature, lane_change_feature])
@@ -108,12 +127,11 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         # Boundary constraints
         ocp.subject_to(ocp.at_t0(x) == init_matrix[k,0])
         ocp.subject_to(ocp.at_t0(vx) == init_matrix[k,1])
-        ocp.subject_to(ocp.at_t0(ax) == init_matrix[k,2])
-        ocp.subject_to(ocp.at_t0(jx) == init_matrix[k,3])
+        ocp.subject_to(ocp.at_t0(psi) == init_matrix[k,2])
+        ocp.subject_to(ocp.at_t0(dpsi) == init_matrix[k,3])
         ocp.subject_to(ocp.at_t0(y) == init_matrix[k,4])
         ocp.subject_to(ocp.at_t0(vy) == init_matrix[k,5])
-        ocp.subject_to(ocp.at_t0(ay) == init_matrix[k,6])
-        ocp.subject_to(ocp.at_t0(jy) == init_matrix[k,7])
+
 
         # ocp.subject_to(ocp.at_tf(y) == delta_lane)
         # ocp.subject_to(ocp.at_tf(vy) == 0)
@@ -127,15 +145,12 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         ####################
         [x_guess, y_guess, vx_guess, vy_guess, ax_guess,ay_guess,jx_guess, jy_guess] = guess_states(dict_list[k],desired_speed,CP)
 
+        # Can improve to give here a guess for the yaw and the yaw_rate
         ocp.set_initial(x,x_guess)
         ocp.set_initial(vx,vx_guess)
-        ocp.set_initial(ax,ax_guess)
-        ocp.set_initial(jx,jx_guess)
 
         ocp.set_initial(y,y_guess)
         ocp.set_initial(vy,vy_guess)
-        ocp.set_initial(ay,ay_guess)
-        ocp.set_initial(jy,jy_guess)
 
         # Solving the problem
         # -------------------
@@ -159,28 +174,36 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
 
         # Sampeling the optimal solutions
 
+        # theta(t)/theta(t)/s
+        tpsi_i, psi_i = sol.sample(psi, grid='integrator')
+        tdpsi_i, dpsi_i = sol.sample(dpsi, grid='integrator')
+
         # X(t)/Y(t)
         tx_i, x_i = sol.sample(x, grid='integrator')
         ty_i, y_i = sol.sample(y, grid='integrator')
 
         # Vx(t)/Vy(t)
-        tvx_i, vx_i = sol.sample(vx, grid='integrator')
-        tvy_i, vy_i = sol.sample(vy, grid='integrator')
+        tvx_i, vx_i_loc = sol.sample(vx, grid='integrator')
+        tvy_i, vy_i_loc = sol.sample(vy, grid='integrator')
 
-        # Ax(t)/Ay(t)
-        tax_i, ax_i = sol.sample(ax, grid='integrator')
-        tay_i, ay_i = sol.sample(ay, grid='integrator')
+        vx_i = plt.cos(psi_i) * vx_i_loc - plt.sin(psi_i) * vy_i_loc
+        vy_i = plt.sin(psi_i) * vx_i_loc + plt.cos(psi_i) * vy_i_loc
 
-        # Jx(t)/Jy(t)
-        tjx_i, jx_i = sol.sample(jx, grid='integrator')
-        tjy_i, jy_i = sol.sample(jy, grid='integrator')
+        # Calcultion of Ax(t)/Ay(t)
+        tax_i, ax_i_loc = sol.sample(ax_con, grid='integrator')
+        tay_i, ay_i_loc = sol.sample(ay_con, grid='integrator')
 
-        # Jouncex(t)/Jouncey(t)
-        tjx_i, ux_i = sol.sample(ux, grid='integrator')
-        tjy_i, uy_i = sol.sample(uy, grid='integrator')
+        # Calcultion of Ax(t)/Ay(t)
+        ax_loc_tot = ax_i_loc - dpsi_i * vy_i_loc
+        ay_loc_tot = ay_i_loc + dpsi_i * vx_i_loc
 
-        # Approximate space between samples by a quintic spline:
-        # [x, vx, ax, jx, y, vy, ay, jy]  = spline_evalution(3, tx_i, x_i, vx_i, ax_i, jx_i, y_i, vy_i, ay_i, jy_i)
+        ax_i = plt.cos(psi_i) * ax_loc_tot - plt.sin(psi_i) * ay_loc_tot
+        ay_i = plt.sin(psi_i) * ax_loc_tot + plt.cos(psi_i) * ay_loc_tot
+
+        # Calcultion of Jx(t)/Jy(t)
+        [jy_i, jx_i] = jerk_vehicle_model(tx_i, ax_i, ay_i, 1)
+        jx_i = plt.squeeze(jx_i)
+        jy_i = plt.squeeze(jy_i)
 
         # curvature with global axis information
         curv = (vx_i * ay_i -  vy_i* ax_i) / (vx_i** 2 + vy_i** 2) ** (3 / 2)
@@ -210,10 +233,8 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
             axcom3b.plot(tvy_i, vy_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
             axcom4a.plot(tax_i, ax_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
             axcom4b.plot(tay_i, ay_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
-            axcom5a.plot(tjx_i, jx_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
-            axcom5b.plot(tjy_i, jy_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
-            axcom6a.plot(tjx_i, ux_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
-            axcom6b.plot(tjy_i, uy_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
+            axcom5a.plot(tx_i, jx_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
+            axcom5b.plot(ty_i, jy_i, '.-', label="iteration: "+theta_iter, linewidth=3.0)
             axcom7.plot(tx_i, curv, '.-',   label="iteration: "+theta_iter, linewidth=3.0)
 
             axcom1a.legend()
@@ -240,10 +261,8 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
             ax3b.plot(tvy_i, vy_i, '.-',label = files[k][10:],linewidth = 3.0)
             ax4a.plot(tax_i, ax_i, '.-',label = files[k][10:],linewidth = 3.0)
             ax4b.plot(tay_i, ay_i, '.-',label = files[k][10:],linewidth = 3.0)
-            ax5a.plot(tjx_i, jx_i, '.-',label = files[k][10:],linewidth = 3.0)
-            ax5b.plot(tjy_i, jy_i, '.-',label = files[k][10:],linewidth = 3.0)
-            ax6a.plot(tjx_i, ux_i, '.-', label=files[k][10:], linewidth=3.0)
-            ax6b.plot(tjy_i, uy_i, '.-', label=files[k][10:], linewidth=3.0)
+            ax5a.plot(tx_i, jx_i, '.-',label = files[k][10:],linewidth = 3.0)
+            ax5b.plot(ty_i, jy_i, '.-',label = files[k][10:],linewidth = 3.0)
 
             ax8.plot(tx_i, curv, '.-', label=files[k][10:], linewidth=3.0)
 
