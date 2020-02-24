@@ -89,6 +89,12 @@ print('\n')
 for i in plt.arange(0,len(calculated_features),1):
     print(calculated_features[i])
 
+print("These are the differences of the features.")
+print("------------------------------------------")
+print('\n')
+for i in plt.arange(0,len(calculated_features),1):
+    print(calculated_features[i] - f_obs[i])
+
 print("This is the history of f_calc_rel.")
 print("------------------------------------------")
 print('\n')
