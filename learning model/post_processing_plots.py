@@ -123,14 +123,16 @@ def post_processing_plots(his_f_calc_rel,his_weights):
     plt.grid(True)
     plt.title('Weight of feature 7', fontsize=14)
 
-    for i in plt.arange(0,length,1):
-        ac1.plot(iterations[i], his_weights[i][1][0], 'o', label= "iteration "+str(i+1), linewidth=3.0)
-        ac2.plot(iterations[i], his_weights[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac3.plot(iterations[i], his_weights[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac4.plot(iterations[i], his_weights[i][1][3], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac5.plot(iterations[i], his_weights[i][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac6.plot(iterations[i], his_weights[i][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        ac7.plot(iterations[i], his_weights[i][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+    iterations_w = plt.arange(1, len(his_weights) + 1, 1)
+    iterations_w = iterations_w[:, plt.newaxis]
+    for i in plt.arange(0,len(his_weights),1):
+        ac1.plot(iterations_w[i], his_weights[i][1][0], 'o', label= "iteration "+str(i+1), linewidth=3.0)
+        ac2.plot(iterations_w[i], his_weights[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac3.plot(iterations_w[i], his_weights[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac4.plot(iterations_w[i], his_weights[i][1][3], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac5.plot(iterations_w[i], his_weights[i][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac6.plot(iterations_w[i], his_weights[i][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac7.plot(iterations_w[i], his_weights[i][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)
 
 
     # Plotting update of theta
