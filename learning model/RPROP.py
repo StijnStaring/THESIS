@@ -1,5 +1,9 @@
 def RPROP(grad_curr,grad_prev,update,w_curr,del_w_prev,exception):
     import pylab as plt
+    # this RPROP is not equal to the original as presented in the paper.
+    # Modification made that a grad change occurs --> all previous steps are cancelled out and the step of the corresponding
+    # grad sign changes are reduced.
+
     # Expects grad in shape n x 1
     # definition of parameters:
     n_pos = 1.2

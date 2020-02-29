@@ -40,8 +40,9 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
 
     # Optimization
     ##############
-        ocp = Ocp(T=FreeTime(des_matrix[k,2]))
-        # ocp = Ocp(T=des_matrix[k,2])
+        # THE TIME IS SET FIXED!!!
+        # ocp = Ocp(T=FreeTime(des_matrix[k,2]))
+        ocp = Ocp(T=des_matrix[k,2])
 
         # States (global axis) --> path is 5th order as in paper
         x = ocp.state()
@@ -76,13 +77,16 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         # # ocp.add_objective(theta[0, 0]* ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * ocp.integral((desired_speed - vx) ** 2) + theta[6, 0] * ocp.integral((delta_lane - y) ** 2))
         # ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral(ax ** 2 + ay ** 2) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral(jx ** 2 + jy ** 2) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3) + theta[5, 0] * 1 / f_obs[5, 0] * ocp.integral((desired_speed - vx) ** 2)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
         # # THE VX FEATURE IS REMOVED!!
-        ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3)+theta[6, 0] * 1 / f_obs[6, 0]  * ocp.integral((delta_lane - y) ** 2))
+        # # THE Y(t) FEATURE IS REMOVED!!
+        # ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2) + theta[2, 0] * 1 / f_obs[2, 0] * ocp.integral((jx ** 2 + jy ** 2)) + theta[3, 0] * 1 / f_obs[3, 0] * ocp.integral(jy ** 2) + theta[4, 0] * 1 / f_obs[4, 0] * ocp.integral((vx * ay - vy * ax) ** 2 / (vx ** 2 + vy ** 2) ** 3))
+        ocp.add_objective(theta[0, 0] * 1 / f_obs[0, 0] * ocp.integral((ax ** 2 + ay ** 2)) + theta[1, 0] * 1 / f_obs[1, 0] * ocp.integral(ay ** 2))
+
 
         ocp.subject_to(-1 <= (y <= 4.5))
 
         # Boundary on the max curvature of the vehicle
-        curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3 / 2)
-        ocp.subject_to(-0.030 <= (curv <= 0.030))
+        # curv = (vx * ay - vy * ax) / (vx ** 2 + vy ** 2) ** (3 / 2)
+        # ocp.subject_to(-0.030 <= (curv <= 0.030))
         ocp.subject_to(-5 <= ((vx-desired_speed) <= 5))
         ocp.subject_to(-2 <= (ax <= 2))
         ocp.subject_to(-20 <= (ay <= 20))

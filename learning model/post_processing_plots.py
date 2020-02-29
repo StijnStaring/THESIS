@@ -71,7 +71,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads):
         ac7.plot(iterations[i], his_f_calc_rel[i][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)
 
 
-# Weights over iterations
+    # Weights over iterations
     plt.figure("Weights",figsize=(10, 4))
 
     plt.subplot(2, 4, 1)
