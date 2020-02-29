@@ -16,7 +16,7 @@ from post_processing_plots import post_processing_plots
 # 22-02-20
 # Exacte implementatie zoals beschreven in de paper
 # No normalization necessary with respect of gradient --> size doesn't matter in RPROP implementation.
-# Optimization objective is normalized in order to have dimensionless weights --> better start (+-equal size of optimization terms at start)
+# Optimization objective is normalized in order to have dimensionless weights --> better start (+-equal size of optimization terms at start).
 
 # Defining weights
 ##################
