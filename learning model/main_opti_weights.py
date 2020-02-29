@@ -79,7 +79,8 @@ while rec < 20:
     # Update theta with RPROP
     ##########################
     grad_curr = f_obs-f_calculated
-    [grad_prev, del_theta_prev, exception, theta, update] = RPROP(grad_curr,grad_prev,update,theta,del_theta_prev,exception)
+    [grad_prev, del_theta_prev, exception, theta, update, multi_grads] = RPROP(grad_curr,grad_prev,update,theta,del_theta_prev,exception)
+    his_multi_grads.append([str(rec)+"//",multi_grads])
 
     # Plots in the for loop
     axf.plot([f_calc_rel[0], f_calc_rel[1], f_calc_rel[2], f_calc_rel[3], f_calc_rel[4], f_calc_rel[5], f_calc_rel[6]],
@@ -97,6 +98,12 @@ while rec < 20:
     ###########################
 
 # Post - processing
+print("This is the history of his_multi_grads.")
+print("------------------------------------------")
+print('\n')
+for i in plt.arange(0,len(his_multi_grads),1):
+    print(his_multi_grads[i])
+
 print("This is the history of f_calc_rel.")
 print("------------------------------------------")
 print('\n')
@@ -116,7 +123,7 @@ for i in plt.arange(1,len(his_weights),1):
     print("This is update " +str(i))
     print(his_weights[i][1] - his_weights[i-1][1])
 
-post_processing_plots(his_f_calc_rel,his_weights)
+post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads)
 
 plt.show()
 #####################

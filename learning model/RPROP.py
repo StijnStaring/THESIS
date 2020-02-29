@@ -8,6 +8,7 @@ def RPROP(grad_curr,grad_prev,update,w_curr,del_w_prev,exception):
     del_min = 1e-6
     w_new = plt.zeros([len(grad_curr),1])
     del_w = plt.zeros([len(grad_curr),1])
+    multi_grads = plt.zeros([len(grad_curr),1])
 
 
     # algorithm
@@ -17,6 +18,9 @@ def RPROP(grad_curr,grad_prev,update,w_curr,del_w_prev,exception):
         if exception[i] == 1:
             grad_prev[i] = 0
             print('exception is used')
+
+        # storage of mutli_grads
+        multi_grads[i] = grad_curr[i]*grad_prev[i]
 
         if grad_curr[i]*grad_prev[i] > 0:
             update[i] = min(update[i]*n_pos,del_max)
@@ -39,4 +43,4 @@ def RPROP(grad_curr,grad_prev,update,w_curr,del_w_prev,exception):
             print('2x grad = 0')
 
 
-    return grad_curr, del_w, exception, w_new, update
+    return grad_curr, del_w, exception, w_new, update, multi_grads
