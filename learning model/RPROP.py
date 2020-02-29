@@ -30,7 +30,7 @@ def RPROP(grad_curr,grad_prev,update,w_curr,del_w_prev,exception):
             del_w[i] = - del_w_prev[i]
             w_new[i] = w_curr[i] +del_w[i]
             exception[i] = 1
-            print('niet 2x pos grad')
+            print('2x neg grad')
 
         elif grad_curr[i]*grad_prev[i] == 0:
             del_w[i] = -plt.sign(grad_curr[i]) * update[i]

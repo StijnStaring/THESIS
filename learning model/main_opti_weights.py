@@ -22,11 +22,12 @@ from RPROP import RPROP
 # Defining weights
 ##################
 # sns.set_palette(sns.color_palette("hls", 20))
+his_multi_grads = []
 his_weights = []
 his_f_calc_rel = []
 amount_features = 7
 rec = 1
-plot_datasets = 1
+plot_datasets = 0
 plot_opti_weights = 0
 calculated_features = plt.zeros([amount_features,1])
 
@@ -85,6 +86,7 @@ while rec < 20:
              '-', marker='o', markersize=6, label="Calc Features iter: " + str(rec))
     axf.legend()
     calculated_features = plt.array([f1, f2, f3, f4, f5, f6, f7])
+
     axfn.plot([f1, f2, f3, f4, f5, f6, f7],
              '-', marker='o', markersize=6, label="Calc Features iter: " + str(rec))
     axfn.legend()
