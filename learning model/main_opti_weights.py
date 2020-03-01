@@ -2,6 +2,7 @@
 stijnstaring@hotmail.com
 
 The program automatically uses all the csv files stored in the 'used_data' folder.
+Github ==> ideal test folder
 """
 # import seaborn as sns
 import pylab as plt
