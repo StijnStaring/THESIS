@@ -106,8 +106,8 @@ def optim_weights(theta,init_matrix,des_matrix,dict_list,files,theta_iter,plot,f
         ocp.set_der(dpsi, ddpsi)
 
         # Extra variables - jerks in the local axis! (ook nog aanpassen bij het bereken van de features data)
-        # jx = ocp.der(ax)
-        # jy = ocp.der(ay)
+        jx = ocp.der(ax_con)
+        jy = ocp.der(ay_con)
 
         delta_lane = des_matrix[k, 0]
         desired_speed = des_matrix[k,1]
