@@ -143,6 +143,23 @@ opti.set_initial(T, 1)
 #     time_list.append(i*dt)
 # time_vector = plt.array(time_list)
 
+ax_list = []
+for k in range(N+1):
+    ax_list.append(f(X[:, k], U[:,k])[2])
+ay_list = []
+for k in range(N+1):
+    ay_list.append(f(X[:, k], U[:,k])[3])
+
+# calculation jerk
+jy_list = []
+for i in plt.arange(0, len(ay_list), 1):
+    if i == 0:
+        jy_list.append((ay_list[i + 1]-ay_list[i])/dt)
+    elif i == len(ay_list):
+        jy_list.append((ay_list[i]-ay_list[i-1])/dt)
+    else:
+        jy_list.append((ay_list[i + 1] - ay_list[i - 1]) / (2 * dt))
+
 # f1: total acceleration
 ##########################
 k1 = (f(states, controls)[2])**2+(f(states, controls)[3])**2
@@ -154,7 +171,7 @@ F1 = Function('F1', [states, controls, dt], [integrand_extra],['states','control
 
 F1_int = 0
 for k in range(N):
-    F1_int = F1_int + F1(X[:, k], U[k],T/N)
+    F1_int = F1_int + F1(X[:, k], U[:,k],T/N)
 
 print(F1_int)
 
