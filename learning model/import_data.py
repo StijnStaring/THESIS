@@ -30,7 +30,7 @@ def import_data(plot):
     f4 = 0
     f5 = 0
     f6 = 0
-    f7 = 0
+    f7 = 1
 
     for file in files:
         data = pd.read_csv(file)
@@ -50,46 +50,46 @@ def import_data(plot):
         # Calculate observed feature values --> Simpson integration rule
         time_vector = plt.arange(0, time_lane_change + dt_grid, dt_grid)
 
-        # f1: total acceleration
-        integrand = plt.squeeze(data_cl['ax_proj_cl']**2+data_cl['ay_proj_cl']**2)
+        # f1: longitudinal acceleration
+        integrand = plt.squeeze(data_cl['ax_cl']**2)
         f1_cal = scipy.integrate.simps(integrand, time_vector)
         f1 = f1 + f1_cal
         # print('f1: ',f1)
 
         # f2: lateral acceleration
-        integrand = plt.squeeze(data_cl['ay_proj_cl']**2)
+        integrand = plt.squeeze(data_cl['ay_cl']**2)
         f2_cal = scipy.integrate.simps(integrand, time_vector)
         f2 = f2 + f2_cal
         # print('f2: ', f2)
 
-        #f3: total jerk
-        integrand = plt.squeeze(data_cl['jx_cl']**2+data_cl['jy_cl']**2)
+        #f3: lateral jerk
+        integrand = plt.squeeze(data_cl['jy_cl']** 2)
         f3_cal = scipy.integrate.simps(integrand, time_vector)
         f3 = f3 + f3_cal
         # print('f3: ', f3)
 
-        # f4: lateral jerk
-        integrand = plt.squeeze(data_cl['jy_cl']** 2)
+        # f4: centriputal force
+        integrand = plt.squeeze((-data_cl['vy_cl'] * data_cl['r_cl']) ** 2 + (data_cl['vx_cl'] * data_cl['r_cl']) ** 2)
         f4_cal = scipy.integrate.simps(integrand, time_vector)
         f4 = f4 + f4_cal
         # print('f4: ', f4)
 
-        # f5: curvature
-        integrand = plt.squeeze((data_cl['vx_proj_cl']*data_cl['ay_proj_cl']-data_cl['vy_proj_cl']*data_cl['ax_proj_cl'])**2/(data_cl['vx_proj_cl']**2+data_cl['vy_proj_cl']**2)**3)
+        # # f5: curvature
+        # integrand = plt.squeeze((data_cl['vx_proj_cl']*data_cl['ay_proj_cl']-data_cl['vy_proj_cl']*data_cl['ax_proj_cl'])**2/(data_cl['vx_proj_cl']**2+data_cl['vy_proj_cl']**2)**3)
+        # f5_cal = scipy.integrate.simps(integrand, time_vector)
+        # f5 = f5 + f5_cal
+        # # print('f5: ', f5)
+
+        # f5: desired speed
+        integrand = plt.squeeze((desired_speed-data_cl['vx_proj_cl'])**2)
         f5_cal = scipy.integrate.simps(integrand, time_vector)
         f5 = f5 + f5_cal
-        # print('f5: ', f5)
-
-        # f6: desired speed
-        integrand = plt.squeeze((desired_speed-data_cl['vx_proj_cl'])**2)
-        f6_cal = scipy.integrate.simps(integrand, time_vector)
-        f6 = f6 + f6_cal
         # print('f6: ', f6)
 
-        # f7: desired lane change
+        # f6: desired lane change
         integrand = plt.squeeze((delta_lane - data_cl['y_cl'])**2)
-        f7_cal = scipy.integrate.simps(integrand, time_vector)
-        f7 = f7 + f7_cal
+        f6_cal = scipy.integrate.simps(integrand, time_vector)
+        f6 = f6 + f6_cal
         # print('f7: ', f7)
 
         # Plotting in figures
@@ -101,12 +101,12 @@ def import_data(plot):
             ax2.plot(data_cl['x_cl'], data_cl['y_cl'], '-',label = file,linewidth = 3.0)
 
             # The vx and vy velocities are as seen in the global axis (fixed).
-            ax3a.plot(data_cl['time_cl'], data_cl['vx_proj_cl'], '-',label = file,linewidth = 3.0)
-            ax3b.plot(data_cl['time_cl'], data_cl['vy_proj_cl'], '-',label = file,linewidth = 3.0)
+            ax3a.plot(data_cl['time_cl'], data_cl['vx_cl'], '-',label = file,linewidth = 3.0)
+            ax3b.plot(data_cl['time_cl'], data_cl['vy_cl'], '-',label = file,linewidth = 3.0)
 
             # The ax and ay accelerations are as seen in the global axis (fixed).
-            ax4a.plot(data_cl['time_cl'], data_cl['ax_proj_cl'], '-',label = file,linewidth = 3.0)
-            ax4b.plot(data_cl['time_cl'], data_cl['ay_proj_cl'], '-',label = file,linewidth = 3.0)
+            ax4a.plot(data_cl['time_cl'], data_cl['ax_cl'], '-',label = file,linewidth = 3.0)
+            ax4b.plot(data_cl['time_cl'], data_cl['ay_cl'], '-',label = file,linewidth = 3.0)
 
             # The jerk_x and jerk_y are as seen in the global axis (fixed).
             ax5a.plot(data_cl['time_cl'], data_cl['jx_cl'], '-',label = file,linewidth = 3.0)
@@ -146,14 +146,20 @@ def import_data(plot):
     f4 = f4/length
     f5 = f5/length
     f6 = f6/length
-    f7 = f7/length
+    # f7 = f7/length
+    print('integrand = plt.squeeze(data_cl[ax_proj_cl]**2)')
     print(f1)
+    print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
     print(f2)
+    print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
     print(f3)
+    print('integrand = plt.squeeze((-data_cl[vy_cl] * data_cl[r_cl]) ** 2 + (data_cl[vx_cl] * data_cl[r_cl]) ** 2)')
     print(f4)
+    print('integrand = plt.squeeze((desired_speed - data_cl[vx_proj_cl]) ** 2)')
     print(f5)
+    print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
     print(f6)
-    print(f7)
+    # print(f7)
 
 
 

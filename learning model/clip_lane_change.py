@@ -82,8 +82,8 @@ def clip_lane_change(data):
 
     # calculating jerks
     jerk_y, jerk_x = calc_jerk(data_cl, 0)  # jerk is calculated in global axis.
-    data_cl['jx_cl'] = jerk_x
-    data_cl['jy_cl'] = jerk_y
+    data_cl['jx_cl'] = jerk_x # This is the local jerk
+    data_cl['jy_cl'] = jerk_y # This is the local jerk
 
     # curvature with global axis information
     data_cl['curvature_cl'] = (data_cl['vx_proj_cl']*data_cl['ay_proj_cl']-data_cl['vy_proj_cl']*data_cl['ax_proj_cl'])/(data_cl['vx_proj_cl']**2+data_cl['vy_proj_cl']**2)**(3/2)
