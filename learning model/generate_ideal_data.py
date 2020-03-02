@@ -41,6 +41,10 @@ vy_start = 0
 psi_start = 0
 psi_dot_start = 0
 width_road = 3
+# Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
+# Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
+theta = plt.array([2,])
+
 
 # Equations of the vehicle model
 x = MX.sym('x') # in global axis
@@ -138,41 +142,85 @@ opti.set_initial(T, 1)
 #    objective
 # -----------------------------------------------
 # Objective: (need to be normalized?)
-# time_list = []
-# for i in range(N+1):
-#     time_list.append(i*dt)
-# time_vector = plt.array(time_list)
+time_list = []
+for i in range(N):
+    time_list.append(i*dt)
+time_vector = plt.array(time_list)
+
+anx_list = []
+for k in range(N):
+    anx_list.append(-vy[k]*psi_dot[k])
+
+any_list = []
+for k in range(N): # one point less taken in comparison of the total amount
+    any_list.append(vx[k]*psi_dot[k])
 
 ax_list = []
-for k in range(N+1):
+for k in range(N): # These derivatives of the states of a point less: N instead of N+1
     ax_list.append(f(X[:, k], U[:,k])[2])
 ay_list = []
-for k in range(N+1):
+for k in range(N):
     ay_list.append(f(X[:, k], U[:,k])[3])
 
-# calculation jerk
+# calculation lateral jerk
 jy_list = []
 for i in plt.arange(0, len(ay_list), 1):
     if i == 0:
         jy_list.append((ay_list[i + 1]-ay_list[i])/dt)
-    elif i == len(ay_list):
+    elif i == len(ay_list)-1:
         jy_list.append((ay_list[i]-ay_list[i-1])/dt)
     else:
         jy_list.append((ay_list[i + 1] - ay_list[i - 1]) / (2 * dt))
 
-# f1: total acceleration
-##########################
-k1 = (f(states, controls)[2])**2+(f(states, controls)[3])**2
-k2 = (f(states + dt/2 * k1, controls)[2])**2+(f(states + dt/2 * k1, controls)[3])**2
-k3 = (f(states + dt/2 * k2, controls)[2])**2+(f(states + dt/2 * k2, controls)[3])**2
-k4 = (f(states + dt * k3, controls)[2])**2+(f(states + dt * k3, controls)[3])**2
-integrand_extra = dt/6*(k1 +2*k2 +2*k3 +k4)
-F1 = Function('F1', [states, controls, dt], [integrand_extra],['states','controls','dt'],['integrand_next'])
+vx_des_list = []
+for k in range(N): # These derivatives of the states of a point less: N instead of N+1
+    vx_des_list.append(vx[k]-vx_start)
 
-F1_int = 0
-for k in range(N):
-    F1_int = F1_int + F1(X[:, k], U[:,k],T/N)
+y_des_list = []
+for k in range(N): # These derivatives of the states of a point less: N instead of N+1
+    y_des_list.append(y[k]-width_road)
 
-print(F1_int)
+# k1 = (f(states, controls)[2])**2+(f(states, controls)[3])**2
+# k2 = (f(states + dt/2 * k1, controls)[2])**2+(f(states + dt/2 * k1, controls)[3])**2
+# k3 = (f(states + dt/2 * k2, controls)[2])**2+(f(states + dt/2 * k2, controls)[3])**2
+# k4 = (f(states + dt * k3, controls)[2])**2+(f(states + dt * k3, controls)[3])**2
+# integrand_extra = dt/6*(k1 +2*k2 +2*k3 +k4)
+# F1 = Function('F1', [states, controls, dt], [integrand_extra],['states','controls','dt'],['integrand_next'])
+
+# F1_int = 0
+# for k in range(N):
+#     F1_int = F1_int + F1(X[:, k], U[:,k],T/N)
+
+# Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
+
+# f0: longitudinal acceleration
+integrand = plt.array(ax_list)** 2
+f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+# f1: lateral acceleration
+integrand = plt.array(ay_list)** 2
+f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+# print('f1: ',f1_cal)
+
+# f2: lateral jerk
+integrand = plt.array(jy_list)** 2
+f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+# f3: centriputal force
+integrand = plt.array(anx_list)** 2+plt.array(any_list)** 2
+f3_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+# f4: desired velocity
+integrand = plt.array(vx_des_list)** 2
+f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+# f5: desired lane change
+integrand = plt.array(y_des_list)** 2
+f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+opti.minimize(theta[0]*f0_cal+theta[1]*f1_cal+theta[2]*f2_cal+theta[3]*f3_cal+theta[4]*f4_cal+theta[5]*f5_cal)
+
+
+
 
 
