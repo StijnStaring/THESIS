@@ -44,6 +44,19 @@ width_road = 3
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
 theta = plt.array([2,])
+# normalization information
+# integrand = plt.squeeze(ax** 2)
+norm0 = 0.3072585725919982
+# integrand = plt.squeeze(ay** 2)
+norm1 = 2.0824922161681316
+# integrand = plt.squeeze(jy ** 2)
+norm2 = 41.4796020568006
+# integrand = plt.squeeze((-vy*dpsi) ** 2 + (vx*dpsi)**2)
+norm3 = 35.511231053915
+# integrand = plt.squeeze((desired_speed - vx) ** 2)
+norm4 = 0.2172162321065016
+# integrand = plt.squeeze((delta_lane - y) ** 2)
+norm5 = 13.158914673920528
 
 
 # Equations of the vehicle model
@@ -218,7 +231,7 @@ f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 integrand = plt.array(y_des_list)** 2
 f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
-opti.minimize(theta[0]*f0_cal+theta[1]*f1_cal+theta[2]*f2_cal+theta[3]*f3_cal+theta[4]*f4_cal+theta[5]*f5_cal)
+opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]*f3_cal+theta[4]*f4_cal+theta[5]*f5_cal)
 
 
 
