@@ -1,0 +1,33 @@
+Simpson method
+---------------
+integrand = plt.squeeze(data_cl[ax_cl]**2)
+0.005492930350878995
+integrand = plt.squeeze(data_cl[ay_cl] ** 2)
+0.07368478845406116
+integrand = plt.squeeze(data_cl[jy_cl] ** 2)
+0.10082503272293279
+integrand = plt.squeeze((-data_cl[vy_cl] * data_cl[r_cl]) ** 2 + (data_cl[vx_cl] * data_cl[r_cl]) ** 2)
+4.266065430559213
+integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)
+0.033958762976575116
+integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)
+9.515425898187612
+
+Trapezium method
+-----------------
+integrand = plt.squeeze(data_cl[ax_cl]**2)
+0.005506572672456269
+integrand = plt.squeeze(data_cl[ay_cl] ** 2)
+0.07373060266978523
+integrand = plt.squeeze(data_cl[jy_cl] ** 2)
+0.10095826227088327
+integrand = plt.squeeze((-data_cl[vy_cl] * data_cl[r_cl]) ** 2 + (data_cl[vx_cl] * data_cl[r_cl]) ** 2)
+4.264921801076734
+integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)
+0.033957860144509605
+integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)
+9.515494297002054
+
+
+Difference between the two methods is negligible.
+Trapezium method is easier and more robuust in use. (faster + is not crashing when 700 points are taken into account)

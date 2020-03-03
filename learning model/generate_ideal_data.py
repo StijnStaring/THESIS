@@ -11,7 +11,7 @@ time_range: free time range
 speed_range: [80-90] km/hour
 :return: csv-datafiles
 """
-import scipy
+import csv
 from scipy import integrate, signal
 from import_data import import_data
 from define_plots import define_plots
@@ -19,7 +19,7 @@ from jerk import jerk
 import pylab as plt
 from casadi import *
 
-[norm0,norm1,norm2,norm3,norm4,norm5,init_matrix,des_matrix,dict_list,files] = import_data(0)
+[norm0,norm1,norm2,norm3,norm4,norm5,init_matrix,des_matrix,dict_list,files] = import_data(1)
 data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
 # Remark !x and y are coordinates in global axis!
@@ -38,7 +38,8 @@ pi = 3.14159265359
 # Parameters of the optimization
 nx = 6 # amount of states
 nc = 2 # amount of controls
-N = 700
+N = 600
+
 x_start = 0
 y_start = 0
 vx_start = 80/3.6 # this is also the desired velocity
@@ -60,7 +61,7 @@ time_guess = des_matrix[0,2]
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
-theta = plt.array([2,5,6,7,1,4]) # deze wegingsfactoren dienen achterhaald te worden.
+theta = plt.array([2,5,6,7,1,5]) # deze wegingsfactoren dienen achterhaald te worden.
 
 # Equations of the vehicle model
 x = MX.sym('x') # in global axis
@@ -139,6 +140,7 @@ for k in range(N):
 opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
 opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
 opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road
+opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
 
 # Initial constraints
 # states: x, y, vx, vy, psi, psi_dot
@@ -165,7 +167,7 @@ opti.set_initial(T, time_guess)
 # -----------------------------------------------
 #    objective
 # -----------------------------------------------
-# Objective: (need to be normalized?)
+# Objective: The total accelerations in the local axis are considered!
 time_list = []
 for i in range(N): # These derivatives of the states of a point less: N instead of N+1
     time_list.append(i*T/N)
@@ -186,15 +188,18 @@ ay_list = []
 for k in range(N):
     ay_list.append(f(X[:, k], U[:,k])[3])
 
+ax_tot = plt.array(ax_list) + plt.array(anx_list)
+ay_tot = plt.array(ay_list) + plt.array(any_list)
+
 # calculation lateral jerk
 jy_list = []
-for i in plt.arange(0, len(ay_list), 1):
+for i in plt.arange(0, len(ay_tot), 1):
     if i == 0:
-        jy_list.append((ay_list[i + 1]-ay_list[i])/(T/N))
-    elif i == len(ay_list)-1:
-        jy_list.append((ay_list[i]-ay_list[i-1])/(T/N))
+        jy_list.append((ay_tot[i + 1]-ay_tot[i])/(T/N))
+    elif i == len(ay_tot)-1:
+        jy_list.append((ay_tot[i]-ay_tot[i-1])/(T/N))
     else:
-        jy_list.append((ay_list[i + 1] - ay_list[i - 1]) / (2 * (T/N)))
+        jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
 
 vx_des_list = []
 for k in range(N): # These derivatives of the states of a point less: N instead of N+1
@@ -204,10 +209,16 @@ y_des_list = []
 for k in range(N): # These derivatives of the states of a point less: N instead of N+1
     y_des_list.append(y[k]-width_road)
 
-# Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
+# Extra constraints on acceleration and jerk:
+opti.subject_to(ax_tot[0] == 0)
+opti.subject_to(ay_tot[0] == 0)
+opti.subject_to(jy_list[0] == 0)
+
+
+# Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 
 # f0: longitudinal acceleration
-integrand = plt.array(ax_list)** 2
+integrand = ax_tot** 2
 f0_cal = 0
 for i in plt.arange(0, len(integrand) - 1, 1):
     f0_cal = f0_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
@@ -215,7 +226,7 @@ for i in plt.arange(0, len(integrand) - 1, 1):
 # f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 # f1: lateral acceleration
-integrand = plt.array(ay_list)** 2
+integrand = ay_tot** 2
 f1_cal = 0
 for i in plt.arange(0, len(integrand) - 1, 1):
     f1_cal = f1_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
@@ -255,6 +266,7 @@ for i in plt.arange(0, len(integrand) - 1, 1):
 # opti.minimize(theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal)
 opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
 print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
+print('Relative weights: ', theta)
 
 # Implementation of the solver
 opti.solver('ipopt')
@@ -287,4 +299,39 @@ jy_sol = jerk(ay_list,dt_sol)
 
 define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol)
 
+print("\n")
+print('Integrated feature values: ')
+print('------------------------------')
+print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
+print(sol.value(f0_cal))
+print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
+print(sol.value(f1_cal))
+print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
+print(sol.value(f2_cal))
+print('integrand = plt.squeeze((-data_cl[vy_cl] * data_cl[r_cl]) ** 2 + (data_cl[vx_cl] * data_cl[r_cl]) ** 2)')
+print(sol.value(f3_cal))
+print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
+print(sol.value(f4_cal))
+print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
+print(sol.value(f5_cal))
+
+# ----------------------------------
+#    Storing of data in csv-file
+# ----------------------------------
+# path = "written_data\ N_600_V_80.csv"
+# file = open(path,'w',newline= "")
+# writer = csv.writer(file)
+# writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta"])
+#
+# for i in range(N+1):
+#     if i == N:
+#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_sol[i - 1], ay_sol[i - 1], jx_sol[i - 1],jy_sol[i - 1], psi_sol[i], psi_dot_sol[i], throttle_sol[i - 1], delta_sol[i - 1]])
+#     else:
+#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_sol[i], ay_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i], delta_sol[i]])
+#
+# file.close()
+
+# ----------------------------------
+#    Show
+# ----------------------------------
 plt.show()

@@ -35,13 +35,13 @@ def plotting_datasets():
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal velocity [m/s]", fontsize=14)
     plt.grid(True)
-    plt.title('Vx(t) dataset (global)', fontsize=14)
+    plt.title('Vx(t) dataset (local)', fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax3b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical velocity [m/s]", fontsize=14)
-    plt.title('Vy(t) dataset (global)', fontsize=14)
+    plt.title('Vy(t) dataset (local)', fontsize=14)
     plt.grid(True)
 
     # Ax(t)/Ay(t)
@@ -51,13 +51,13 @@ def plotting_datasets():
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal acceleration [m/s^2]", fontsize=14)
     plt.grid(True)
-    plt.title('Ax(t) dataset (global)', fontsize=14)
+    plt.title('Ax(t) dataset (local)', fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax4b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical acceleration [m/s^2]", fontsize=14)
-    plt.title('Ay(t) dataset (global)', fontsize=14)
+    plt.title('Ay(t) dataset (local)', fontsize=14)
     plt.grid(True)
 
     # Jx(t)/Jy(t)
@@ -68,13 +68,13 @@ def plotting_datasets():
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal jerk [m/s^3]", fontsize=14)
     plt.grid(True)
-    plt.title('jx(t) dataset (global)', fontsize=14)
+    plt.title('jx(t) dataset (local)', fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax5b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical jerk [m/s^3]", fontsize=14)
-    plt.title('jy(t) dataset (global)', fontsize=14)
+    plt.title('jy(t) dataset (local)', fontsize=14)
     plt.grid(True)
 
     # yaw(t)/r(t) -> radians should be transformed to degrees
@@ -90,7 +90,7 @@ def plotting_datasets():
     ax6b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("[degrees/s]", fontsize=14)
-    plt.title('yaw(t)/s dataset', fontsize=14)
+    plt.title('yaw rate(t) (local)', fontsize=14)
     plt.grid(True)
 
     # steerwheelangle -> is already given in degrees
@@ -101,12 +101,12 @@ def plotting_datasets():
     plt.grid(True)
     plt.title('Steerwheelangle dataset', fontsize=14)
 
-    # Curvature
-    plt.figure("Curvature")
+    #  amplitude of Centriputal acc
+    plt.figure("Centriputal acc")
     ax8 = plt.gca()
     plt.xlabel("t [s]", fontsize=14)
-    plt.ylabel("Curvature [1/m]", fontsize=14)
-    plt.title('Curvature of the dataset (global)', fontsize=14)
+    plt.ylabel("centrital acc [m/s^2]", fontsize=14)
+    plt.title('Centriputal acc', fontsize=14)
     plt.grid(True)
 
     return ax1a, ax1b, ax2, ax3a, ax3b, ax4a, ax4b, ax5a, ax5b, ax6a, ax6b, ax7, ax8

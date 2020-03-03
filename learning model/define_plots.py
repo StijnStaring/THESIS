@@ -12,13 +12,13 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal distance [m]", fontsize=14)
     plt.grid(True)
-    plt.title('x(t) ',fontsize=14)
+    plt.title('x(t) global',fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax1b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical distance [m]", fontsize=14)
-    plt.title('y(t) ',fontsize=14)
+    plt.title('y(t) global',fontsize=14)
     plt.grid(True)
 
     # path
@@ -26,7 +26,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax2 = plt.gca()
     plt.xlabel("x [m]",fontsize=14)
     plt.ylabel("y [m]",fontsize=14)
-    plt.title('Path [m] ',fontsize=14)
+    plt.title('Path global [m] ',fontsize=14)
     plt.grid(True)
 
     # Vx(t)/Vy(t)
@@ -37,13 +37,13 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal velocity [m/s]", fontsize=14)
     plt.grid(True)
-    plt.title('Vx(t) ',fontsize=14)
+    plt.title('Vx(t) local',fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax3b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical velocity [m/s]", fontsize=14)
-    plt.title('Vy(t) ',fontsize=14)
+    plt.title('Vy(t) local',fontsize=14)
     plt.grid(True)
 
 
@@ -54,13 +54,13 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal acceleration [m/s^2]", fontsize=14)
     plt.grid(True)
-    plt.title('Ax(t) ',fontsize=14)
+    plt.title('Ax(t) local',fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax4b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical acceleration [m/s^2]", fontsize=14)
-    plt.title('Ay(t) ',fontsize=14)
+    plt.title('Ay(t) local',fontsize=14)
     plt.grid(True)
 
     # Jx(t)/Jy(t)
@@ -71,13 +71,13 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal jerk [m/s^3]", fontsize=14)
     plt.grid(True)
-    plt.title('jx(t) ',fontsize=14)
+    plt.title('jx(t) local',fontsize=14)
 
     plt.subplot(1, 2, 2)
     ax5b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical jerk [m/s^3]", fontsize=14)
-    plt.title('jy(t) ',fontsize=14)
+    plt.title('jy(t) local',fontsize=14)
     plt.grid(True)
 
     # yaw(t)/yaw/s(t)
@@ -110,7 +110,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax7b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("delta [degrees]", fontsize=14)
-    plt.title('delta ', fontsize=14)
+    plt.title('delta local', fontsize=14)
     plt.grid(True)
 
     time_vector = plt.linspace(0,T_sol,len(x_sol))

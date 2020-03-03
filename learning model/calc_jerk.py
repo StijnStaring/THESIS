@@ -6,8 +6,8 @@ def calc_jerk(data_cl,fig):
     lengte = len(data_cl['time_cl'])
     dt = data_cl['time_cl'][1, 0] - data_cl['time_cl'][0, 0]
 
-    ax_d = data_cl['ax_cl']
-    ay_d = data_cl['ay_cl']
+    ax_d = data_cl['ax_local_cl']
+    ay_d = data_cl['ay_local_cl']
 
     # calculate lateral jerk (using the central scheme) // Kan beter voor punten op rand --> forward difference
     jy_list = []

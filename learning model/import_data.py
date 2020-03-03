@@ -9,6 +9,7 @@ def import_data(plot):
     import pandas as pd
     # Simpson rule is designed for numerical integration --> approxiates the integrand by a quadrant and integrates this.
     # This is an update of the trapezium rule
+    # Remember that accelerations out of Amesim model is giving the total acceleration in the local axis! (rotating axis + local accelerations)
 
     files = glob.glob("used_data/*.csv")
     print("The amount of m fils are: ", len(files))
@@ -38,32 +39,32 @@ def import_data(plot):
         print(file)
 
         # Clipping and plotting the observed lane change
-        [time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, init, data_cl] =clip_lane_change(data)
+        [time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, data_cl] =clip_lane_change(data)
 
         local_calc_jerk(data_cl, 0)
 
         # Assign initial and desired conditions
         # init_matrix = [x,vx,ax,jx,y,vy,ay,jy]
-        init_matrix[index,:] = plt.squeeze(plt.array([init[0],init[1],init[2],init[3],init[4],init[5],init[6],init[7]]))
+        # init_matrix[index,:] = plt.squeeze(plt.array([init[0],init[1],init[2],init[3],init[4],init[5],init[6],init[7]]))
         des_matrix[index,:] = plt.squeeze(plt.array([delta_lane, desired_speed,time_lane_change]))
 
         # Calculate observed feature values --> Simpson integration rule
         time_vector = plt.arange(0, time_lane_change + dt_grid, dt_grid)
 
         # f1: longitudinal acceleration
-        integrand = plt.squeeze(data_cl['ax_cl']**2)
+        integrand = plt.squeeze(data_cl['ax_local_cl']**2)
         f1_cal = scipy.integrate.simps(integrand, time_vector)
         f1 = f1 + f1_cal
         # print('f1: ',f1)
 
         # f2: lateral acceleration
-        integrand = plt.squeeze(data_cl['ay_cl']**2)
+        integrand = plt.squeeze(data_cl['ay_local_cl']**2)
         f2_cal = scipy.integrate.simps(integrand, time_vector)
         f2 = f2 + f2_cal
         # print('f2: ', f2)
 
         #f3: lateral jerk
-        integrand = plt.squeeze(data_cl['jy_cl']** 2)
+        integrand = plt.squeeze(data_cl['jy_local_cl']** 2)
         f3_cal = scipy.integrate.simps(integrand, time_vector)
         f3 = f3 + f3_cal
         # print('f3: ', f3)
@@ -99,12 +100,12 @@ def import_data(plot):
             ax3b.plot(data_cl['time_cl'], data_cl['vy_cl'], '-',label = file,linewidth = 3.0)
 
             # The ax and ay accelerations are as seen in the global axis (fixed).
-            ax4a.plot(data_cl['time_cl'], data_cl['ax_cl'], '-',label = file,linewidth = 3.0)
-            ax4b.plot(data_cl['time_cl'], data_cl['ay_cl'], '-',label = file,linewidth = 3.0)
+            ax4a.plot(data_cl['time_cl'], data_cl['ax_local_cl'], '-',label = file,linewidth = 3.0)
+            ax4b.plot(data_cl['time_cl'], data_cl['ay_local_cl'], '-',label = file,linewidth = 3.0)
 
             # The jerk_x and jerk_y are as seen in the global axis (fixed).
-            ax5a.plot(data_cl['time_cl'], data_cl['jx_cl'], '-',label = file,linewidth = 3.0)
-            ax5b.plot(data_cl['time_cl'], data_cl['jy_cl'], '-',label = file,linewidth = 3.0)
+            ax5a.plot(data_cl['time_cl'], data_cl['jx_local_cl'], '-',label = file,linewidth = 3.0)
+            ax5b.plot(data_cl['time_cl'], data_cl['jy_local_cl'], '-',label = file,linewidth = 3.0)
 
             # The yaw and yaw_rate in degrees.
             ax6a.plot(data_cl['time_cl'], data_cl['yaw_cl']*180/plt.pi, '-', label=file, linewidth=3.0)
@@ -113,8 +114,10 @@ def import_data(plot):
             # The steerwheelangle in degrees
             ax7.plot(data_cl['time_cl'], data_cl['steering_deg_cl'], '-', label=file, linewidth=3.0)
 
-            # The curvature
-            ax8.plot(data_cl['time_cl'], data_cl['curvature_cl'], '-', label=file, linewidth=3.0)
+            # Centriputal force
+            ax8.plot(data_cl['time_cl'], plt.square((data_cl['r_cl']*data_cl['vx_cl'])**2+(data_cl['r_cl']*data_cl['vy_cl'])**2), '-', label=file, linewidth=3.0)
+
+
 
             ax1a.legend()
             ax1b.legend()
@@ -128,7 +131,8 @@ def import_data(plot):
             ax6a.legend()
             ax6b.legend()
             ax7.legend()
-            ax8.legend()
+            ax7.legend()
+
 
         dict_list.append(data_cl)
         index = index + 1
@@ -141,6 +145,7 @@ def import_data(plot):
     f5 = f5/length
     f6 = f6/length
 
+    print('Normalization values calculated form given dataset')
     print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
     print(f1)
     print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
