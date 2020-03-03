@@ -19,7 +19,7 @@ from jerk import jerk
 import pylab as plt
 from casadi import *
 
-[norm0,norm1,norm2,norm3,norm4,norm5,init_matrix,des_matrix,dict_list,files] = import_data(1)
+[norm0,norm1,norm2,norm3,norm4,init_matrix,des_matrix,dict_list,files] = import_data(1)
 data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
 # Remark !x and y are coordinates in global axis!
@@ -56,12 +56,12 @@ vy_guess = signal.resample(data_cl['vy_cl'],N+1).T
 psi_guess = signal.resample(data_cl['yaw_cl'],N+1).T
 psi_dot_guess = signal.resample(data_cl['r_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
-delta_guess = signal.resample(data_cl['steering_deg_cl']*plt.pi/180,N).T
+# delta_guess = signal.resample(data_cl['steering_deg_cl']*plt.pi/180,N).T
 time_guess = des_matrix[0,2]
 
-# Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
+# Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
-theta = plt.array([2,5,6,7,1,5]) # deze wegingsfactoren dienen achterhaald te worden.
+theta = plt.array([2,5,6,2,4]) # deze wegingsfactoren dienen achterhaald te worden.
 
 # Equations of the vehicle model
 x = MX.sym('x') # in global axis
@@ -138,7 +138,7 @@ for k in range(N):
 
 # Path constraints
 opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
-opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
+# opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
 opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road
 opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
 
@@ -160,7 +160,7 @@ opti.set_initial(vy,vy_guess)
 opti.set_initial(psi,psi_guess)
 opti.set_initial(psi_dot,psi_dot_guess)
 opti.set_initial(throttle,throttle_guess)
-opti.set_initial(delta,delta_guess)
+# opti.set_initial(delta,delta_guess)
 opti.set_initial(T, time_guess)
 
 ##
@@ -240,32 +240,25 @@ for i in plt.arange(0, len(integrand) - 1, 1):
     f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
 # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
-# f3: centriputal force
-integrand = plt.array(anx_list)** 2+plt.array(any_list)** 2
+# f3: desired velocity
+integrand = plt.array(vx_des_list)** 2
 f3_cal = 0
 for i in plt.arange(0, len(integrand) - 1, 1):
     f3_cal = f3_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-# f3_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+# f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
-# f4: desired velocity
-integrand = plt.array(vx_des_list)** 2
+# f4: desired lane change
+integrand = plt.array(y_des_list)** 2
 f4_cal = 0
 for i in plt.arange(0, len(integrand) - 1, 1):
     f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-# f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-
-# f5: desired lane change
-integrand = plt.array(y_des_list)** 2
-f5_cal = 0
-for i in plt.arange(0, len(integrand) - 1, 1):
-    f5_cal = f5_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
 # f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 # opti.minimize(theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal)
-opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
-print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
+opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
+print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4]))
 print('Relative weights: ', theta)
 
 # Implementation of the solver
@@ -289,15 +282,27 @@ ax_list = []
 for k in range(N): # These derivatives of the states of a point less: N instead of N+1
     ax_list.append(sol.value(f(X[:, k], U[:,k])[2]))
 ax_sol = plt.array(ax_list)
+anx_list = []
+for k in range(N):
+    anx_list.append(sol.value(-vy[k]*psi_dot[k]))
+anx_sol = plt.array(anx_list)
+ax_tot_sol = ax_sol + anx_sol
+
 ay_list = []
 for k in range(N):
     ay_list.append(sol.value(f(X[:, k], U[:,k])[3]))
 ay_sol = plt.array(ay_list)
-jx_sol = jerk(ax_list,dt_sol)
-jy_sol = jerk(ay_list,dt_sol)
+any_list = []
+for k in range(N):
+    any_list.append(sol.value(vx[k]*psi_dot[k]))
+any_sol = plt.array(any_list)
+ay_tot_sol = ay_sol + any_sol
+
+jx_sol = jerk(ax_tot_sol,dt_sol)
+jy_sol = jerk(ay_tot_sol,dt_sol)
 
 
-define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol)
+define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol)
 
 print("\n")
 print('Integrated feature values: ')
@@ -308,12 +313,10 @@ print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
 print(sol.value(f1_cal))
 print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
 print(sol.value(f2_cal))
-print('integrand = plt.squeeze((-data_cl[vy_cl] * data_cl[r_cl]) ** 2 + (data_cl[vx_cl] * data_cl[r_cl]) ** 2)')
+print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
 print(sol.value(f3_cal))
 print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
 print(sol.value(f4_cal))
-print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-print(sol.value(f5_cal))
 
 # ----------------------------------
 #    Storing of data in csv-file

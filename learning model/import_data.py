@@ -52,39 +52,33 @@ def import_data(plot):
         time_vector = plt.arange(0, time_lane_change + dt_grid, dt_grid)
 
         # f1: longitudinal acceleration
-        integrand = plt.squeeze(data_cl['ax_local_cl']**2)
+        integrand = plt.squeeze(data_cl['ax_cl']**2)
         f1_cal = scipy.integrate.simps(integrand, time_vector)
         f1 = f1 + f1_cal
         # print('f1: ',f1)
 
         # f2: lateral acceleration
-        integrand = plt.squeeze(data_cl['ay_local_cl']**2)
+        integrand = plt.squeeze(data_cl['ay_cl']**2)
         f2_cal = scipy.integrate.simps(integrand, time_vector)
         f2 = f2 + f2_cal
         # print('f2: ', f2)
 
         #f3: lateral jerk
-        integrand = plt.squeeze(data_cl['jy_local_cl']** 2)
+        integrand = plt.squeeze(data_cl['jy_cl']** 2)
         f3_cal = scipy.integrate.simps(integrand, time_vector)
         f3 = f3 + f3_cal
         # print('f3: ', f3)
 
-        # f4: centriputal force
-        integrand = plt.squeeze((-data_cl['vy_cl'] * data_cl['r_cl']) ** 2 + (data_cl['vx_cl'] * data_cl['r_cl']) ** 2)
+        #f4: desired speed
+        integrand = plt.squeeze((desired_speed-data_cl['vx_cl'])**2)
         f4_cal = scipy.integrate.simps(integrand, time_vector)
         f4 = f4 + f4_cal
-        # print('f4: ', f4)
-
-        # f5: desired speed
-        integrand = plt.squeeze((desired_speed-data_cl['vx_cl'])**2)
-        f5_cal = scipy.integrate.simps(integrand, time_vector)
-        f5 = f5 + f5_cal
         # print('f6: ', f6)
 
-        # f6: desired lane change
+        # f5: desired lane change
         integrand = plt.squeeze((delta_lane - data_cl['y_cl'])**2)
-        f6_cal = scipy.integrate.simps(integrand, time_vector)
-        f6 = f6 + f6_cal
+        f5_cal = scipy.integrate.simps(integrand, time_vector)
+        f5 = f5 + f5_cal
         # print('f7: ', f7)
 
         # Plotting in figures
@@ -100,12 +94,12 @@ def import_data(plot):
             ax3b.plot(data_cl['time_cl'], data_cl['vy_cl'], '-',label = file,linewidth = 3.0)
 
             # The ax and ay accelerations are as seen in the global axis (fixed).
-            ax4a.plot(data_cl['time_cl'], data_cl['ax_local_cl'], '-',label = file,linewidth = 3.0)
-            ax4b.plot(data_cl['time_cl'], data_cl['ay_local_cl'], '-',label = file,linewidth = 3.0)
+            ax4a.plot(data_cl['time_cl'], data_cl['ax_cl'], '-',label = file,linewidth = 3.0)
+            ax4b.plot(data_cl['time_cl'], data_cl['ay_cl'], '-',label = file,linewidth = 3.0)
 
             # The jerk_x and jerk_y are as seen in the global axis (fixed).
-            ax5a.plot(data_cl['time_cl'], data_cl['jx_local_cl'], '-',label = file,linewidth = 3.0)
-            ax5b.plot(data_cl['time_cl'], data_cl['jy_local_cl'], '-',label = file,linewidth = 3.0)
+            ax5a.plot(data_cl['time_cl'], data_cl['jx_cl'], '-',label = file,linewidth = 3.0)
+            ax5b.plot(data_cl['time_cl'], data_cl['jy_cl'], '-',label = file,linewidth = 3.0)
 
             # The yaw and yaw_rate in degrees.
             ax6a.plot(data_cl['time_cl'], data_cl['yaw_cl']*180/plt.pi, '-', label=file, linewidth=3.0)
@@ -143,7 +137,7 @@ def import_data(plot):
     f3 = f3/length
     f4 = f4/length
     f5 = f5/length
-    f6 = f6/length
+
 
     print('Normalization values calculated form given dataset')
     print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
@@ -152,17 +146,15 @@ def import_data(plot):
     print(f2)
     print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
     print(f3)
-    print('integrand = plt.squeeze((-data_cl[vy_cl] * data_cl[r_cl]) ** 2 + (data_cl[vx_cl] * data_cl[r_cl]) ** 2)')
-    print(f4)
     print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
-    print(f5)
+    print(f4)
     print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-    print(f6)
+    print(f5)
 
 
 
 
-    return f1,f2,f3,f4,f5,f6,init_matrix,des_matrix,dict_list,files
+    return f1,f2,f3,f4,f5,init_matrix,des_matrix,dict_list,files
 # init matrix: amount of datasets x 8
 # des  matrix: amount of datasets x 3
 

@@ -86,8 +86,8 @@ def clip_lane_change(data):
 
     # calculating jerks
     jerk_y, jerk_x = calc_jerk(data_cl, 0)  # jerk is calculated in local axis.
-    data_cl['jx_local_cl'] = jerk_x # This is the local jerk
-    data_cl['jy_local_cl'] = jerk_y # This is the local jerk
+    data_cl['jx_cl'] = jerk_x # This is the local jerk
+    data_cl['jy_cl'] = jerk_y # This is the local jerk
 
     # setting desired speed and intitial values
     desired_speed = data_cl['vx_cl'][-1]
