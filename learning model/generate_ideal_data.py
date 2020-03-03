@@ -38,7 +38,7 @@ pi = 3.14159265359
 # Parameters of the optimization
 nx = 6 # amount of states
 nc = 2 # amount of controls
-N = 600
+N = 700
 x_start = 0
 y_start = 0
 vx_start = 80/3.6 # this is also the desired velocity
@@ -167,16 +167,16 @@ opti.set_initial(T, time_guess)
 # -----------------------------------------------
 # Objective: (need to be normalized?)
 time_list = []
-for i in range(N):
+for i in range(N): # These derivatives of the states of a point less: N instead of N+1
     time_list.append(i*T/N)
 time_vector = plt.array(time_list)
 
 anx_list = []
-for k in range(N):
+for k in range(N): # These derivatives of the states of a point less: N instead of N+1
     anx_list.append(-vy[k]*psi_dot[k])
 
 any_list = []
-for k in range(N): # one point less taken in comparison of the total amount
+for k in range(N): # These derivatives of the states of a point less: N instead of N+1
     any_list.append(vx[k]*psi_dot[k])
 
 ax_list = []
@@ -204,45 +204,54 @@ y_des_list = []
 for k in range(N): # These derivatives of the states of a point less: N instead of N+1
     y_des_list.append(y[k]-width_road)
 
-# k1 = (f(states, controls)[2])**2+(f(states, controls)[3])**2
-# k2 = (f(states + dt/2 * k1, controls)[2])**2+(f(states + dt/2 * k1, controls)[3])**2
-# k3 = (f(states + dt/2 * k2, controls)[2])**2+(f(states + dt/2 * k2, controls)[3])**2
-# k4 = (f(states + dt * k3, controls)[2])**2+(f(states + dt * k3, controls)[3])**2
-# integrand_extra = dt/6*(k1 +2*k2 +2*k3 +k4)
-# F1 = Function('F1', [states, controls, dt], [integrand_extra],['states','controls','dt'],['integrand_next'])
-
-# F1_int = 0
-# for k in range(N):
-#     F1_int = F1_int + F1(X[:, k], U[:,k],T/N)
-
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 
 # f0: longitudinal acceleration
 integrand = plt.array(ax_list)** 2
-f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+f0_cal = 0
+for i in plt.arange(0, len(integrand) - 1, 1):
+    f0_cal = f0_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+
+# f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 # f1: lateral acceleration
 integrand = plt.array(ay_list)** 2
-f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+f1_cal = 0
+for i in plt.arange(0, len(integrand) - 1, 1):
+    f1_cal = f1_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+# f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 # print('f1: ',f1_cal)
 
 # f2: lateral jerk
 integrand = plt.array(jy_list)** 2
-f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+f2_cal = 0
+for i in plt.arange(0, len(integrand) - 1, 1):
+    f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+# f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 # f3: centriputal force
 integrand = plt.array(anx_list)** 2+plt.array(any_list)** 2
-f3_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+f3_cal = 0
+for i in plt.arange(0, len(integrand) - 1, 1):
+    f3_cal = f3_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+# f3_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 # f4: desired velocity
 integrand = plt.array(vx_des_list)** 2
-f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+f4_cal = 0
+for i in plt.arange(0, len(integrand) - 1, 1):
+    f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+# f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 # f5: desired lane change
 integrand = plt.array(y_des_list)** 2
-f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+f5_cal = 0
+for i in plt.arange(0, len(integrand) - 1, 1):
+    f5_cal = f5_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+# f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
-# opti.minimize(sumsqr(throttle) + sumsqr(delta))
+
+# Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 # opti.minimize(theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal)
 opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
 print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
