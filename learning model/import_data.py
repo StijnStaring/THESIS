@@ -74,14 +74,8 @@ def import_data(plot):
         f4 = f4 + f4_cal
         # print('f4: ', f4)
 
-        # # f5: curvature
-        # integrand = plt.squeeze((data_cl['vx_proj_cl']*data_cl['ay_proj_cl']-data_cl['vy_proj_cl']*data_cl['ax_proj_cl'])**2/(data_cl['vx_proj_cl']**2+data_cl['vy_proj_cl']**2)**3)
-        # f5_cal = scipy.integrate.simps(integrand, time_vector)
-        # f5 = f5 + f5_cal
-        # # print('f5: ', f5)
-
         # f5: desired speed
-        integrand = plt.squeeze((desired_speed-data_cl['vx_proj_cl'])**2)
+        integrand = plt.squeeze((desired_speed-data_cl['vx_cl'])**2)
         f5_cal = scipy.integrate.simps(integrand, time_vector)
         f5 = f5 + f5_cal
         # print('f6: ', f6)
@@ -146,8 +140,8 @@ def import_data(plot):
     f4 = f4/length
     f5 = f5/length
     f6 = f6/length
-    # f7 = f7/length
-    print('integrand = plt.squeeze(data_cl[ax_proj_cl]**2)')
+
+    print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
     print(f1)
     print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
     print(f2)
@@ -155,15 +149,15 @@ def import_data(plot):
     print(f3)
     print('integrand = plt.squeeze((-data_cl[vy_cl] * data_cl[r_cl]) ** 2 + (data_cl[vx_cl] * data_cl[r_cl]) ** 2)')
     print(f4)
-    print('integrand = plt.squeeze((desired_speed - data_cl[vx_proj_cl]) ** 2)')
+    print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
     print(f5)
     print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
     print(f6)
-    # print(f7)
 
 
 
-    return f1,f2,f3,f4,f5,f6,f7,init_matrix,des_matrix,dict_list,files
+
+    return f1,f2,f3,f4,f5,f6,init_matrix,des_matrix,dict_list,files
 # init matrix: amount of datasets x 8
 # des  matrix: amount of datasets x 3
 

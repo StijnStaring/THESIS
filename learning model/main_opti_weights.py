@@ -26,14 +26,14 @@ his_weights = []
 his_f_calc_rel = []
 amount_features = 7
 rec = 1
-plot_datasets = 0
+plot_datasets = 1
 plot_opti_weights = 0
 calculated_features = plt.zeros([amount_features,1])
 
 
 
 # des_matrix = delta_lane,speed_desired, time_lane_change
-[f1_o,f2_o,f3_o,f4_o,f5_o,f6_o,f7_o,init_matrix,des_matrix,dict_list,files] = import_data(plot_datasets)
+[f1_o,f2_o,f3_o,f4_o,f5_o,f6_o,init_matrix,des_matrix,dict_list,files] = import_data(plot_datasets)
 
 # RPROP variables
 del_0 = 0.1

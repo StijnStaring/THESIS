@@ -81,7 +81,7 @@ def clip_lane_change(data):
     data_cl['ay_proj_cl'] = plt.sin(data_cl['yaw_cl'])* ax_loc_tot  + plt.cos(data_cl['yaw_cl'])* ay_loc_tot
 
     # calculating jerks
-    jerk_y, jerk_x = calc_jerk(data_cl, 0)  # jerk is calculated in global axis.
+    jerk_y, jerk_x = calc_jerk(data_cl, 0)  # jerk is calculated in local axis.
     data_cl['jx_cl'] = jerk_x # This is the local jerk
     data_cl['jy_cl'] = jerk_y # This is the local jerk
 

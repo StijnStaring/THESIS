@@ -12,10 +12,15 @@ speed_range: [80-90] km/hour
 :return: csv-datafiles
 """
 import scipy
-from scipy import integrate
+from scipy import integrate, signal
+from import_data import import_data
+from define_plots import define_plots
+from jerk import jerk
 import pylab as plt
 from casadi import *
 
+[norm0,norm1,norm2,norm3,norm4,norm5,init_matrix,des_matrix,dict_list,files] = import_data(0)
+data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
 # Remark !x and y are coordinates in global axis!
 M = 1430
@@ -41,23 +46,21 @@ vy_start = 0
 psi_start = 0
 psi_dot_start = 0
 width_road = 3
+
+# Resampling and guesses
+x_guess = signal.resample(data_cl['x_cl'],N+1).T
+y_guess = signal.resample(data_cl['y_cl'],N+1).T
+vx_guess = signal.resample(data_cl['vx_cl'],N+1).T
+vy_guess = signal.resample(data_cl['vy_cl'],N+1).T
+psi_guess = signal.resample(data_cl['yaw_cl'],N+1).T
+psi_dot_guess = signal.resample(data_cl['r_cl'],N+1).T
+throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
+delta_guess = signal.resample(data_cl['steering_deg_cl']*plt.pi/180,N).T
+time_guess = des_matrix[0,2]
+
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
-theta = plt.array([2,5,6,7,1,4])
-# normalization information
-# integrand = plt.squeeze(ax** 2)
-norm0 = 0.3072585725919982
-# integrand = plt.squeeze(ay** 2)
-norm1 = 2.0824922161681316
-# integrand = plt.squeeze(jy ** 2)
-norm2 = 41.4796020568006
-# integrand = plt.squeeze((-vy*dpsi) ** 2 + (vx*dpsi)**2)
-norm3 = 35.511231053915
-# integrand = plt.squeeze((desired_speed - vx) ** 2)
-norm4 = 0.2172162321065016
-# integrand = plt.squeeze((delta_lane - y) ** 2)
-norm5 = 13.158914673920528
-
+theta = plt.array([2,5,6,7,1,4]) # deze wegingsfactoren dienen achterhaald te worden.
 
 # Equations of the vehicle model
 x = MX.sym('x') # in global axis
@@ -73,10 +76,8 @@ delta = MX.sym('delta')
 
 x_dot_glob = vx*cos(psi)-vy*sin(psi)
 y_dot_glob = vx*sin(psi)+vy*cos(psi)
-# slipangle_f = plt.arctan2(vy+psi_dot*a,vx) - delta
-# slipangle_r = plt.arctan2(vy-psi_dot*b,vx)
-slipangle_f = 5
-slipangle_r = 6
+slipangle_f = plt.arctan2(vy+psi_dot*a,vx) - delta
+slipangle_r = plt.arctan2(vy-psi_dot*b,vx)
 Fxf = throttle*Tmax/(2*rw)
 Fxr = Fxf
 Fyf = -2*Kyf* slipangle_f
@@ -150,42 +151,50 @@ opti.subject_to(psi[-1] == 0) # assuming straight road
 opti.subject_to(psi_dot[-1] == 0)
 
 #  Set guesses
-opti.set_initial(T, 1)
+opti.set_initial(x,x_guess)
+opti.set_initial(y,y_guess)
+opti.set_initial(vx,vx_guess)
+opti.set_initial(vy,vy_guess)
+opti.set_initial(psi,psi_guess)
+opti.set_initial(psi_dot,psi_dot_guess)
+opti.set_initial(throttle,throttle_guess)
+opti.set_initial(delta,delta_guess)
+opti.set_initial(T, time_guess)
 
 ##
 # -----------------------------------------------
 #    objective
 # -----------------------------------------------
 # Objective: (need to be normalized?)
-# time_list = []
-# for i in range(N):
-#     time_list.append(i*T/N)
-# time_vector = plt.array(time_list)
-#
-# anx_list = []
-# for k in range(N):
-#     anx_list.append(-vy[k]*psi_dot[k])
-#
-# any_list = []
-# for k in range(N): # one point less taken in comparison of the total amount
-#     any_list.append(vx[k]*psi_dot[k])
-#
-# ax_list = []
-# for k in range(N): # These derivatives of the states of a point less: N instead of N+1
-#     ax_list.append(f(X[:, k], U[:,k])[2])
-# ay_list = []
-# for k in range(N):
-#     ay_list.append(f(X[:, k], U[:,k])[3])
+time_list = []
+for i in range(N):
+    time_list.append(i*T/N)
+time_vector = plt.array(time_list)
+
+anx_list = []
+for k in range(N):
+    anx_list.append(-vy[k]*psi_dot[k])
+
+any_list = []
+for k in range(N): # one point less taken in comparison of the total amount
+    any_list.append(vx[k]*psi_dot[k])
+
+ax_list = []
+for k in range(N): # These derivatives of the states of a point less: N instead of N+1
+    ax_list.append(f(X[:, k], U[:,k])[2])
+ay_list = []
+for k in range(N):
+    ay_list.append(f(X[:, k], U[:,k])[3])
 
 # calculation lateral jerk
-# jy_list = []
-# for i in plt.arange(0, len(ay_list), 1):
-#     if i == 0:
-#         jy_list.append((ay_list[i + 1]-ay_list[i])/(T/N))
-#     elif i == len(ay_list)-1:
-#         jy_list.append((ay_list[i]-ay_list[i-1])/(T/N))
-#     else:
-#         jy_list.append((ay_list[i + 1] - ay_list[i - 1]) / (2 * (T/N)))
+jy_list = []
+for i in plt.arange(0, len(ay_list), 1):
+    if i == 0:
+        jy_list.append((ay_list[i + 1]-ay_list[i])/(T/N))
+    elif i == len(ay_list)-1:
+        jy_list.append((ay_list[i]-ay_list[i-1])/(T/N))
+    else:
+        jy_list.append((ay_list[i + 1] - ay_list[i - 1]) / (2 * (T/N)))
 
 vx_des_list = []
 for k in range(N): # These derivatives of the states of a point less: N instead of N+1
@@ -208,39 +217,65 @@ for k in range(N): # These derivatives of the states of a point less: N instead 
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 
-# # f0: longitudinal acceleration
-# integrand = plt.array(ax_list)** 2
-# f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+# f0: longitudinal acceleration
+integrand = plt.array(ax_list)** 2
+f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 # f1: lateral acceleration
-# integrand = plt.array(ay_list)** 2
-# f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-# # print('f1: ',f1_cal)
-#
-# # f2: lateral jerk
-# integrand = plt.array(jy_list)** 2
-# f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-#
-# # f3: centriputal force
-# integrand = plt.array(anx_list)** 2+plt.array(any_list)** 2
-# f3_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+integrand = plt.array(ay_list)** 2
+f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+# print('f1: ',f1_cal)
 
-# # f4: desired velocity
-# integrand = plt.array(vx_des_list)** 2
-# f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-#
-# # f5: desired lane change
-# integrand = plt.array(y_des_list)** 2
-# f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-opti.minimize(sumsqr(throttle))
+# f2: lateral jerk
+integrand = plt.array(jy_list)** 2
+f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+# f3: centriputal force
+integrand = plt.array(anx_list)** 2+plt.array(any_list)** 2
+f3_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+# f4: desired velocity
+integrand = plt.array(vx_des_list)** 2
+f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+# f5: desired lane change
+integrand = plt.array(y_des_list)** 2
+f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+# opti.minimize(sumsqr(throttle) + sumsqr(delta))
 # opti.minimize(theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal)
-# opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
+opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
 print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
 
 # Implementation of the solver
 opti.solver('ipopt')
 sol = opti.solve()
 
+# ----------------------------------
+#    Post processing
+# ----------------------------------
+x_sol = sol.value(x)
+y_sol = sol.value(y)
+vx_sol = sol.value(vx)
+vy_sol = sol.value(vy)
+psi_sol = sol.value(psi)
+psi_dot_sol = sol.value(psi_dot)
+throttle_sol = sol.value(throttle)
+delta_sol = sol.value(delta)
+T_sol = sol.value(T)
+dt_sol = T_sol/(len(x_sol)-1)
+ax_list = []
+for k in range(N): # These derivatives of the states of a point less: N instead of N+1
+    ax_list.append(sol.value(f(X[:, k], U[:,k])[2]))
+ax_sol = plt.array(ax_list)
+ay_list = []
+for k in range(N):
+    ay_list.append(sol.value(f(X[:, k], U[:,k])[3]))
+ay_sol = plt.array(ay_list)
+jx_sol = jerk(ax_list,dt_sol)
+jy_sol = jerk(ay_list,dt_sol)
 
 
+define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol)
 
+plt.show()
