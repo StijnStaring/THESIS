@@ -46,7 +46,7 @@ vx_start = 80/3.6 # this is also the desired velocity
 vy_start = 0
 psi_start = 0
 psi_dot_start = 0
-width_road = 3
+width_road = 3.47
 
 # Resampling and guesses
 x_guess = signal.resample(data_cl['x_cl'],N+1).T
@@ -56,7 +56,7 @@ vy_guess = signal.resample(data_cl['vy_cl'],N+1).T
 psi_guess = signal.resample(data_cl['yaw_cl'],N+1).T
 psi_dot_guess = signal.resample(data_cl['r_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
-# delta_guess = signal.resample(data_cl['steering_deg_cl']*plt.pi/180,N).T
+delta_guess = signal.resample(data_cl['steering_deg_cl']*plt.pi/180,N).T
 time_guess = des_matrix[0,2]
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
@@ -160,7 +160,7 @@ opti.set_initial(vy,vy_guess)
 opti.set_initial(psi,psi_guess)
 opti.set_initial(psi_dot,psi_dot_guess)
 opti.set_initial(throttle,throttle_guess)
-# opti.set_initial(delta,delta_guess)
+opti.set_initial(delta,delta_guess)
 opti.set_initial(T, time_guess)
 
 ##
@@ -255,7 +255,7 @@ for i in plt.arange(0, len(integrand) - 1, 1):
 # f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 
-# Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*an**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
+# Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 # opti.minimize(theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal)
 opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
 print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4]))
@@ -301,7 +301,6 @@ ay_tot_sol = ay_sol + any_sol
 jx_sol = jerk(ax_tot_sol,dt_sol)
 jy_sol = jerk(ay_tot_sol,dt_sol)
 
-
 define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol)
 
 print("\n")
@@ -328,9 +327,9 @@ print(sol.value(f4_cal))
 #
 # for i in range(N+1):
 #     if i == N:
-#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_sol[i - 1], ay_sol[i - 1], jx_sol[i - 1],jy_sol[i - 1], psi_sol[i], psi_dot_sol[i], throttle_sol[i - 1], delta_sol[i - 1]])
+#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i - 1], ay_tot_sol[i - 1], jx_sol[i - 1],jy_sol[i - 1], psi_sol[i], psi_dot_sol[i], throttle_sol[i - 1], delta_sol[i - 1]])
 #     else:
-#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_sol[i], ay_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i], delta_sol[i]])
+#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i], delta_sol[i]])
 #
 # file.close()
 

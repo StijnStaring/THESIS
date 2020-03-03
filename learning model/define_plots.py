@@ -130,20 +130,5 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0)
     ax7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0)
 
-
-    # ax1a.legend()
-    # ax1b.legend()
-    # ax2.legend()
-    # ax3a.legend()
-    # ax3b.legend()
-    # ax4a.legend()
-    # ax4b.legend()
-    # ax5a.legend()
-    # ax5b.legend()
-    # ax6a.legend()
-    # ax6b.legend()
-    # ax7a.legend()
-    # ax7b.legend()
-
     print("\n")
     print("Lane change duration of: ",T_sol," [s]")

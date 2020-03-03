@@ -2,7 +2,6 @@ def import_data(plot):
     import glob
     from clip_lane_change import clip_lane_change
     from plotting_datasets import plotting_datasets
-    from local_calc_jerk import local_calc_jerk
     import scipy
     from scipy import integrate
     import pylab as plt
@@ -30,8 +29,6 @@ def import_data(plot):
     f3 = 0
     f4 = 0
     f5 = 0
-    f6 = 0
-    f7 = 1
 
     for file in files:
         data = pd.read_csv(file)
@@ -40,8 +37,6 @@ def import_data(plot):
 
         # Clipping and plotting the observed lane change
         [time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed, dt_grid, data_cl] =clip_lane_change(data)
-
-        local_calc_jerk(data_cl, 0)
 
         # Assign initial and desired conditions
         # init_matrix = [x,vx,ax,jx,y,vy,ay,jy]
