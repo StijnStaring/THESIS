@@ -320,18 +320,18 @@ print(sol.value(f4_cal))
 # ----------------------------------
 #    Storing of data in csv-file
 # ----------------------------------
-# path = "written_data\ N_600_V_80.csv"
-# file = open(path,'w',newline= "")
-# writer = csv.writer(file)
-# writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta"])
-#
-# for i in range(N+1):
-#     if i == N:
-#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i - 1], ay_tot_sol[i - 1], jx_sol[i - 1],jy_sol[i - 1], psi_sol[i], psi_dot_sol[i], throttle_sol[i - 1], delta_sol[i - 1]])
-#     else:
-#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i], delta_sol[i]])
-#
-# file.close()
+path = "written_data\ N_600_V_80.csv"
+file = open(path,'w',newline= "")
+writer = csv.writer(file)
+writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta"])
+
+for i in range(N+1):
+    if i == N:
+        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i - 1], ay_tot_sol[i - 1], jx_sol[i - 1],jy_sol[i - 1], psi_sol[i], psi_dot_sol[i], throttle_sol[i - 1], delta_sol[i - 1]])
+    else:
+        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i], delta_sol[i]])
+
+file.close()
 
 # ----------------------------------
 #    Show
