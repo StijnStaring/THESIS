@@ -15,7 +15,7 @@ import csv
 from scipy import integrate, signal
 from import_data import import_data
 from define_plots import define_plots
-from jerk import jerk
+from derivative import derivative
 import pylab as plt
 from casadi import *
 
@@ -38,7 +38,7 @@ pi = 3.14159265359
 # Parameters of the optimization
 nx = 6 # amount of states
 nc = 2 # amount of controls
-N = 600
+N = 500
 
 x_start = 0
 y_start = 0
@@ -46,7 +46,7 @@ vx_start = des_matrix[0,1] # this is also the desired velocity
 vy_start = 0
 psi_start = 0
 psi_dot_start = 0
-width_road = 3.47
+width_road = des_matrix[0,0]
 
 # Resampling and guesses
 x_guess = signal.resample(data_cl['x_cl'],N+1).T
@@ -145,12 +145,15 @@ opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
 # Initial constraints
 # states: x, y, vx, vy, psi, psi_dot
 opti.subject_to(X[:,0]== vertcat(x_start,y_start,vx_start,vy_start,psi_start,psi_dot_start))
-
+# Controls set on zero in first interval --> want to start from steady state.
+opti.subject_to(delta[0] == 0)
+opti.subject_to(throttle[0] == 0)
 # Terminal constraints
 opti.subject_to(y[-1] == width_road) # should move 3 m lateral
 opti.subject_to(vy[-1] == 0) # lane change is completed
 opti.subject_to(psi[-1] == 0) # assuming straight road
 opti.subject_to(psi_dot[-1] == 0)
+
 
 #  Set guesses
 opti.set_initial(x,x_guess)
@@ -169,50 +172,64 @@ opti.set_initial(T, time_guess)
 # -----------------------------------------------
 # Objective: The total accelerations in the local axis are considered!
 time_list = []
-for i in range(N): # These derivatives of the states of a point less: N instead of N+1
+for i in range(N+1):
     time_list.append(i*T/N)
 time_vector = plt.array(time_list)
 
+# normal lateral accelleration
 anx_list = []
-for k in range(N): # These derivatives of the states of a point less: N instead of N+1
+for k in range(N+1):
     anx_list.append(-vy[k]*psi_dot[k])
 
 any_list = []
-for k in range(N): # These derivatives of the states of a point less: N instead of N+1
+for k in range(N+1):
     any_list.append(vx[k]*psi_dot[k])
 
-ax_list = []
-for k in range(N): # These derivatives of the states of a point less: N instead of N+1
-    ax_list.append(f(X[:, k], U[:,k])[2])
-ay_list = []
-for k in range(N):
-    ay_list.append(f(X[:, k], U[:,k])[3])
+# tangential lateral accelleration
+aty_list = []
+for i in plt.arange(0, len(time_list), 1):
+    if i == 0:
+        aty_list.append((vy[i + 1]-vy[i])/(T/N))
+    elif i == len(time_list)-1:
+        aty_list.append((vy[i]-vy[i-1])/(T/N))
+    else:
+        aty_list.append((vy[i + 1] - vy[i - 1]) / (2 * (T/N)))
 
-ax_tot = plt.array(ax_list) + plt.array(anx_list)
-ay_tot = plt.array(ay_list) + plt.array(any_list)
+# tangential longitudinal accelleration
+atx_list = []
+for i in plt.arange(0, len(time_list), 1):
+    if i == 0:
+        atx_list.append((vx[i + 1]-vx[i])/(T/N))
+    elif i == len(time_list)-1:
+        atx_list.append((vx[i]-vx[i-1])/(T/N))
+    else:
+        atx_list.append((vx[i + 1] - vx[i - 1]) / (2 * (T/N)))
 
-# calculation lateral jerk
+ax_tot = plt.array(atx_list) + plt.array(anx_list)
+ay_tot = plt.array(aty_list) + plt.array(any_list)
+
+# calculation lateral jerk -> jerk is calculated from the total acceleration!
 jy_list = []
-for i in plt.arange(0, len(ay_tot), 1):
+for i in plt.arange(0, len(time_list), 1):
     if i == 0:
         jy_list.append((ay_tot[i + 1]-ay_tot[i])/(T/N))
-    elif i == len(ay_tot)-1:
+    elif i == len(time_list)-1:
         jy_list.append((ay_tot[i]-ay_tot[i-1])/(T/N))
     else:
         jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
 
 vx_des_list = []
-for k in range(N): # These derivatives of the states of a point less: N instead of N+1
+for k in range(N+1):
     vx_des_list.append(vx[k]-vx_start)
 
 y_des_list = []
-for k in range(N): # These derivatives of the states of a point less: N instead of N+1
+for k in range(N+1):
     y_des_list.append(y[k]-width_road)
 
 # Extra constraints on acceleration and jerk:
-opti.subject_to(ax_tot[0] == 0)
-opti.subject_to(ay_tot[0] == 0)
-opti.subject_to(jy_list[0] == 0)
+# opti.subject_to(atx_list[-1] == 0)
+opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
+# opti.subject_to(jy_list[-1] == 0)
 
 
 # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
@@ -256,7 +273,7 @@ for i in plt.arange(0, len(integrand) - 1, 1):
 
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-# opti.minimize(theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal)
+# opti.minimize(theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
 opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
 print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4]))
 print('Relative weights: ', theta)
@@ -279,29 +296,38 @@ delta_sol = sol.value(delta)
 T_sol = sol.value(T)
 dt_sol = T_sol/(len(x_sol)-1)
 ax_list = []
-for k in range(N): # These derivatives of the states of a point less: N instead of N+1
-    ax_list.append(sol.value(f(X[:, k], U[:,k])[2]))
-ax_sol = plt.array(ax_list)
+
+# for k in range(N+1):
+#     ax_list.append(sol.value(f(X[:, k], U[:,k])[2]))
+# ax_sol = plt.array(ax_list)
+
 anx_list = []
-for k in range(N):
+for k in range(N+1):
     anx_list.append(sol.value(-vy[k]*psi_dot[k]))
 anx_sol = plt.array(anx_list)
-ax_tot_sol = ax_sol + anx_sol
 
-ay_list = []
-for k in range(N):
-    ay_list.append(sol.value(f(X[:, k], U[:,k])[3]))
-ay_sol = plt.array(ay_list)
+vx_list = []
+for k in range(N+1):
+    vx_list.append(vx_sol[k])
+atx_sol = derivative(vx_list,dt_sol)
+ax_tot_sol = atx_sol + anx_sol
+
 any_list = []
-for k in range(N):
+for k in range(N+1):
     any_list.append(sol.value(vx[k]*psi_dot[k]))
 any_sol = plt.array(any_list)
-ay_tot_sol = ay_sol + any_sol
 
-jx_sol = jerk(ax_tot_sol,dt_sol)
-jy_sol = jerk(ay_tot_sol,dt_sol)
+vy_list = []
+for k in range(N+1):
+    vy_list.append(vy_sol[k])
+aty_sol = derivative(vy_list,dt_sol)
 
-define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol,ay_sol,any_sol)
+ay_tot_sol = aty_sol + any_sol
+
+jx_sol = derivative(ax_tot_sol,dt_sol)
+jy_sol = derivative(ay_tot_sol,dt_sol)
+
+define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol)
 
 print("\n")
 print('Integrated feature values: ')
@@ -323,17 +349,18 @@ print(sol.value(f4_cal))
 path = "written_data\ N_600_V_80.csv"
 file = open(path,'w',newline= "")
 writer = csv.writer(file)
-writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta"])
+writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta","aty","any"])
 
 for i in range(N+1):
-    if i == N:
-        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i - 1], ay_tot_sol[i - 1], jx_sol[i - 1],jy_sol[i - 1], psi_sol[i], psi_dot_sol[i], throttle_sol[i - 1], delta_sol[i - 1]])
+    if i == N: # last control point has no physical meaning
+        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
     else:
-        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i], delta_sol[i]])
+        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
 
 file.close()
 
 # ----------------------------------
 #    Show
 # ----------------------------------
+print('dt of the optimization is: ', dt_sol)
 plt.show()

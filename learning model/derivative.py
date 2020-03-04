@@ -1,4 +1,4 @@
-def jerk(a_list,dt):
+def derivative(a_list,dt):
     import pylab as plt
 
     j_list = []
