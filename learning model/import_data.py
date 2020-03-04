@@ -16,7 +16,7 @@ def import_data(plot):
 
     # plotting of the datasets
     if plot == 1:
-        [ax1a,ax1b,ax2,ax3a,ax3b,ax4a,ax4b,ax5a,ax5b,ax6a,ax6b,ax7,ax8] = plotting_datasets()
+        [ax1a, ax1b, ax2, ax3a, ax3b, ax4a, ax4b, ax5a, ax5b, ax6a, ax6b, ax7, ax8, ax9a, ax9b] = plotting_datasets()
 
     # initialise the init state conditions:
     init_matrix = plt.zeros((length,8))
@@ -106,6 +106,9 @@ def import_data(plot):
             # Centriputal force
             ax8.plot(data_cl['time_cl'], plt.square((data_cl['r_cl']*data_cl['vx_cl'])**2+(data_cl['r_cl']*data_cl['vy_cl'])**2), '-', label=file, linewidth=3.0)
 
+            # Lateral accelleration splitted
+            ax9a.plot(data_cl['time_cl'], data_cl['ay_local_cl'] , '-', label=file, linewidth=3.0)
+            ax9b.plot(data_cl['time_cl'], data_cl['r_cl'] * data_cl['vx_cl'], '-', label=file, linewidth=3.0)
 
 
             ax1a.legend()
@@ -120,7 +123,9 @@ def import_data(plot):
             ax6a.legend()
             ax6b.legend()
             ax7.legend()
-            ax7.legend()
+            ax8.legend()
+            ax9a.legend()
+            ax9b.legend()
 
 
         dict_list.append(data_cl)

@@ -109,5 +109,21 @@ def plotting_datasets():
     plt.title('Centriputal acc', fontsize=14)
     plt.grid(True)
 
-    return ax1a, ax1b, ax2, ax3a, ax3b, ax4a, ax4b, ax5a, ax5b, ax6a, ax6b, ax7, ax8
+    # Split plot of the local lateral acceleration
+    plt.figure("Ayt", figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    ax9a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Ayt [m/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Ayt Dataset', fontsize=14)
+
+    plt.subplot(1, 2, 2)
+    ax9b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Ayn", fontsize=14)
+    plt.title('Ayn Dataset', fontsize=14)
+    plt.grid(True)
+
+    return ax1a, ax1b, ax2, ax3a, ax3b, ax4a, ax4b, ax5a, ax5b, ax6a, ax6b, ax7, ax8, ax9a, ax9b
 

@@ -42,7 +42,7 @@ N = 600
 
 x_start = 0
 y_start = 0
-vx_start = 80/3.6 # this is also the desired velocity
+vx_start = des_matrix[0,1] # this is also the desired velocity
 vy_start = 0
 psi_start = 0
 psi_dot_start = 0
@@ -61,7 +61,7 @@ time_guess = des_matrix[0,2]
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
-theta = plt.array([2,5,6,2,4]) # deze wegingsfactoren dienen achterhaald te worden.
+theta = plt.array([4,5,6,1,2]) # deze wegingsfactoren dienen achterhaald te worden. (in ax en ay zit ook de normal acceleration)
 
 # Equations of the vehicle model
 x = MX.sym('x') # in global axis
@@ -301,7 +301,7 @@ ay_tot_sol = ay_sol + any_sol
 jx_sol = jerk(ax_tot_sol,dt_sol)
 jy_sol = jerk(ay_tot_sol,dt_sol)
 
-define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol)
+define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol,ay_sol,any_sol)
 
 print("\n")
 print('Integrated feature values: ')

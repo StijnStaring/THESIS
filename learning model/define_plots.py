@@ -1,4 +1,4 @@
-def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol):
+def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol,ayt_sol,any_sol):
     """"
     Theta_iter is a string
     """
@@ -113,6 +113,22 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.title('delta local', fontsize=14)
     plt.grid(True)
 
+    # Different parts of the local lateral acceleration
+    plt.figure("Ayt: iter " + theta_iter, figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    ax8a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Ayt [m/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Ayt ', fontsize=14)
+
+    plt.subplot(1, 2, 2)
+    ax8b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Ayn [m/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Ayn', fontsize=14)
+
     time_vector = plt.linspace(0,T_sol,len(x_sol))
 
     # states
@@ -129,6 +145,9 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0)
     ax7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0)
     ax7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0)
+    ax8a.plot(time_vector[0:-1], ayt_sol, '.-', linewidth=3.0)
+    ax8b.plot(time_vector[0:-1], any_sol, '.-', linewidth=3.0)
+
 
     print("\n")
     print("Lane change duration of: ",T_sol," [s]")

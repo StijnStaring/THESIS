@@ -23,17 +23,16 @@ from RPROP import RPROP
 # sns.set_palette(sns.color_palette("hls", 20))
 his_multi_grads = []
 his_weights = []
-his_f_calc_rel = []
-amount_features = 7
+his_f_calc_rel = [] # procentual difference between the calculated features
+amount_features = 5
 rec = 1
 plot_datasets = 1
-plot_opti_weights = 0
+plot_opti_weights = 1
 calculated_features = plt.zeros([amount_features,1])
 
-
-
 # des_matrix = delta_lane,speed_desired, time_lane_change
-[f1_o,f2_o,f3_o,f4_o,f5_o,f6_o,init_matrix,des_matrix,dict_list,files] = import_data(plot_datasets)
+[norm0,norm1,norm2,norm3,norm4,init_matrix,des_matrix,dict_list,files] = import_data(0)
+data_cl = dict_list[0]
 
 # RPROP variables
 del_0 = 0.1
