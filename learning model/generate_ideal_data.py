@@ -15,12 +15,15 @@ import csv
 import pylab as plt
 from scipy import integrate, signal
 from import_data import import_data
+from import_ideal_data import import_ideal_data
 from define_plots import define_plots
 from derivative import derivative
 from generate_delta_guess import generate_delta_guess
 from casadi import *
 
-[_,_,_,_,_,init_matrix,des_matrix,dict_list,files] = import_data(0)
+# [_,_,_,_,_,init_matrix,des_matrix,dict_list,files] = import_data(0)
+data_cl = import_ideal_data()
+
 # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden. (example lane change)
 norm0 = 0.007276047781441449
 norm1 = 2.6381715506137424
@@ -28,7 +31,7 @@ norm2 = 11.283498669013454
 norm3 = 0.046662223759442054
 norm4 = 17.13698903738383
 
-data_cl = dict_list[0]
+# data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
 # Remark !x and y are coordinates in global axis!
 M = 1430
@@ -62,26 +65,26 @@ x_guess = signal.resample(data_cl['x_cl'],N+1).T
 y_guess = signal.resample(data_cl['y_cl'],N+1).T
 vx_guess = signal.resample(data_cl['vx_cl'],N+1).T
 vy_guess = signal.resample(data_cl['vy_cl'],N+1).T
-psi_guess = signal.resample(data_cl['yaw_cl'],N+1).T
-psi_dot_guess = signal.resample(data_cl['r_cl'],N+1).T
+psi_guess = signal.resample(data_cl['psi_cl'],N+1).T
+psi_dot_guess = signal.resample(data_cl['psi_dot_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
-delta_guess = signal.resample(data_cl['steering_rad_cl'],N).T # Error made in data Siemens --> SWA not 40 degrees
+delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siemens --> SWA not 40 degrees
 # time_guess = des_matrix[0,2]
 time_guess = 4.01
 # delta_guess = generate_delta_guess(time_guess,N)[plt.newaxis,:]
 
-plt.figure()
-plt.plot(plt.linspace(0,time_guess,delta_guess.shape[1]),plt.squeeze(delta_guess)*180/plt.pi)
-plt.xlabel("Time [s]", fontsize=14)
-plt.ylabel("delta [degrees]", fontsize=14)
-plt.title('delta local', fontsize=14)
-plt.grid(True)
+# plt.figure()
+# plt.plot(plt.linspace(0,time_guess,delta_guess.shape[1]),plt.squeeze(delta_guess)*180/plt.pi)
+# plt.xlabel("Time [s]", fontsize=14)
+# plt.ylabel("delta [degrees]", fontsize=14)
+# plt.title('delta local', fontsize=14)
+# plt.grid(True)
 
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
 # theta = plt.array([4,5,6,1,2]) # deze wegingsfactoren dienen achterhaald te worden. (in ax en ay zit ook de normal acceleration)
-theta = plt.array([1,1,1,1,1])
+theta = plt.array([4,5,6,1,2])
 
 # Equations of the vehicle model
 x = MX.sym('x') # in global axis

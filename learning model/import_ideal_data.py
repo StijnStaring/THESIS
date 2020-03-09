@@ -3,11 +3,18 @@ def import_ideal_data():
     import pylab as plt
     import pandas as pd
 
-    file = glob.glob("written_data/*.csv")
+    file = glob.glob("reading_data/*.csv")
     print("The name of the file: ", file)
 
-    data = pd.read_csv(file)
+    data = pd.read_csv(file[0])
+
     data_cl = dict()
+
+    # path = "rading_data\ diff_weights_guess"
+    # file = open(path, newline='')
+    # reader = csv.reader(file)
+    # header = next(reader)
+    # data = []
 
     # "time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta","aty","any"
     data_cl['time_cl'] = plt.array([data.time]).T
