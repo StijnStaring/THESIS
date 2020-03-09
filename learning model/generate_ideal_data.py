@@ -20,7 +20,14 @@ from derivative import derivative
 from generate_delta_guess import generate_delta_guess
 from casadi import *
 
-[norm0,norm1,norm2,norm3,norm4,init_matrix,des_matrix,dict_list,files] = import_data(0)
+[_,_,_,_,_,init_matrix,des_matrix,dict_list,files] = import_data(0)
+# theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden. (example lane change)
+norm0 = 0.007276047781441449
+norm1 = 2.6381715506137424
+norm2 = 11.283498669013454
+norm3 = 0.046662223759442054
+norm4 = 17.13698903738383
+
 data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
 # Remark !x and y are coordinates in global axis!
@@ -43,12 +50,13 @@ N = 500
 
 x_start = 0
 y_start = 0
-vx_start = des_matrix[0,1] # this is the desired velocity
+# vx_start = des_matrix[0,1] # this is the desired velocity
+vx_start = 23.10159175
 vy_start = 0
 psi_start = 0
 psi_dot_start = 0
-width_road = des_matrix[0,0]
-
+# width_road = des_matrix[0,0]
+width_road = 3.46990715
 # Resampling and guesses
 x_guess = signal.resample(data_cl['x_cl'],N+1).T
 y_guess = signal.resample(data_cl['y_cl'],N+1).T
@@ -58,7 +66,8 @@ psi_guess = signal.resample(data_cl['yaw_cl'],N+1).T
 psi_dot_guess = signal.resample(data_cl['r_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
 delta_guess = signal.resample(data_cl['steering_rad_cl'],N).T # Error made in data Siemens --> SWA not 40 degrees
-time_guess = des_matrix[0,2]
+# time_guess = des_matrix[0,2]
+time_guess = 4.01
 # delta_guess = generate_delta_guess(time_guess,N)[plt.newaxis,:]
 
 plt.figure()
@@ -71,7 +80,8 @@ plt.grid(True)
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
-theta = plt.array([4,5,6,1,2]) # deze wegingsfactoren dienen achterhaald te worden. (in ax en ay zit ook de normal acceleration)
+# theta = plt.array([4,5,6,1,2]) # deze wegingsfactoren dienen achterhaald te worden. (in ax en ay zit ook de normal acceleration)
+theta = plt.array([1,1,1,1,1])
 
 # Equations of the vehicle model
 x = MX.sym('x') # in global axis
@@ -221,24 +231,14 @@ ay_tot = plt.array(aty_list) + plt.array(any_list)
 
 # calculation lateral jerk -> jerk is calculated from the total acceleration!
 # Better to use a second order numerical scheme
-# jy_list = []
-# for i in plt.arange(0, len(time_list), 1):
-#     if i == 0:
-#         jy_list.append((ay_tot[i + 1]-ay_tot[i])/(T/N))
-#     elif i == len(time_list)-1:
-#         jy_list.append((ay_tot[i]-ay_tot[i-1])/(T/N))
-#     else:
-#         jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
-
 jy_list = []
 for i in plt.arange(0, len(time_list), 1):
     if i == 0:
-        jy_list.append((vy[i + 1] - 2*vy[i] + vy[i-1])/(T/N)**2)
+        jy_list.append((ay_tot[i + 1]-ay_tot[i])/(T/N))
     elif i == len(time_list)-1:
         jy_list.append((ay_tot[i]-ay_tot[i-1])/(T/N))
     else:
         jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
-
 
 vx_des_list = []
 for k in range(N+1):
@@ -297,8 +297,8 @@ for i in plt.arange(0, len(integrand) - 1, 1):
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
-# opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[4]/norm4*f4_cal)
-# opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal)
+# opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
+
 print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4]))
 print('Relative weights: ', theta)
 
@@ -348,39 +348,8 @@ aty_sol = derivative(vy_list,dt_sol)
 
 ay_tot_sol = aty_sol + any_sol
 
-# jx_sol = derivative(ax_tot_sol,dt_sol)
-# jy_sol = derivative(ay_tot_sol,dt_sol)
-
-
-jy_list = []
-for i in plt.arange(0, len(time_list), 1):
-    if i == 0:
-        jy_list.append((vy_sol[i + 1] - 2*vy_sol[i] + vy_sol[i-1])/(T_sol/N)**2)
-    elif i == len(time_list)-1:
-        jy_list.append((ay_tot_sol[i]-ay_tot_sol[i-1])/(T_sol/N))
-    else:
-        jy_list.append((ay_tot_sol[i + 1] - ay_tot_sol[i - 1]) / (2 * (T_sol/N)))
-jy_sol = plt.array(jy_list)
-
-jx_list = []
-for i in plt.arange(0, len(time_list), 1):
-    if i == 0:
-        jx_list.append((vx_sol[i + 1] - 2*vx_sol[i] + vx_sol[i-1])/(T_sol/N)**2)
-    elif i == len(time_list)-1:
-        jx_list.append((ax_tot_sol[i]-ax_tot_sol[i-1])/(T_sol/N))
-    else:
-        jx_list.append((ax_tot_sol[i + 1] - ax_tot_sol[i - 1]) / (2 * (T_sol/N)))
-jx_sol = plt.array(jx_list)
-
-
-
-
-
-
-
-
-
-
+jx_sol = derivative(ax_tot_sol,dt_sol)
+jy_sol = derivative(ay_tot_sol,dt_sol)
 
 
 define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol)

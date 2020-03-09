@@ -1,0 +1,12 @@
+# theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden. (example lane change)
+norm0 = 0.007276047781441449
+norm1 = 2.6381715506137424
+norm2 = 11.283498669013454
+norm3 = 0.046662223759442054
+norm4 = 17.13698903738383
+
+
+--> gevolg: strenger op jerk en lateral acc
+dan de originele dataset. Minder streng op
+y(t), ax, vx. 
+
