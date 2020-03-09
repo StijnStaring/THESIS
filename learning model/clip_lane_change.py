@@ -15,6 +15,9 @@ def clip_lane_change(data):
     vx_d = plt.array([data.Vx]).T
     vy_d = plt.array([data.Vy]).T
     dt = time_d[1, 0]- time_d[0, 0]
+
+
+
     throw_away = 15
     vy_th = 0.0001 # sensitivity
     sleep = 10 # to notice a trend in data and avoid decision on single outlier

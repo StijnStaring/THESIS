@@ -19,7 +19,7 @@ from derivative import derivative
 import pylab as plt
 from casadi import *
 
-[norm0,norm1,norm2,norm3,norm4,init_matrix,des_matrix,dict_list,files] = import_data(1)
+[norm0,norm1,norm2,norm3,norm4,init_matrix,des_matrix,dict_list,files] = import_data(0)
 data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
 # Remark !x and y are coordinates in global axis!
@@ -42,7 +42,7 @@ N = 500
 
 x_start = 0
 y_start = 0
-vx_start = des_matrix[0,1] # this is also the desired velocity
+vx_start = des_matrix[0,1] # this is the desired velocity
 vy_start = 0
 psi_start = 0
 psi_dot_start = 0
@@ -209,6 +209,7 @@ ax_tot = plt.array(atx_list) + plt.array(anx_list)
 ay_tot = plt.array(aty_list) + plt.array(any_list)
 
 # calculation lateral jerk -> jerk is calculated from the total acceleration!
+# Better to use a second order numerical scheme
 jy_list = []
 for i in plt.arange(0, len(time_list), 1):
     if i == 0:
@@ -217,6 +218,7 @@ for i in plt.arange(0, len(time_list), 1):
         jy_list.append((ay_tot[i]-ay_tot[i-1])/(T/N))
     else:
         jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
+
 
 vx_des_list = []
 for k in range(N+1):

@@ -157,8 +157,3 @@ def import_data(plot):
     return f1,f2,f3,f4,f5,init_matrix,des_matrix,dict_list,files
 # init matrix: amount of datasets x 8
 # des  matrix: amount of datasets x 3
-
-
-
-
-

@@ -1,7 +1,6 @@
-def comparing_features(dict_list):
+def comparing_features(data_cl):
     import pylab as plt
 
-    data_cl = dict_list[0]
     # Define plot to compare normalized features
     plt.figure("Comparing Normalized Features")
     axf = plt.gca()
@@ -79,13 +78,13 @@ def comparing_features(dict_list):
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal acceleration [m/s^2]", fontsize=14)
     plt.grid(True)
-    plt.title('Ax(t) comparison', fontsize=14)
+    plt.title('Ax(t) comparison (total)', fontsize=14)
 
     plt.subplot(1, 2, 2)
     axcom4b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical acceleration [m/s^2]", fontsize=14)
-    plt.title('Ay(t) comparison', fontsize=14)
+    plt.title('Ay(t) comparison (total)', fontsize=14)
     plt.grid(True)
 
     # Jx(t)/Jy(t)
@@ -96,39 +95,65 @@ def comparing_features(dict_list):
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Horizontal jerk [m/s^3]", fontsize=14)
     plt.grid(True)
-    plt.title('jx(t) comparison', fontsize=14)
+    plt.title('jx(t) comparison (total)', fontsize=14)
 
     plt.subplot(1, 2, 2)
     axcom5b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Vertical jerk [m/s^3]", fontsize=14)
-    plt.title('jy(t) comparison', fontsize=14)
+    plt.title('jy(t) comparison (total)', fontsize=14)
     plt.grid(True)
 
-    # ux(t)/uy(t)
+    # yaw(t)/yaw/s(t)
 
-    plt.figure("Comparison jounce", figsize=(10, 4))
+    plt.figure("Yaw angle: iter ", figsize=(10, 4))
     plt.subplot(1, 2, 1)
     axcom6a = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
-    plt.ylabel("Horizontal jounce [m/s^4]", fontsize=14)
+    plt.ylabel("Yaw angle [degrees]", fontsize=14)
     plt.grid(True)
-    plt.title('ux(t) comparison', fontsize=14)
+    plt.title('Yaw angle ', fontsize=14)
 
     plt.subplot(1, 2, 2)
     axcom6b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
-    plt.ylabel("Vertical jounce [m/s^4]", fontsize=14)
-    plt.title('uy(t) comparison', fontsize=14)
+    plt.ylabel("Yaw angle/s [degrees/s]", fontsize=14)
+    plt.title('Yaw angle/s ', fontsize=14)
     plt.grid(True)
 
-    # Curvature
-    plt.figure("Comparison curvature", figsize=(10, 4))
-    axcom7 = plt.gca()
-    plt.xlabel("t [s]", fontsize=14)
-    plt.ylabel("Curvature [1/m]", fontsize=14)
-    plt.title('Curvature comparison', fontsize=14)
+    # Inputs
+    plt.figure("throttle: iter ", figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    axcom7a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("throttle [-]", fontsize=14)
     plt.grid(True)
+    plt.title('throttle ', fontsize=14)
+
+    plt.subplot(1, 2, 2)
+    axcom7b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("delta [degrees]", fontsize=14)
+    plt.title('delta local', fontsize=14)
+    plt.grid(True)
+
+    # Different parts of the local lateral acceleration
+    plt.figure("Ayt: iter ", figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    axcom8a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Ayt [m/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Ayt ', fontsize=14)
+
+    plt.subplot(1, 2, 2)
+    axcom8b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Ayn [m/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Ayn', fontsize=14)
+
+
 
     # Plotting data in figures
     axcom1a.plot(data_cl['time_cl'], data_cl['x_cl'], '-', label="X(t) 1 (data)", linewidth=3.0)
@@ -137,18 +162,28 @@ def comparing_features(dict_list):
     axcom2.plot(data_cl['x_cl'], data_cl['y_cl'], '-', label="path 1 (data)", linewidth=3.0)
 
     # The vx and vy velocities are as seen in the global axis (fixed).
-    axcom3a.plot(data_cl['time_cl'], data_cl['vx_proj_cl'], '-', label="Vx(t) 1 (data)", linewidth=3.0)
-    axcom3b.plot(data_cl['time_cl'], data_cl['vy_proj_cl'], '-', label="Vy(t) 1 (data)", linewidth=3.0)
+    axcom3a.plot(data_cl['time_cl'], data_cl['vx_cl'], '-', label="Vx(t) 1 (data)", linewidth=3.0)
+    axcom3b.plot(data_cl['time_cl'], data_cl['vy_cl'], '-', label="Vy(t) 1 (data)", linewidth=3.0)
 
     # The ax and ay accelerations are as seen in the global axis (fixed).
-    axcom4a.plot(data_cl['time_cl'], data_cl['ax_proj_cl'], '-', label="Ax(t) 1 (data)", linewidth=3.0)
-    axcom4b.plot(data_cl['time_cl'], data_cl['ay_proj_cl'], '-', label="Ay(t) 1 (data)", linewidth=3.0)
+    axcom4a.plot(data_cl['time_cl'], data_cl['ax_cl'], '-', label="Ax(t) 1 (data)", linewidth=3.0)
+    axcom4b.plot(data_cl['time_cl'], data_cl['ay_cl'], '-', label="Ay(t) 1 (data)", linewidth=3.0)
 
     # The jerk_x and jerk_y are as seen in the global axis (fixed).
     axcom5a.plot(data_cl['time_cl'], data_cl['jx_cl'], '-', label="Jx(t) 1 (data)", linewidth=3.0)
     axcom5b.plot(data_cl['time_cl'], data_cl['jy_cl'], '-', label="Jy(t) 1 (data)", linewidth=3.0)
 
-    # The curvature
-    axcom7.plot(data_cl['time_cl'], data_cl['curvature_cl'], '-', label="Curvature 1 (data)", linewidth=3.0)
+    # yaw and yaw rate
+    axcom6a.plot(data_cl['time_cl'], data_cl['psi_cl']* 180 / plt.pi, '-', label="Psi(t) 1 (data)", linewidth=3.0)
+    axcom6b.plot(data_cl['time_cl'], data_cl['psi_dot_cl']* 180 / plt.pi, '-', label="Psi_dot(t) 1 (data)", linewidth=3.0)
 
-    return axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7
+    # throttle and delta and yaw rate
+    axcom7a.plot(data_cl['time_cl'], data_cl['throttle_cl'] , '-', label="Throttle(t) 1 (data)", linewidth=3.0)
+    axcom7b.plot(data_cl['time_cl'], data_cl['delta_cl'] * 180 / plt.pi, '-', label="Delta(t) 1 (data)",linewidth=3.0)
+
+    # throttle and delta and yaw rate
+    axcom8a.plot(data_cl['time_cl'], data_cl['aty_cl'], '-', label="Aty(t) 1 (data)", linewidth=3.0)
+    axcom8b.plot(data_cl['time_cl'], data_cl['any_cl'], '-', label="Any(t) 1 (data)", linewidth=3.0)
+
+
+    return axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b
