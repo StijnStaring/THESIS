@@ -12,11 +12,12 @@ speed_range: [80-90] km/hour
 :return: csv-datafiles
 """
 import csv
+import pylab as plt
 from scipy import integrate, signal
 from import_data import import_data
 from define_plots import define_plots
 from derivative import derivative
-import pylab as plt
+from generate_delta_guess import generate_delta_guess
 from casadi import *
 
 [norm0,norm1,norm2,norm3,norm4,init_matrix,des_matrix,dict_list,files] = import_data(0)
@@ -56,8 +57,17 @@ vy_guess = signal.resample(data_cl['vy_cl'],N+1).T
 psi_guess = signal.resample(data_cl['yaw_cl'],N+1).T
 psi_dot_guess = signal.resample(data_cl['r_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
-delta_guess = signal.resample(data_cl['steering_deg_cl']*plt.pi/180,N).T
+delta_guess = signal.resample(data_cl['steering_rad_cl'],N).T # Error made in data Siemens --> SWA not 40 degrees
 time_guess = des_matrix[0,2]
+# delta_guess = generate_delta_guess(time_guess,N)[plt.newaxis,:]
+
+plt.figure()
+plt.plot(plt.linspace(0,time_guess,delta_guess.shape[1]),plt.squeeze(delta_guess)*180/plt.pi)
+plt.xlabel("Time [s]", fontsize=14)
+plt.ylabel("delta [degrees]", fontsize=14)
+plt.title('delta local', fontsize=14)
+plt.grid(True)
+
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
@@ -146,8 +156,9 @@ opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
 # states: x, y, vx, vy, psi, psi_dot
 opti.subject_to(X[:,0]== vertcat(x_start,y_start,vx_start,vy_start,psi_start,psi_dot_start))
 # Controls set on zero in first interval --> want to start from steady state.
-opti.subject_to(delta[0] == 0)
-opti.subject_to(throttle[0] == 0)
+# opti.subject_to(delta[0] == 0)
+# opti.subject_to(throttle[0] == 0)
+# (This will cause a very small deceleration but makes sure ay is starting from zero)
 # Terminal constraints
 opti.subject_to(y[-1] == width_road) # should move 3 m lateral
 opti.subject_to(vy[-1] == 0) # lane change is completed
@@ -210,10 +221,19 @@ ay_tot = plt.array(aty_list) + plt.array(any_list)
 
 # calculation lateral jerk -> jerk is calculated from the total acceleration!
 # Better to use a second order numerical scheme
+# jy_list = []
+# for i in plt.arange(0, len(time_list), 1):
+#     if i == 0:
+#         jy_list.append((ay_tot[i + 1]-ay_tot[i])/(T/N))
+#     elif i == len(time_list)-1:
+#         jy_list.append((ay_tot[i]-ay_tot[i-1])/(T/N))
+#     else:
+#         jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
+
 jy_list = []
 for i in plt.arange(0, len(time_list), 1):
     if i == 0:
-        jy_list.append((ay_tot[i + 1]-ay_tot[i])/(T/N))
+        jy_list.append((vy[i + 1] - 2*vy[i] + vy[i-1])/(T/N)**2)
     elif i == len(time_list)-1:
         jy_list.append((ay_tot[i]-ay_tot[i-1])/(T/N))
     else:
@@ -229,9 +249,10 @@ for k in range(N+1):
     y_des_list.append(y[k]-width_road)
 
 # Extra constraints on acceleration and jerk:
-# opti.subject_to(atx_list[-1] == 0)
 opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
-# opti.subject_to(jy_list[-1] == 0)
+opti.subject_to(jy_list[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
+opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
+opti.subject_to(jy_list[0] == 0) # start from the beginning of the lane change
 
 
 # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
@@ -275,8 +296,9 @@ for i in plt.arange(0, len(integrand) - 1, 1):
 
 
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-# opti.minimize(theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
 opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
+# opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[4]/norm4*f4_cal)
+# opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal)
 print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4]))
 print('Relative weights: ', theta)
 
@@ -326,8 +348,40 @@ aty_sol = derivative(vy_list,dt_sol)
 
 ay_tot_sol = aty_sol + any_sol
 
-jx_sol = derivative(ax_tot_sol,dt_sol)
-jy_sol = derivative(ay_tot_sol,dt_sol)
+# jx_sol = derivative(ax_tot_sol,dt_sol)
+# jy_sol = derivative(ay_tot_sol,dt_sol)
+
+
+jy_list = []
+for i in plt.arange(0, len(time_list), 1):
+    if i == 0:
+        jy_list.append((vy_sol[i + 1] - 2*vy_sol[i] + vy_sol[i-1])/(T_sol/N)**2)
+    elif i == len(time_list)-1:
+        jy_list.append((ay_tot_sol[i]-ay_tot_sol[i-1])/(T_sol/N))
+    else:
+        jy_list.append((ay_tot_sol[i + 1] - ay_tot_sol[i - 1]) / (2 * (T_sol/N)))
+jy_sol = plt.array(jy_list)
+
+jx_list = []
+for i in plt.arange(0, len(time_list), 1):
+    if i == 0:
+        jx_list.append((vx_sol[i + 1] - 2*vx_sol[i] + vx_sol[i-1])/(T_sol/N)**2)
+    elif i == len(time_list)-1:
+        jx_list.append((ax_tot_sol[i]-ax_tot_sol[i-1])/(T_sol/N))
+    else:
+        jx_list.append((ax_tot_sol[i + 1] - ax_tot_sol[i - 1]) / (2 * (T_sol/N)))
+jx_sol = plt.array(jx_list)
+
+
+
+
+
+
+
+
+
+
+
 
 define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol)
 

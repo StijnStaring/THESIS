@@ -56,7 +56,7 @@ def clip_lane_change(data):
     data_cl['vy_proj_cl'] = vy_proj[index_start:index_end+1]
     data_cl['r_cl'] = plt.array([data.r]).T[index_start:index_end+1]
     data_cl['yaw_cl'] = plt.array([data.yaw]).T[index_start:index_end+1]
-    data_cl['steering_deg_cl'] = plt.array([data.steering_deg]).T[index_start:index_end+1]
+    data_cl['steering_rad_cl'] = (plt.array([data.steering_deg])*(plt.pi/180)**2).T[index_start:index_end+1]
     data_cl['throttle_cl'] = plt.array([data.throttle]).T[index_start:index_end+1]
     data_cl['brake_cl'] = plt.array([data.brake]).T[index_start:index_end+1]
     data_cl['ax_cl'] = plt.array([data.ax]).T[index_start:index_end+1] # big difference with projected acceleration / total local acc

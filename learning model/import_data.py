@@ -101,7 +101,7 @@ def import_data(plot):
             ax6b.plot(data_cl['time_cl'], data_cl['r_cl']*180/plt.pi, '-', label=file, linewidth=3.0)
 
             # The steerwheelangle in degrees
-            ax7.plot(data_cl['time_cl'], data_cl['steering_deg_cl'], '-', label=file, linewidth=3.0)
+            ax7.plot(data_cl['time_cl'], data_cl['steering_rad_cl'], '-', label=file, linewidth=3.0)
 
             # Centriputal force
             ax8.plot(data_cl['time_cl'], plt.square((data_cl['r_cl']*data_cl['vx_cl'])**2+(data_cl['r_cl']*data_cl['vy_cl'])**2), '-', label=file, linewidth=3.0)
