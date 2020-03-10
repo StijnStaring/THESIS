@@ -1,5 +1,6 @@
 def import_ideal_data_PG():
     import glob
+    from clip_lane_change_PG import clip_lane_change_PG
     import pylab as plt
     import pandas as pd
 
@@ -30,12 +31,13 @@ def import_ideal_data_PG():
             data_cl['throttle_cl'] = plt.array([data.throttle]).T
             data_cl['delta_cl'] = plt.array([data.delta]).T
             data_cl['aty_cl'] = plt.array([data.aty]).T
-            data_cl['any_cl'] = plt.array([data.any]).T
+            data_cl['any_cl'] = data_cl['psi_dot_cl'] * data_cl['vx_cl']
             data_cl['dt_cl'] = data_cl['time_cl'][1, 0] - data_cl['time_cl'][0, 0]
 
             data_cl_list.append(data_cl)
 
         else:
+            [time_lane_change, start_lane_change, end_lane_change, index_start, index_end, delta_lane, desired_speed,dt_grid, data_cl] = clip_lane_change_PG(data)
+            data_cl_list.append(data_cl)
 
-
-    return data_cl_list
+    return data_cl_list, files

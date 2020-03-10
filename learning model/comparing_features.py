@@ -18,7 +18,6 @@ def comparing_features(data_cl):
     plt.grid(True)
 
     # comparison of used weights
-
     plt.figure("Comparison weights", figsize=(10, 4))
     acw = plt.gca()
     plt.xlabel("Weight number", fontsize=14)

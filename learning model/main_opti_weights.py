@@ -6,13 +6,13 @@ Github ==> ideal test folder
 """
 # import seaborn as sns
 import pylab as plt
-from import_data import import_data
+from import_ideal_data import import_ideal_data
 from optim_weights import optim_weights
-from calc_features import calc_features
 from comparing_features import comparing_features
 from post_processing_plots import post_processing_plots
 from RPROP import RPROP
-from import_ideal_data import import_ideal_data
+from import_data2 import import_data2
+from optim_weights_ideal import optim_weights_ideal
 
 # Remarks
 # ########
@@ -27,13 +27,13 @@ his_weights = []
 his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
 rec = 1
-plot_datasets = 0
 plot_opti_weights = 1
-calculated_features = plt.zeros([amount_features,1])
-
-# des_matrix = delta_lane,speed_desired, time_lane_change
-[f1_o,f2_o,f3_o,f4_o,f5_o,init_matrix,des_matrix,dict_list,files] = import_data(0)
-data_cl = import_ideal_data()
+width_road = 3.46990715
+vx_start = 23.10159175
+time_guess = 4.01
+# Import data
+[data_cl,f_data] = import_data2(width_road,vx_start)
+# theta = plt.array([4,5,6,1,2]) => goal
 
 # RPROP variables
 del_0 = 0.1
@@ -44,24 +44,24 @@ grad_curr = plt.zeros([amount_features,1])
 grad_prev = plt.zeros([amount_features,1])
 update = del_0*plt.ones([amount_features,1])
 #################
-#  data_cl[ax_cl]**2,data_cl[ay_cl] ** 2,data_cl[jy_cl] ** 2,delta_lane - data_cl[y_cl]) ** 2,desired_speed - data_cl[vx_cl]) ** 2
-theta = 1*plt.ones((amount_features,1))
+# Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
+theta = 1.5*plt.ones((amount_features,1))
 his_weights.append([str(rec)+"//",theta])
 
 # plotting
 [axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b] = comparing_features(data_cl)
 axf.plot([1,1,1,1,1],'-', marker='*', markersize=6, label = "Observed features")
-axfn.plot([f1_o,f2_o,f3_o,f4_o,f5_o],'-', marker='*', markersize=6, label = "Observed features")
+axfn.plot([f_data[0],f_data[1],f_data[2],f_data[3],f_data[4]],'-', marker='*', markersize=6, label = "Observed features")
 acw.plot([theta[0],theta[1],theta[2],theta[3],theta[4]],'-', marker='o', markersize=6, label = "iter " + str(rec))
-f_obs = plt.array([f1_o,f2_o,f3_o,f4_o,f5_o])
-f_obs = f_obs[:,plt.newaxis]
 ###########
 
 # Optimization loop
-# Change this to convergence criterium: df/dt = 0
-while :
+# Change this to convergence criterium: df/dt = 0 or weights are accurately found.
+theta_chosen = plt.array([4,5,6,1,2])
+while plt.sum(theta_chosen - theta) < 0.5 or plt.sum(grad_curr) < 0.5:
     print('rec is: ',rec)
-    [his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc] = optim_weights(theta, init_matrix,des_matrix,dict_list, files,str(rec),plot_opti_weights,f_obs,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7)
+
+    # [his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy, his_time_cal_lc] = optim_weights(theta, init_matrix,des_matrix,dict_list, files,str(rec),plot_opti_weights,f_obs,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7)
     # his_time_cal[time_lane_change, dt]
     [f1, f2, f3, f4, f5, f6, f7] = calc_features(his_x, his_vx, his_ax, his_jx, his_y, his_vy, his_ay, his_jy,his_time_cal_lc, des_matrix)
 

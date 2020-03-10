@@ -13,18 +13,21 @@ speed_range: [80-90] km/hour
 """
 import csv
 import pylab as plt
-from scipy import integrate, signal
-from import_data import import_data
+from scipy import signal
+# from import_data import import_data
 from import_ideal_data import import_ideal_data
 from define_plots import define_plots
 from derivative import derivative
-from generate_delta_guess import generate_delta_guess
+# from generate_delta_guess import generate_delta_guess
 from casadi import *
 
 # [_,_,_,_,_,init_matrix,des_matrix,dict_list,files] = import_data(0)
-data_cl = import_ideal_data()
+width_road = 3.46990715
+vx_start = 23.10159175
+time_guess = 4.01
+data_cl = import_ideal_data(width_road,vx_start)
 
-# theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden. (example lane change)
+# theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
 norm0 = 0.007276047781441449
 norm1 = 2.6381715506137424
 norm2 = 11.283498669013454
@@ -54,12 +57,12 @@ N = 500
 x_start = 0
 y_start = 0
 # vx_start = des_matrix[0,1] # this is the desired velocity
-vx_start = 23.10159175
+
 vy_start = 0
 psi_start = 0
 psi_dot_start = 0
 # width_road = des_matrix[0,0]
-width_road = 3.46990715
+
 # Resampling and guesses
 x_guess = signal.resample(data_cl['x_cl'],N+1).T
 y_guess = signal.resample(data_cl['y_cl'],N+1).T
@@ -70,7 +73,7 @@ psi_dot_guess = signal.resample(data_cl['psi_dot_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
 delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siemens --> SWA not 40 degrees
 # time_guess = des_matrix[0,2]
-time_guess = 4.01
+
 # delta_guess = generate_delta_guess(time_guess,N)[plt.newaxis,:]
 
 # plt.figure()
@@ -84,6 +87,7 @@ time_guess = 4.01
 # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
 # theta = plt.array([4,5,6,1,2]) # deze wegingsfactoren dienen achterhaald te worden. (in ax en ay zit ook de normal acceleration)
+# theta = plt.array([4,5,6,1,2])
 theta = plt.array([4,5,6,1,2])
 
 # Equations of the vehicle model
