@@ -184,5 +184,7 @@ def comparing_features(data_cl):
     axcom8a.plot(data_cl['time_cl'], data_cl['aty_cl'], '-', label="Aty(t) 1 (data)", linewidth=3.0)
     axcom8b.plot(data_cl['time_cl'], data_cl['any_cl'], '-', label="Any(t) 1 (data)", linewidth=3.0)
 
+    axcom1a.legend()
+
 
     return axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b

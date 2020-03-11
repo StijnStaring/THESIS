@@ -1,4 +1,4 @@
-def import_data2(width_road,vx_start):
+def import_data2(width_road,vx_start,ak):
     import glob
     import pylab as plt
     import pandas as pd
@@ -69,19 +69,20 @@ def import_data2(width_road,vx_start):
     for i in plt.arange(0, len(integrand) - 1, 1):
         f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * data_cl['dt_cl']
 
-    print("\n")
-    print('Integrated feature values: ')
-    print('------------------------------')
-    print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
-    print(f0_cal)
-    print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
-    print(f1_cal)
-    print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
-    print(f2_cal)
-    print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-    print(f3_cal)
-    print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
-    print(f4_cal)
+    if ak == 1:
+        print("\n")
+        print('Integrated feature values of the DATA ')
+        print('------------------------------')
+        print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
+        print(f0_cal)
+        print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
+        print(f1_cal)
+        print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
+        print(f2_cal)
+        print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
+        print(f3_cal)
+        print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
+        print(f4_cal)
 
     features = plt.array([f0_cal,f1_cal,f2_cal,f3_cal,f4_cal])
 

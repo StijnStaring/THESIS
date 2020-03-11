@@ -4,7 +4,7 @@ def RPROP(grad_curr,grad_prev,update,w_curr,del_w_prev,exception):
     # definition of parameters:
     n_pos = 1.2
     n_neg = 0.5
-    del_max = 1.0
+    del_max = 50
     del_min = 1e-6
     w_new = plt.zeros([len(grad_curr),1])
     del_w = plt.zeros([len(grad_curr),1])
@@ -13,7 +13,7 @@ def RPROP(grad_curr,grad_prev,update,w_curr,del_w_prev,exception):
 
     # algorithm
     for i in plt.arange(0,len(grad_curr),1):
-        print('i = ',i)
+        print('feature in RPROP  = ',i)
         print('\n')
         if exception[i] == 1:
             grad_prev[i] = 0

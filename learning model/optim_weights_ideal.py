@@ -6,14 +6,20 @@ from derivative import derivative
 from import_data2 import import_data2
 from casadi import *
 
-def optim_weights_ideal(width_road,vx_start,time_guess,iteration,N,plotting):
+def optim_weights_ideal(theta,width_road,vx_start,time_guess,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b):
     # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
+    theta = plt.squeeze(theta)
     norm0 = 0.007276047781441449
     norm1 = 2.6381715506137424
     norm2 = 11.283498669013454
     norm3 = 0.046662223759442054
     norm4 = 17.13698903738383
-    [data_cl,_] = import_data2(width_road, vx_start)
+    # norm0 = 1.0
+    # norm1 = 1.0
+    # norm2 = 1.0
+    # norm3 = 1.0
+    # norm4 = 1.0
+    [data_cl,_] = import_data2(width_road, vx_start,0)
 
     # data_cl = dict_list[0]
     # Parameters of the non-linear bicycle model used to generate the data.
@@ -50,7 +56,7 @@ def optim_weights_ideal(width_road,vx_start,time_guess,iteration,N,plotting):
     delta_guess = signal.resample(data_cl['delta_cl'], N).T  # Error made in data Siemens --> SWA not 40 degrees
 
     # Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-    theta = plt.array([4, 5, 6, 1, 2])
+    # theta = plt.array([4, 5, 6, 1, 2])
 
     # Equations of the vehicle model
     x = MX.sym('x')  # in global axis
@@ -262,11 +268,10 @@ def optim_weights_ideal(width_road,vx_start,time_guess,iteration,N,plotting):
     # ----------------------------------
     #    Post processing
     # ----------------------------------
-    data_s = dict()
-    data_s['x_s'] = sol.value(x)
-    data_s['y_s'] = sol.value(y)
-    data_s['vx_s'] = sol.value(vx)
-    data_s['vy_s'] = sol.value(vy)
+    x_sol = sol.value(x)
+    y_sol = sol.value(y)
+    vx_sol = sol.value(vx)
+    vy_sol = sol.value(vy)
     psi_sol = sol.value(psi)
     psi_dot_sol = sol.value(psi_dot)
     throttle_sol = sol.value(throttle)
@@ -323,6 +328,39 @@ def optim_weights_ideal(width_road,vx_start,time_guess,iteration,N,plotting):
     print(f4)
     print('dt of the optimization is: ', dt_sol)
 
-    return f0,f1,f2,f3,f4
+    data_s = dict()
+    data_s['x_s'] = sol.value(x)
+    data_s['y_s'] = sol.value(y)
+    data_s['vx_s'] = sol.value(vx)
+    data_s['vy_s'] = sol.value(vy)
+    data_s['psi_s'] = sol.value(psi)
+    data_s['psi_dot_s'] = sol.value(psi_dot)
+    data_s['throttle_s'] = sol.value(throttle)
+    data_s['delta_s'] = sol.value(delta)
+    data_s['T_s'] = sol.value(T)
+    data_s['dt_s'] = data_s['T_s'] / (len(data_s['x_s']) - 1)
+
+    features = plt.array([f0,f1,f2,f3,f4])
+    features = features[:,plt.newaxis]
+    time_vector = plt.linspace(0, T_sol, len(x_sol))
+
+    # Plotting
+    axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0)
+    axcom1b.plot(time_vector, y_sol, '.-',  linewidth=3.0)
+    axcom2.plot(x_sol, y_sol, '.-',  linewidth=3.0)
+    axcom3a.plot(time_vector, vx_sol, '.-',  linewidth=3.0)
+    axcom3b.plot(time_vector, vy_sol, '.-',  linewidth=3.0)
+    axcom4a.plot(time_vector, ax_tot_sol, '.-',  linewidth=3.0)
+    axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0)
+    axcom5a.plot(time_vector, jx_sol, '.-', linewidth=3.0)
+    axcom5b.plot(time_vector, jy_sol, '.-', linewidth=3.0)
+    axcom6a.plot(time_vector, psi_sol*180/plt.pi, '.-', linewidth=3.0)
+    axcom6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0)
+    axcom7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0)
+    axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0)
+    axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0)
+    axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0)
+
+    return data_s, features
 
 
