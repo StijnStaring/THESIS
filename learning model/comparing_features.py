@@ -185,6 +185,20 @@ def comparing_features(data_cl):
     axcom8b.plot(data_cl['time_cl'], data_cl['any_cl'], '-', label="Any(t) 1 (data)", linewidth=3.0)
 
     axcom1a.legend()
+    axcom1b.legend()
+    axcom2.legend()
+    axcom3a.legend()
+    axcom3b.legend()
+    axcom4a.legend()
+    axcom4b.legend()
+    axcom5a.legend()
+    axcom5b.legend()
+    axcom6a.legend()
+    axcom6b.legend()
+    axcom7a.legend()
+    axcom7b.legend()
+    axcom8a.legend()
+    axcom8b.legend()
 
 
     return axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b

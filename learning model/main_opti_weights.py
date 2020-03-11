@@ -61,7 +61,7 @@ theta_chosen = plt.array([4,5,6,1,2])
 theta_chosen = theta_chosen[:,plt.newaxis]
 # while plt.sum(plt.absolute(grad_curr)) < 0.5:
 # while plt.sum(plt.absolute(theta_chosen - theta)) > 0.5:
-while rec < 30:
+while :
 
     print('rec is: ',rec)
     plotting_calc = 0
@@ -100,7 +100,7 @@ print('\n')
 for i in plt.arange(0,len(his_multi_grads),1):
     print(his_multi_grads[i])
 
-print("This is the history of his_multi_grads.")
+print("This is the history of current_grads.")
 print("------------------------------------------")
 print('\n')
 for i in plt.arange(0,len(his_grad_current),1):
