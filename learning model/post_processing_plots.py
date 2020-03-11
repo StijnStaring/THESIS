@@ -1,4 +1,4 @@
-def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current):
+def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta):
     """"
     Theta_iter is a string
     """
@@ -316,3 +316,64 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         ac5.plot(iterations[i], his_grad_current[i][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         # ac6.plot(iterations[i], his_grad_current[i][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         # ac7.plot(iterations[i], his_grad_current[i][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+
+    # history of difference theta
+    plt.figure("History of diff theta", figsize=(10, 4))
+
+    plt.subplot(2, 3, 1)
+    ac1 = plt.gca()
+    plt.xlabel("Iteration [-]", fontsize=14)
+    plt.ylabel("diff theta 1 [-]", fontsize=14)
+    plt.grid(True)
+    plt.title('diff theta 1', fontsize=14)
+
+    plt.subplot(2, 3, 2)
+    ac2 = plt.gca()
+    plt.xlabel("Iteration [-]", fontsize=14)
+    plt.ylabel("diff theta 2 [-]", fontsize=14)
+    plt.grid(True)
+    plt.title('diff theta 2', fontsize=14)
+
+    plt.subplot(2, 3, 3)
+    ac3 = plt.gca()
+    plt.xlabel("Iteration [-]", fontsize=14)
+    plt.ylabel("diff theta 3 [-]", fontsize=14)
+    plt.grid(True)
+    plt.title('diff theta 3', fontsize=14)
+
+    plt.subplot(2, 3, 4)
+    ac4 = plt.gca()
+    plt.xlabel("Iteration [-]", fontsize=14)
+    plt.ylabel("diff theta 4 [-]", fontsize=14)
+    plt.grid(True)
+    plt.title('diff theta 4', fontsize=14)
+
+    plt.subplot(2, 3, 5)
+    ac5 = plt.gca()
+    plt.xlabel("Iteration [-]", fontsize=14)
+    plt.ylabel("diff theta 5 [-]", fontsize=14)
+    plt.grid(True)
+    plt.title('diff theta 5', fontsize=14)
+
+    # plt.subplot(2, 4, 6)
+    # ac6 = plt.gca()
+    # plt.xlabel("Iteration [-]", fontsize=14)
+    # plt.ylabel("Multi grad feature 6 [-]", fontsize=14)
+    # plt.grid(True)
+    # plt.title('Multi grad of features 6', fontsize=14)
+    #
+    # plt.subplot(2, 4, 7)
+    # ac7 = plt.gca()
+    # plt.xlabel("Iteration [-]", fontsize=14)
+    # plt.ylabel("Multi grad feature 7 [-]", fontsize=14)
+    # plt.grid(True)
+    # plt.title('Multi grad of features 7', fontsize=14)
+
+    for i in plt.arange(0, len(his_diff_theta), 1):
+        ac1.plot(iterations[i], his_diff_theta[i][1][0], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac2.plot(iterations[i], his_diff_theta[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac3.plot(iterations[i], his_diff_theta[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac4.plot(iterations[i], his_diff_theta[i][1][3], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        ac5.plot(iterations[i], his_diff_theta[i][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        # ac6.plot(iterations[i], his_diff_theta[i][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        # ac7.plot(iterations[i], his_diff_theta[i][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)

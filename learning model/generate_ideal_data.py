@@ -27,7 +27,7 @@ vx_start = 23.10159175
 time_guess = 4.01
 data_cl = import_ideal_data(width_road,vx_start)
 
-# theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
+# theta = plt.array([4,5,6,1,2]) en met data guess 1 berekende norm waarden en data guess 1 zelf. (example lane change)
 norm0 = 0.007276047781441449
 norm1 = 2.6381715506137424
 norm2 = 11.283498669013454

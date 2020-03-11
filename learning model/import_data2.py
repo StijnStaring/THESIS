@@ -7,6 +7,12 @@ def import_data2(width_road,vx_start,ak):
     print("The name of the file: ", file)
 
     data = pd.read_csv(file[0])
+    # theta_rel used in data = plt.array([4,5,6,1,2] with norms:
+    # norm0 = 0.007276047781441449
+    # norm1 = 2.6381715506137424
+    # norm2 = 11.283498669013454
+    # norm3 = 0.046662223759442054
+    # norm4 = 17.13698903738383
 
     data_cl = dict()
 
@@ -79,9 +85,9 @@ def import_data2(width_road,vx_start,ak):
         print(f1_cal)
         print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
         print(f2_cal)
-        print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-        print(f3_cal)
         print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
+        print(f3_cal)
+        print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
         print(f4_cal)
 
     features = plt.array([f0_cal,f1_cal,f2_cal,f3_cal,f4_cal])

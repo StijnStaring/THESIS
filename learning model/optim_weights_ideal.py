@@ -1,6 +1,5 @@
 import pylab as plt
 from scipy import signal
-from import_ideal_data import import_ideal_data
 from define_plots import define_plots
 from derivative import derivative
 from import_data2 import import_data2
@@ -322,9 +321,9 @@ def optim_weights_ideal(theta,width_road,vx_start,time_guess,iteration,N,plottin
     print(f1)
     print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
     print(f2)
-    print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-    print(f3)
     print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
+    print(f3)
+    print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
     print(f4)
     print('dt of the optimization is: ', dt_sol)
 
@@ -339,43 +338,65 @@ def optim_weights_ideal(theta,width_road,vx_start,time_guess,iteration,N,plottin
     data_s['delta_s'] = sol.value(delta)
     data_s['T_s'] = sol.value(T)
     data_s['dt_s'] = data_s['T_s'] / (len(data_s['x_s']) - 1)
+    data_s['ax_tot_s'] = ax_tot_sol
+    data_s['ay_tot_s'] = ay_tot_sol
+    data_s['aty_s'] = aty_sol
+    data_s['any_s'] = any_sol
+    data_s['jx_s'] = jx_sol
+    data_s['jy_s'] = jy_sol
 
     features = plt.array([f0,f1,f2,f3,f4])
     features = features[:,plt.newaxis]
     time_vector = plt.linspace(0, T_sol, len(x_sol))
 
     # Plotting
-    axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom1b.plot(time_vector, y_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
-    axcom2.plot(x_sol, y_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
-    axcom3a.plot(time_vector, vx_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
-    axcom3b.plot(time_vector, vy_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
-    axcom4a.plot(time_vector, ax_tot_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
-    axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom5a.plot(time_vector, jx_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom5b.plot(time_vector, jy_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom6a.plot(time_vector, psi_sol*180/plt.pi, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
-    axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom1b.plot(time_vector, y_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
+    # axcom2.plot(x_sol, y_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
+    # axcom3a.plot(time_vector, vx_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
+    # axcom3b.plot(time_vector, vy_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
+    # axcom4a.plot(time_vector, ax_tot_sol, '.-',  linewidth=3.0,label="it: "+str(iteration))
+    # axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom5a.plot(time_vector, jx_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom5b.plot(time_vector, jy_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom6a.plot(time_vector, psi_sol*180/plt.pi, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
+    # axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
+    if iteration == 1:
+        axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom1b.plot(time_vector, y_sol, '.-',  linewidth=3.0,label="initial solution")
+        axcom2.plot(x_sol, y_sol, '.-',  linewidth=3.0,label="initial solution")
+        axcom3a.plot(time_vector, vx_sol, '.-',  linewidth=3.0,label="initial solution")
+        axcom3b.plot(time_vector, vy_sol, '.-',  linewidth=3.0,label="initial solution")
+        axcom4a.plot(time_vector, ax_tot_sol, '.-',  linewidth=3.0,label="initial solution")
+        axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom5a.plot(time_vector, jx_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom5b.plot(time_vector, jy_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom6a.plot(time_vector, psi_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
+        axcom6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
+        axcom7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
+        axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0,label="initial solution")
 
-    axcom1a.legend()
-    axcom1b.legend()
-    axcom2.legend()
-    axcom3a.legend()
-    axcom3b.legend()
-    axcom4a.legend()
-    axcom4b.legend()
-    axcom5a.legend()
-    axcom5b.legend()
-    axcom6a.legend()
-    axcom6b.legend()
-    axcom7a.legend()
-    axcom7b.legend()
-    axcom8a.legend()
-    axcom8b.legend()
+        axcom1a.legend()
+        axcom1b.legend()
+        axcom2.legend()
+        axcom3a.legend()
+        axcom3b.legend()
+        axcom4a.legend()
+        axcom4b.legend()
+        axcom5a.legend()
+        axcom5b.legend()
+        axcom6a.legend()
+        axcom6b.legend()
+        axcom7a.legend()
+        axcom7b.legend()
+        axcom8a.legend()
+        axcom8b.legend()
 
     return data_s, features
 
