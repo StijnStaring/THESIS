@@ -1,12 +1,10 @@
-def import_data2(width_road,vx_start,ak):
-    import glob
+def import_data2(file,ak):
     import pylab as plt
     import pandas as pd
 
-    file = glob.glob("used_data/*.csv")
-    print("The name of the file: ", file)
 
-    data = pd.read_csv(file[0])
+    # data = pd.read_csv(file[0])
+    data = pd.read_csv(file)
     # theta_rel used in data = plt.array([4,5,6,1,2] with norms:
     # norm0 = 0.007276047781441449
     # norm1 = 2.6381715506137424
@@ -39,6 +37,10 @@ def import_data2(width_road,vx_start,ak):
     data_cl['aty_cl'] = plt.array([data.aty]).T
     data_cl['any_cl'] = data_cl['psi_dot_cl'] * data_cl['vx_cl']
     data_cl['dt_cl'] = data_cl['time_cl'][1, 0] - data_cl['time_cl'][0, 0]
+
+    # Asssigning data generartion degree of freedom
+    width_road = data_cl['y_cl'][-1]
+    vx_start = data_cl['vx_cl'][0]
 
     # Calculation of features
     # f0: longitudinal acceleration
@@ -92,4 +94,4 @@ def import_data2(width_road,vx_start,ak):
 
     features = plt.array([f0_cal,f1_cal,f2_cal,f3_cal,f4_cal])
 
-    return data_cl,features
+    return data_cl,features,width_road,vx_start

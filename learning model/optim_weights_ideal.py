@@ -5,7 +5,7 @@ from derivative import derivative
 from import_data2 import import_data2
 from casadi import *
 
-def optim_weights_ideal(theta,width_road,vx_start,time_guess,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b):
+def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,file):
     # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
     theta = plt.squeeze(theta)
     # norm0 = 0.007276047781441449
@@ -18,7 +18,7 @@ def optim_weights_ideal(theta,width_road,vx_start,time_guess,iteration,N,plottin
     norm2 = 1.0
     norm3 = 1.0
     norm4 = 1.0
-    [data_cl,_] = import_data2(width_road, vx_start,0)
+    [data_cl,_,width_road, vx_start] = import_data2(file,0)
 
     # data_cl = dict_list[0]
     # Parameters of the non-linear bicycle model used to generate the data.
@@ -45,6 +45,7 @@ def optim_weights_ideal(theta,width_road,vx_start,time_guess,iteration,N,plottin
     psi_dot_start = 0
 
     # Resampling and guesses
+    time_guess = data_cl['time_cl'][-1]
     x_guess = signal.resample(data_cl['x_cl'], N + 1).T
     y_guess = signal.resample(data_cl['y_cl'], N + 1).T
     vx_guess = signal.resample(data_cl['vx_cl'], N + 1).T
