@@ -46,7 +46,8 @@ grad_prev = plt.zeros([amount_features,1])
 update = del_0*plt.ones([amount_features,1])
 #################
 # Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-theta = plt.array([[1.5],[1.5],[1.5],[1.5],[1.5]])
+# theta = plt.array([[1.5],[1.5],[1.5],[1.5],[1.5]])
+theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0]])
 # theta = 1.5*plt.ones((amount_features,1))
 his_weights.append([str(rec)+"//",theta])
 
@@ -59,7 +60,8 @@ acw.plot([theta[0],theta[1],theta[2],theta[3],theta[4]],'-', marker='o', markers
 
 # Optimization loop
 # Change this to convergence criterium: df/dt = 0 or weights are accurately found.
-theta_chosen = plt.array([4,5,6,1,2])
+theta_chosen = plt.array([5.49749001e+02, 1.89525204e+00, 5.31749963e-01, 2.14306117e+01, 1.16706616e-01])
+# theta_chosen = plt.array([4,5,6,1,2])
 theta_chosen = theta_chosen[:,plt.newaxis]
 f_calc_rel = plt.array([[100],[100],[100],[100],[100]]) # just start value
 # while plt.sum(plt.absolute(grad_curr)) < 0.5:
