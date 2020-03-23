@@ -31,6 +31,7 @@ his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
 rec = 1
 plot_opti_weights = 1
+N = 500 # amount of data points
 # width_road = 3.46990715
 # vx_start = 23.10159175
 # time_guess = 4.01
@@ -79,7 +80,7 @@ for file in file_list:
     # while rec <3 :
         print('rec is: ',rec)
         plotting_calc = 0
-        [data_s, f_calc] = optim_weights_ideal(theta,rec,500,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,file)
+        [data_s, f_calc] = optim_weights_ideal(theta,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,file)
         dict_sol_list.append(data_s)
         # Normalization for plots
         f_calc_rel = f_calc/f_data

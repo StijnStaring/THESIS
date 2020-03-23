@@ -223,6 +223,7 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
     opti.subject_to(jy_list[0] == 0)  # start from the beginning of the lane change
 
     # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
+    # Crack-nicolson integration gave same results as simpson integration + more robuust solving
 
     # f0: longitudinal acceleration
     integrand = ax_tot ** 2
