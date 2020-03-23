@@ -86,7 +86,7 @@ for file in file_list:
         [data_s, f_calc] = optim_weights_ideal(theta,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,file)
         dict_sol_list.append(data_s)
         # Normalization for plots
-        f_calc_rel = f_calc/f_data
+        f_calc_rel = f_calc/f_data 
         his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
         print("********************************************************************************************")
 
