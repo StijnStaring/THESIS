@@ -84,8 +84,10 @@ delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siem
 # ----------------------------------
 #    for loop over optimization
 # ----------------------------------
-vx_start_a = plt.array([80/3.6,90/3.6,100/3.6,110/3.6])
-width_road_a = plt.array([3.46990715, 3.46990715*2])
+# vx_start_a = plt.array([80/3.6,90/3.6,100/3.6,110/3.6])
+# width_road_a = plt.array([3.46990715, 3.46990715*2])
+vx_start_a = plt.array([80/3.6])
+width_road_a = plt.array([3.46990715])
 for vx_start in vx_start_a:
     for width_road in width_road_a:
 
@@ -242,16 +244,32 @@ for vx_start in vx_start_a:
         ax_tot = plt.array(atx_list) + plt.array(anx_list)
         ay_tot = plt.array(aty_list) + plt.array(any_list)
 
-        # calculation lateral jerk -> jerk is calculated from the total acceleration!
-        # Better to use a second order numerical scheme
-        jy_list = []
+        # yaw_acceleration
+        psi_ddot_list = []
         for i in plt.arange(0, len(time_list), 1):
             if i == 0:
-                jy_list.append((ay_tot[i + 1]-ay_tot[i])/(T/N))
-            elif i == len(time_list)-1:
-                jy_list.append((ay_tot[i]-ay_tot[i-1])/(T/N))
+                psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i]) / (T / N))
+            elif i == len(time_list) - 1:
+                psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
             else:
-                jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
+                psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i - 1]) / (2 * (T / N)))
+
+        # calculation lateral jerk -> jerk is calculated from the total acceleration!
+        # Implementation of second order scheme
+        jy_list_t = []
+        for i in plt.arange(0, len(time_list), 1):
+            if i == 0:
+                jy_list_t.append((aty_list[i + 1]-aty_list[i])/(T/N))
+            elif i == len(time_list)-1:
+                jy_list_t.append((aty_list[i]-aty_list[i-1])/(T/N))
+            else:
+                # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
+                jy_list_t.append((vy[i + 1] -2*vy[i] +vy[i - 1]) / ((T / N)**2))
+
+        jy_list_n = []
+        for k in range(N+1):
+            jy_list_n.append(psi_dot[k]*atx_list[k] + vx[k]*psi_ddot_list[k])
+        jy_tot = plt.array(jy_list_t) + plt.array(jy_list_n)
 
         vx_des_list = []
         for k in range(N+1):
@@ -263,9 +281,9 @@ for vx_start in vx_start_a:
 
         # Extra constraints on acceleration and jerk:
         opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
-        opti.subject_to(jy_list[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
+        opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
         opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
-        opti.subject_to(jy_list[0] == 0) # start from the beginning of the lane change
+        opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
 
 
         # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
@@ -287,7 +305,7 @@ for vx_start in vx_start_a:
         # print('f1: ',f1_cal)
 
         # f2: lateral jerk
-        integrand = plt.array(jy_list)** 2
+        integrand = jy_tot** 2
         f2_cal = 0
         for i in plt.arange(0, len(integrand) - 1, 1):
             f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
@@ -361,12 +379,45 @@ for vx_start in vx_start_a:
 
         ay_tot_sol = aty_sol + any_sol
 
-        jx_sol = derivative(ax_tot_sol,dt_sol)
-        jy_sol = derivative(ay_tot_sol,dt_sol)
+        psi_ddot_sol = derivative(sol.value(psi_dot),dt_sol)
+
+        # Lateral jerk
+        jyt_sol = []
+        for i in plt.arange(0, len(vy_sol), 1):
+            if i == 0:
+                jyt_sol.append((aty_sol[i + 1]-aty_sol[i])/dt_sol)
+            elif i == len(vy_sol)-1:
+                jyt_sol.append((aty_sol[i]-aty_sol[i-1])/dt_sol)
+            else:
+                # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * dt_sol))
+                jyt_sol.append((vy_sol[i + 1] -2*vy_sol[i] +vy_sol[i - 1]) / (dt_sol**2))
+
+        jyn_sol = []
+        for k in range(N+1):
+            jyn_sol.append(sol.value(psi_dot)[k]*atx_sol[k] + vx_sol[k]*psi_ddot_sol[k])
+
+        jy_tot_sol = plt.array(jyt_sol) + plt.array(jyn_sol)
+
+        # Longitudinal jerk
+        jxt_sol = []
+        for i in plt.arange(0, len(vx_sol), 1):
+            if i == 0:
+                jxt_sol.append((atx_sol[i + 1] - atx_sol[i]) / dt_sol)
+            elif i == len(vx_sol) - 1:
+                jxt_sol.append((atx_sol[i] - atx_sol[i - 1]) / dt_sol)
+            else:
+                # jx_list.append((ax_tot[i + 1] - ax_tot[i - 1]) / (2 * dt_sol))
+                jxt_sol.append((vx_sol[i + 1] - 2 * vx_sol[i] + vx_sol[i - 1]) / (dt_sol ** 2))
+
+        jxn_sol = []
+        for k in range(N + 1):
+            jxn_sol.append(-sol.value(psi_dot)[k] * aty_sol[k] - vy_sol[k] * psi_ddot_sol[k])
+
+        jx_tot_sol = plt.array(jxt_sol) + plt.array(jxn_sol)
 
         width = plt.around(width_road, 2)
         speed = plt.around(vx_start, 2)
-        define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
+        define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
 
         print("\n")
         print('Integrated feature values: ')
@@ -386,16 +437,16 @@ for vx_start in vx_start_a:
         #    Storing of data in csv-file
         # ----------------------------------
 
-        path = "written_dataset\ DATA_V" + str(speed) + "_L"+str(width)+".csv"
+        path = "check_2deriv\ DATA_2deriv_V" + str(speed) + "_L"+str(width)+".csv"
         file = open(path,'w',newline= "")
         writer = csv.writer(file)
-        writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta","aty","any"])
+        # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta","aty","any"])
 
         for i in range(N+1):
             if i == N: # last control point has no physical meaning
-                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
+                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
             else:
-                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_sol[i], jy_sol[i],psi_sol[i], psi_dot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
 
         file.close()
         print('dt of the optimization is: ', dt_sol)

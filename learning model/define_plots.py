@@ -1,4 +1,4 @@
-def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width):
+def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width):
     """"
     Theta_iter is a string
     """
@@ -129,6 +129,15 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.grid(True)
     plt.title('Ayn', fontsize=14)
 
+    # yaw acceleration
+
+    plt.figure("Yaw acceleration: iter "+ theta_iter,figsize=(10, 4))
+    ax9 = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Yaw acceleration [degrees/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Yaw acceleration ',fontsize=14)
+
     time_vector = plt.linspace(0,T_sol,len(x_sol))
 
     # states
@@ -147,6 +156,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
     ax8a.plot(time_vector, aty_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
     ax8b.plot(time_vector, any_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax9.plot(time_vector, psi_ddot_sol, '.-', linewidth=3.0, label="SP: " + str(speed) + " W: " + str(width))
 
     ax1a.legend()
     ax1b.legend()
@@ -162,6 +172,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax7b.legend()
     ax8a.legend()
     ax8b.legend()
+    ax9.legend()
 
 
     print("\n")
