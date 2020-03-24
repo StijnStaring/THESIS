@@ -32,6 +32,7 @@ def import_data2(file,ak):
     data_cl['jy_cl'] = plt.array([data.jy]).T
     data_cl['psi_cl'] = plt.array([data.psi]).T
     data_cl['psi_dot_cl'] = plt.array([data.psi_dot]).T
+    data_cl['psi_ddot_cl'] = plt.array([data.psi_ddot]).T
     data_cl['throttle_cl'] = plt.array([data.throttle]).T
     data_cl['delta_cl'] = plt.array([data.delta]).T
     data_cl['aty_cl'] = plt.array([data.aty]).T

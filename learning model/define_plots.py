@@ -156,7 +156,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
     ax8a.plot(time_vector, aty_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
     ax8b.plot(time_vector, any_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax9.plot(time_vector, psi_ddot_sol, '.-', linewidth=3.0, label="SP: " + str(speed) + " W: " + str(width))
+    ax9.plot(time_vector, psi_ddot_sol*180/plt.pi, '.-', linewidth=3.0, label="SP: " + str(speed) + " W: " + str(width))
 
     ax1a.legend()
     ax1b.legend()

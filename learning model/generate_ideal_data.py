@@ -84,10 +84,10 @@ delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siem
 # ----------------------------------
 #    for loop over optimization
 # ----------------------------------
-# vx_start_a = plt.array([80/3.6,90/3.6,100/3.6,110/3.6])
-# width_road_a = plt.array([3.46990715, 3.46990715*2])
-vx_start_a = plt.array([80/3.6])
-width_road_a = plt.array([3.46990715])
+vx_start_a = plt.array([80/3.6,90/3.6,100/3.6,110/3.6])
+width_road_a = plt.array([3.46990715, 3.46990715*2])
+# vx_start_a = plt.array([80/3.6])
+# width_road_a = plt.array([3.46990715])
 for vx_start in vx_start_a:
     for width_road in width_road_a:
 
@@ -350,11 +350,6 @@ for vx_start in vx_start_a:
         delta_sol = sol.value(delta)
         T_sol = sol.value(T)
         dt_sol = T_sol/(len(x_sol)-1)
-        ax_list = []
-
-        # for k in range(N+1):
-        #     ax_list.append(sol.value(f(X[:, k], U[:,k])[2]))
-        # ax_sol = plt.array(ax_list)
 
         anx_list = []
         for k in range(N+1):
@@ -437,10 +432,10 @@ for vx_start in vx_start_a:
         #    Storing of data in csv-file
         # ----------------------------------
 
-        path = "check_2deriv\ DATA_2deriv_V" + str(speed) + "_L"+str(width)+".csv"
+        path = "written_dataset\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
         file = open(path,'w',newline= "")
         writer = csv.writer(file)
-        # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta","aty","any"])
+        writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
 
         for i in range(N+1):
             if i == N: # last control point has no physical meaning

@@ -5,7 +5,7 @@ from derivative import derivative
 from import_data2 import import_data2
 from casadi import *
 
-def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,file):
+def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
     # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
     theta = plt.squeeze(theta)
     # norm0 = 0.007276047781441449
@@ -164,6 +164,7 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
     time_list = []
     for i in range(N + 1):
         time_list.append(i * T / N)
+    # time_vector = plt.array(time_list)
 
     # normal lateral accelleration
     anx_list = []
@@ -197,16 +198,32 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
     ax_tot = plt.array(atx_list) + plt.array(anx_list)
     ay_tot = plt.array(aty_list) + plt.array(any_list)
 
-    # calculation lateral jerk -> jerk is calculated from the total acceleration!
-    # Better to use a second order numerical scheme --> gave no difference only higher peaks
-    jy_list = []
+    # yaw_acceleration
+    psi_ddot_list = []
     for i in plt.arange(0, len(time_list), 1):
         if i == 0:
-            jy_list.append((ay_tot[i + 1] - ay_tot[i]) / (T / N))
+            psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i]) / (T / N))
         elif i == len(time_list) - 1:
-            jy_list.append((ay_tot[i] - ay_tot[i - 1]) / (T / N))
+            psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
         else:
-            jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T / N)))
+            psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i - 1]) / (2 * (T / N)))
+
+    # calculation lateral jerk -> jerk is calculated from the total acceleration!
+    # Implementation of second order scheme
+    jy_list_t = []
+    for i in plt.arange(0, len(time_list), 1):
+        if i == 0:
+            jy_list_t.append((aty_list[i + 1] - aty_list[i]) / (T / N))
+        elif i == len(time_list) - 1:
+            jy_list_t.append((aty_list[i] - aty_list[i - 1]) / (T / N))
+        else:
+            # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
+            jy_list_t.append((vy[i + 1] - 2 * vy[i] + vy[i - 1]) / ((T / N) ** 2))
+
+    jy_list_n = []
+    for k in range(N + 1):
+        jy_list_n.append(psi_dot[k] * atx_list[k] + vx[k] * psi_ddot_list[k])
+    jy_tot = plt.array(jy_list_t) + plt.array(jy_list_n)
 
     vx_des_list = []
     for k in range(N + 1):
@@ -218,13 +235,13 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
 
     # Extra constraints on acceleration and jerk:
     opti.subject_to(aty_list[-1] == 0)  # to avoid shooting through
-    opti.subject_to(jy_list[-1] == 0)  # fully end of lane change --> no lateral acceleration in the next sample
+    opti.subject_to(jy_tot[-1] == 0)  # fully end of lane change --> no lateral acceleration in the next sample
     opti.subject_to(aty_list[0] == 0)  # start from the beginning of the lane change
-    opti.subject_to(jy_list[0] == 0)  # start from the beginning of the lane change
+    opti.subject_to(jy_tot[0] == 0)  # start from the beginning of the lane change
 
     # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-    # Crack-nicolson integration gave same results as simpson integration + more robuust solving
 
+    # Crack-nicolson integration gave same results as simpson integration + more robuust solving
     # f0: longitudinal acceleration
     integrand = ax_tot ** 2
     f0_cal = 0
@@ -238,7 +255,7 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
         f1_cal = f1_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
 
     # f2: lateral jerk
-    integrand = plt.array(jy_list) ** 2
+    integrand = jy_tot ** 2
     f2_cal = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
         f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
@@ -254,6 +271,7 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
     f4_cal = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
         f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
+
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
     opti.minimize(theta[0] / norm0 * f0_cal + theta[1] / norm1 * f1_cal + theta[2] / norm2 * f2_cal + theta[3] / norm3 * f3_cal +theta[4] / norm4 * f4_cal)
@@ -303,17 +321,52 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
 
     ay_tot_sol = aty_sol + any_sol
 
-    jx_sol = derivative(ax_tot_sol, dt_sol)
-    jy_sol = derivative(ay_tot_sol, dt_sol)
+    psi_ddot_sol = derivative(sol.value(psi_dot), dt_sol)
+
+    # Lateral jerk
+    jyt_sol = []
+    for i in plt.arange(0, len(vy_sol), 1):
+        if i == 0:
+            jyt_sol.append((aty_sol[i + 1] - aty_sol[i]) / dt_sol)
+        elif i == len(vy_sol) - 1:
+            jyt_sol.append((aty_sol[i] - aty_sol[i - 1]) / dt_sol)
+        else:
+            # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * dt_sol))
+            jyt_sol.append((vy_sol[i + 1] - 2 * vy_sol[i] + vy_sol[i - 1]) / (dt_sol ** 2))
+
+    jyn_sol = []
+    for k in range(N + 1):
+        jyn_sol.append(sol.value(psi_dot)[k] * atx_sol[k] + vx_sol[k] * psi_ddot_sol[k])
+
+    jy_tot_sol = plt.array(jyt_sol) + plt.array(jyn_sol)
+
+    # Longitudinal jerk
+    jxt_sol = []
+    for i in plt.arange(0, len(vx_sol), 1):
+        if i == 0:
+            jxt_sol.append((atx_sol[i + 1] - atx_sol[i]) / dt_sol)
+        elif i == len(vx_sol) - 1:
+            jxt_sol.append((atx_sol[i] - atx_sol[i - 1]) / dt_sol)
+        else:
+            # jx_list.append((ax_tot[i + 1] - ax_tot[i - 1]) / (2 * dt_sol))
+            jxt_sol.append((vx_sol[i + 1] - 2 * vx_sol[i] + vx_sol[i - 1]) / (dt_sol ** 2))
+
+    jxn_sol = []
+    for k in range(N + 1):
+        jxn_sol.append(-sol.value(psi_dot)[k] * aty_sol[k] - vy_sol[k] * psi_ddot_sol[k])
+
+    jx_tot_sol = plt.array(jxt_sol) + plt.array(jxn_sol)
 
     if plotting == 1:
-        define_plots("1", x_sol, y_sol, vx_sol, vy_sol, ax_tot_sol, ay_tot_sol, jx_sol, jy_sol, psi_sol, psi_dot_sol,throttle_sol, delta_sol, T_sol, aty_sol, any_sol)
+        define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,vx_start,width_road)
+
 
     f0 = sol.value(f0_cal)
     f1 = sol.value(f1_cal)
     f2 = sol.value(f2_cal)
     f3 = sol.value(f3_cal)
     f4 = sol.value(f4_cal)
+
     print("\n")
     print('Integrated feature values: iterations ',str(iteration))
     print('------------------------------')
@@ -344,8 +397,9 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
     data_s['ay_tot_s'] = ay_tot_sol
     data_s['aty_s'] = aty_sol
     data_s['any_s'] = any_sol
-    data_s['jx_s'] = jx_sol
-    data_s['jy_s'] = jy_sol
+    data_s['jx_s'] = jx_tot_sol
+    data_s['jy_s'] = jy_tot_sol
+    data_s['psi_ddot_s'] = psi_ddot_sol
 
     features = plt.array([f0,f1,f2,f3,f4])
     features = features[:,plt.newaxis]
@@ -375,14 +429,15 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
         axcom3b.plot(time_vector, vy_sol, '.-',  linewidth=3.0,label="initial solution")
         axcom4a.plot(time_vector, ax_tot_sol, '.-',  linewidth=3.0,label="initial solution")
         axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom5a.plot(time_vector, jx_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom5b.plot(time_vector, jy_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom5a.plot(time_vector, jx_tot_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom5b.plot(time_vector, jy_tot_sol, '.-', linewidth=3.0,label="initial solution")
         axcom6a.plot(time_vector, psi_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
         axcom6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
         axcom7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0,label="initial solution")
         axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
         axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0,label="initial solution")
         axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0,label="initial solution")
+        axcom9.plot(time_vector, psi_ddot_sol*180/plt.pi, '.-', linewidth=3.0, label="initial solution")
 
         axcom1a.legend()
         axcom1b.legend()
@@ -399,6 +454,7 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
         axcom7b.legend()
         axcom8a.legend()
         axcom8b.legend()
+        axcom9.legend()
 
     return data_s, features
 

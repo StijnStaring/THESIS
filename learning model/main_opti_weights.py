@@ -64,7 +64,7 @@ for file in file_list:
     # theta = plt.array([4,5,6,1,2]) => goal
 
     # plotting
-    [axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b] = comparing_features(data_cl)
+    [axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9] = comparing_features(data_cl)
     axf.plot([1,1,1,1,1],'-', marker='*', markersize=6, label = "Observed features")
     axfn.plot([f_data[0],f_data[1],f_data[2],f_data[3],f_data[4]],'-', marker='*', markersize=6, label = "Observed features")
     acw.plot([theta[0],theta[1],theta[2],theta[3],theta[4]],'-', marker='o', markersize=6, label = "iter " + str(rec))
@@ -83,7 +83,7 @@ for file in file_list:
     while any(plt.absolute(f_calc_rel-1) >= 1e-4):
         print('rec is: ',rec)
         plotting_calc = 0
-        [data_s, f_calc] = optim_weights_ideal(theta,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,file)
+        [data_s, f_calc] = optim_weights_ideal(theta,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
         dict_sol_list.append(data_s)
         # Normalization for plots
         f_calc_rel = f_calc/f_data
@@ -167,6 +167,7 @@ for file in file_list:
     any_sol = data_s['any_s']
     jx_sol = data_s['jx_s']
     jy_sol = data_s['jy_s']
+    psi_ddot_sol = data_s['psi_ddot_s']
 
     time_vector = plt.linspace(0, T_sol, len(x_sol))
     axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0, label="learned solution")
@@ -184,6 +185,7 @@ for file in file_list:
     axcom7b.plot(time_vector[0:-1], delta_sol * 180 / plt.pi, '.-', linewidth=3.0, label="learned solution")
     axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0, label="learned solution")
     axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0, label="learned solution")
+    axcom9.plot(time_vector, psi_ddot_sol* 180 / plt.pi, '.-', linewidth=3.0, label="learned solution")
 
     axcom1a.legend()
     axcom1b.legend()
@@ -200,6 +202,7 @@ for file in file_list:
     axcom7b.legend()
     axcom8a.legend()
     axcom8b.legend()
+    axcom9.legend()
 print('This is the theta_tracker: ',theta_tracker)
 plt.show()
 #####################

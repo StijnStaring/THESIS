@@ -152,6 +152,15 @@ def comparing_features(data_cl):
     plt.grid(True)
     plt.title('Ayn', fontsize=14)
 
+    # yaw acceleration
+
+    plt.figure("Yaw acceleration: iter ", figsize=(10, 4))
+    axcom9 = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Yaw acceleration [degrees/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Yaw acceleration ', fontsize=14)
+
 
 
     # Plotting data in figures
@@ -184,6 +193,9 @@ def comparing_features(data_cl):
     axcom8a.plot(data_cl['time_cl'], data_cl['aty_cl'], '-', label="Aty(t) 1 (data)", linewidth=3.0)
     axcom8b.plot(data_cl['time_cl'], data_cl['any_cl'], '-', label="Any(t) 1 (data)", linewidth=3.0)
 
+    # yaw rate aceleration
+    axcom9.plot(data_cl['time_cl'], data_cl['psi_ddot_cl']*180/plt.pi, '-', label="Psi_ddot(t) 1 (data)", linewidth=3.0)
+
     axcom1a.legend()
     axcom1b.legend()
     axcom2.legend()
@@ -199,6 +211,7 @@ def comparing_features(data_cl):
     axcom7b.legend()
     axcom8a.legend()
     axcom8b.legend()
+    axcom9.legend()
 
 
-    return axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b
+    return axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b, axcom9
