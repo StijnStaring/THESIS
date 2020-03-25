@@ -5,7 +5,7 @@ from derivative import derivative
 from import_data2 import import_data2
 from casadi import *
 
-def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
+def optim_weights_ideal(theta,init_plot,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
     # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
     theta = plt.squeeze(theta)
     # norm0 = 0.007276047781441449
@@ -421,7 +421,7 @@ def optim_weights_ideal(theta,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3
     # axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0,label="it: "+str(iteration))
     # axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
     # axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
-    if iteration == 1:
+    if init_plot == 1:
         axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0,label="initial solution")
         axcom1b.plot(time_vector, y_sol, '.-',  linewidth=3.0,label="initial solution")
         axcom2.plot(x_sol, y_sol, '.-',  linewidth=3.0,label="initial solution")

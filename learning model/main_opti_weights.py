@@ -49,17 +49,16 @@ update = del_0*plt.ones([amount_features,1])
 # theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0]])
 # theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
 theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
-
 theta_tracker = []
-theta_tracker.append(theta)
-# theta = 1.5*plt.ones((amount_features,1))
-his_weights.append([str(rec)+"//",theta])
 
 # Import data
 file_list = glob.glob("used_data/*.csv")
 for file in file_list:
     print("The name of the file: ", file)
     [data_cl,f_data,width_road,vx_start] = import_data2(file,1)
+    init_plot = 1
+    theta_tracker.append(theta)
+    his_weights.append([str(rec) + "//", theta])
 
     # theta = plt.array([4,5,6,1,2]) => goal
 
@@ -83,7 +82,8 @@ for file in file_list:
     while any(plt.absolute(f_calc_rel-1) >= 1e-4):
         print('rec is: ',rec)
         plotting_calc = 0
-        [data_s, f_calc] = optim_weights_ideal(theta,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
+        [data_s, f_calc] = optim_weights_ideal(theta,init_plot,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
+        init_plot = 0
         dict_sol_list.append(data_s)
         # Normalization for plots
         f_calc_rel = f_calc/f_data
@@ -113,6 +113,7 @@ for file in file_list:
         ###########################
 
     # Post - processing
+    rec = 1
     theta_tracker.append(theta)
 
     print("This is the history of his_multi_grads.")
@@ -144,10 +145,8 @@ for file in file_list:
     print('\n')
     if len(his_weights) != 1:
         for i in plt.arange(1,len(his_weights),1):
-            print("This is update " + str(i))
+            print("This is update " + his_weights[i][0])
             print(his_weights[i][1] - his_weights[i-1][1])
-
-    post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
 
     # # Plotting end solution in comparinson
     data_s = dict_sol_list[-1]
@@ -203,6 +202,9 @@ for file in file_list:
     axcom8a.legend()
     axcom8b.legend()
     axcom9.legend()
+
 print('This is the theta_tracker: ',theta_tracker)
+post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
+
 plt.show()
 #####################
