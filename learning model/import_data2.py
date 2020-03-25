@@ -41,7 +41,9 @@ def import_data2(file,ak):
 
     # Asssigning data generartion degree of freedom
     width_road = data_cl['y_cl'][-1]
+    data_cl['width_road'] = width_road
     vx_start = data_cl['vx_cl'][0]
+    data_cl['vx_start'] = vx_start
 
     # Calculation of features
     # f0: longitudinal acceleration
@@ -94,5 +96,10 @@ def import_data2(file,ak):
         print(f4_cal)
 
     features = plt.array([f0_cal,f1_cal,f2_cal,f3_cal,f4_cal])
+    data_cl['f0_cal'] = f0_cal
+    data_cl['f1_cal'] = f1_cal
+    data_cl['f2_cal'] = f2_cal
+    data_cl['f3_cal'] = f3_cal
+    data_cl['f4_cal'] = f4_cal
 
     return data_cl,features,width_road,vx_start

@@ -1,4 +1,4 @@
-def comparing_features(data_cl):
+def comparing_features(data_cl,file_name):
     import pylab as plt
 
     # Define plot to compare normalized features
@@ -164,37 +164,37 @@ def comparing_features(data_cl):
 
 
     # Plotting data in figures
-    axcom1a.plot(data_cl['time_cl'], data_cl['x_cl'], '-', label="X(t) 1 (data)", linewidth=3.0)
-    axcom1b.plot(data_cl['time_cl'], data_cl['y_cl'], '-', label="Y(t) 1 (data)", linewidth=3.0)
+    axcom1a.plot(data_cl['time_cl'], data_cl['x_cl'], '-', label="X(t) "+file_name, linewidth=3.0)
+    axcom1b.plot(data_cl['time_cl'], data_cl['y_cl'], '-', label="Y(t) "+file_name, linewidth=3.0)
 
-    axcom2.plot(data_cl['x_cl'], data_cl['y_cl'], '-', label="path 1 (data)", linewidth=3.0)
+    axcom2.plot(data_cl['x_cl'], data_cl['y_cl'], '-', label="path "+file_name, linewidth=3.0)
 
     # The vx and vy velocities are as seen in the global axis (fixed).
-    axcom3a.plot(data_cl['time_cl'], data_cl['vx_cl'], '-', label="Vx(t) 1 (data)", linewidth=3.0)
-    axcom3b.plot(data_cl['time_cl'], data_cl['vy_cl'], '-', label="Vy(t) 1 (data)", linewidth=3.0)
+    axcom3a.plot(data_cl['time_cl'], data_cl['vx_cl'], '-', label="Vx(t) "+file_name, linewidth=3.0)
+    axcom3b.plot(data_cl['time_cl'], data_cl['vy_cl'], '-', label="Vy(t) "+file_name, linewidth=3.0)
 
     # The ax and ay accelerations are as seen in the global axis (fixed).
-    axcom4a.plot(data_cl['time_cl'], data_cl['ax_cl'], '-', label="Ax(t) 1 (data)", linewidth=3.0)
-    axcom4b.plot(data_cl['time_cl'], data_cl['ay_cl'], '-', label="Ay(t) 1 (data)", linewidth=3.0)
+    axcom4a.plot(data_cl['time_cl'], data_cl['ax_cl'], '-', label="Ax(t) "+file_name, linewidth=3.0)
+    axcom4b.plot(data_cl['time_cl'], data_cl['ay_cl'], '-', label="Ay(t) "+file_name, linewidth=3.0)
 
     # The jerk_x and jerk_y are as seen in the global axis (fixed).
-    axcom5a.plot(data_cl['time_cl'], data_cl['jx_cl'], '-', label="Jx(t) 1 (data)", linewidth=3.0)
-    axcom5b.plot(data_cl['time_cl'], data_cl['jy_cl'], '-', label="Jy(t) 1 (data)", linewidth=3.0)
+    axcom5a.plot(data_cl['time_cl'], data_cl['jx_cl'], '-', label="Jx(t) "+file_name, linewidth=3.0)
+    axcom5b.plot(data_cl['time_cl'], data_cl['jy_cl'], '-', label="Jy(t) "+file_name, linewidth=3.0)
 
     # yaw and yaw rate
-    axcom6a.plot(data_cl['time_cl'], data_cl['psi_cl']* 180 / plt.pi, '-', label="Psi(t) 1 (data)", linewidth=3.0)
-    axcom6b.plot(data_cl['time_cl'], data_cl['psi_dot_cl']* 180 / plt.pi, '-', label="Psi_dot(t) 1 (data)", linewidth=3.0)
+    axcom6a.plot(data_cl['time_cl'], data_cl['psi_cl']* 180 / plt.pi, '-', label="Psi(t) "+file_name, linewidth=3.0)
+    axcom6b.plot(data_cl['time_cl'], data_cl['psi_dot_cl']* 180 / plt.pi, '-', label="Psi_dot(t) "+file_name, linewidth=3.0)
 
     # throttle and delta and yaw rate
-    axcom7a.plot(data_cl['time_cl'], data_cl['throttle_cl'] , '-', label="Throttle(t) 1 (data)", linewidth=3.0)
-    axcom7b.plot(data_cl['time_cl'], data_cl['delta_cl'] * 180 / plt.pi, '-', label="Delta(t) 1 (data)",linewidth=3.0)
+    axcom7a.plot(data_cl['time_cl'], data_cl['throttle_cl'] , '-', label="Throttle(t) "+file_name, linewidth=3.0)
+    axcom7b.plot(data_cl['time_cl'], data_cl['delta_cl'] * 180 / plt.pi, '-', label="Delta(t) "+file_name,linewidth=3.0)
 
     # throttle and delta and yaw rate
-    axcom8a.plot(data_cl['time_cl'], data_cl['aty_cl'], '-', label="Aty(t) 1 (data)", linewidth=3.0)
-    axcom8b.plot(data_cl['time_cl'], data_cl['any_cl'], '-', label="Any(t) 1 (data)", linewidth=3.0)
+    axcom8a.plot(data_cl['time_cl'], data_cl['aty_cl'], '-', label="Aty(t) "+file_name, linewidth=3.0)
+    axcom8b.plot(data_cl['time_cl'], data_cl['any_cl'], '-', label="Any(t) "+file_name, linewidth=3.0)
 
     # yaw rate aceleration
-    axcom9.plot(data_cl['time_cl'], data_cl['psi_ddot_cl']*180/plt.pi, '-', label="Psi_ddot(t) 1 (data)", linewidth=3.0)
+    axcom9.plot(data_cl['time_cl'], data_cl['psi_ddot_cl']*180/plt.pi, '-', label="Psi_ddot(t) "+file_name, linewidth=3.0)
 
     axcom1a.legend()
     axcom1b.legend()

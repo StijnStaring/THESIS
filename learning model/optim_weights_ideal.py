@@ -5,7 +5,7 @@ from derivative import derivative
 from import_data2 import import_data2
 from casadi import *
 
-def optim_weights_ideal(theta,init_plot,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
+def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
     # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
     theta = plt.squeeze(theta)
     norm0 = 0.007276047781441449
@@ -18,7 +18,7 @@ def optim_weights_ideal(theta,init_plot,iteration,N,plotting,axcom1a,axcom1b,axc
     # norm2 = 1.0
     # norm3 = 1.0
     # norm4 = 1.0
-    [data_cl,_,width_road, vx_start] = import_data2(file,0)
+    # [data_cl,_,width_road, vx_start] = import_data2(file,0)
 
     # data_cl = dict_list[0]
     # Parameters of the non-linear bicycle model used to generate the data.
@@ -421,23 +421,23 @@ def optim_weights_ideal(theta,init_plot,iteration,N,plotting,axcom1a,axcom1b,axc
     # axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0,label="it: "+str(iteration))
     # axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
     # axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
-    if init_plot == 1:
-        axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom1b.plot(time_vector, y_sol, '.-',  linewidth=3.0,label="initial solution")
-        axcom2.plot(x_sol, y_sol, '.-',  linewidth=3.0,label="initial solution")
-        axcom3a.plot(time_vector, vx_sol, '.-',  linewidth=3.0,label="initial solution")
-        axcom3b.plot(time_vector, vy_sol, '.-',  linewidth=3.0,label="initial solution")
-        axcom4a.plot(time_vector, ax_tot_sol, '.-',  linewidth=3.0,label="initial solution")
-        axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom5a.plot(time_vector, jx_tot_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom5b.plot(time_vector, jy_tot_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom6a.plot(time_vector, psi_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
-        axcom6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
-        axcom7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0,label="initial solution")
-        axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0,label="initial solution")
-        axcom9.plot(time_vector, psi_ddot_sol*180/plt.pi, '.-', linewidth=3.0, label="initial solution")
+    if iteration == 1:
+        axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom1b.plot(time_vector, y_sol, '.-',  linewidth=3.0,label="init "+file[6:])
+        axcom2.plot(x_sol, y_sol, '.-',  linewidth=3.0,label="initial solution"+file[6:])
+        axcom3a.plot(time_vector, vx_sol, '.-',  linewidth=3.0,label="init "+file[6:])
+        axcom3b.plot(time_vector, vy_sol, '.-',  linewidth=3.0,label="init "+file[6:])
+        axcom4a.plot(time_vector, ax_tot_sol, '.-',  linewidth=3.0,label="init "+file[6:])
+        axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom5a.plot(time_vector, jx_tot_sol, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom5b.plot(time_vector, jy_tot_sol, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom6a.plot(time_vector, psi_sol*180/plt.pi, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom8a.plot(time_vector, aty_sol, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom8b.plot(time_vector, any_sol, '.-', linewidth=3.0,label="init "+file[6:])
+        axcom9.plot(time_vector, psi_ddot_sol*180/plt.pi, '.-', linewidth=3.0, label="init "+file[6:])
 
         axcom1a.legend()
         axcom1b.legend()

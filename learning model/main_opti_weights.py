@@ -30,7 +30,6 @@ his_weights = []
 his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
 rec = 1
-plot_opti_weights = 1
 N = 500 # amount of data points
 # width_road = 3.46990715
 # vx_start = 23.10159175
@@ -49,41 +48,40 @@ update = del_0*plt.ones([amount_features,1])
 theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
 # theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
 # theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
-theta_tracker = []
 
-# Import data
+# Plotting
+######################
+plotting_calc = 0
+axcom1a =0; axcom1b=0; axcom2=0; axcom3a=0;axcom3b=0;axcom4a=0;axcom4b=0;axcom5a=0;axcom5b=0
+axcom6a=0;axcom6b=0;axcom7a=0;axcom7b=0;axcom8a=0;axcom8b=0;axcom9=0
+######################
+
+theta_tracker = []
+theta_tracker.append(theta)
+his_weights.append([str(rec) + "//", theta])
+# theta_chosen = plt.array([5.49749001e+02, 1.89525204e+00, 5.31749963e-01, 2.14306117e+01, 1.16706616e-01])
+theta_chosen = plt.array([4,5,6,1,2])
+theta_chosen = theta_chosen[:,plt.newaxis]
+data_list = []
 file_list = glob.glob("used_data/*.csv")
+f_calc_list = []
 for file in file_list:
     print("The name of the file: ", file)
-    [data_cl,f_data,width_road,vx_start] = import_data2(file,1)
-    init_plot = 1
-    theta_tracker.append(theta)
-    his_weights.append([str(rec) + "//", theta])
-
-    # theta = plt.array([4,5,6,1,2]) => goal
-
+    [data_cl, f_data, width_road, vx_start] = import_data2(file, 1)
+    data_list.append(data_cl)
+    [axf, acw, axfn, axcom1a, axcom1b, axcom2, axcom3a, axcom3b, axcom4a, axcom4b, axcom5a, axcom5b, axcom6a, axcom6b,axcom7a, axcom7b, axcom8a, axcom8b, axcom9] = comparing_features(data_cl,file)
     # plotting
-    [axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9] = comparing_features(data_cl)
-    axf.plot([1,1,1,1,1],'-', marker='*', markersize=6, label = "Observed features")
-    axfn.plot([f_data[0],f_data[1],f_data[2],f_data[3],f_data[4]],'-', marker='*', markersize=6, label = "Observed features")
-    acw.plot([theta[0],theta[1],theta[2],theta[3],theta[4]],'-', marker='o', markersize=6, label = "iter " + str(rec))
+    axf.plot([1, 1, 1, 1, 1], '-', marker='*', markersize=6, label="Observed features")
+    axfn.plot([f_data[0], f_data[1], f_data[2], f_data[3], f_data[4]], '-', marker='*', markersize=6,label="Observed features")
     ###########
 
-    # Optimization loop
-    # Change this to convergence criterium: df/dt = 0 or weights are accurately found.
-    # theta_chosen = plt.array([5.49749001e+02, 1.89525204e+00, 5.31749963e-01, 2.14306117e+01, 1.16706616e-01])
+while :
+    print('rec is: ', rec)
+    for k in range(len(file_list)):
+        file = file_list[k]
+        curr_data = data_list[k]
+        [data_s, f_calc] = optim_weights_ideal(theta,curr_data["width_road"],curr_data["vx_start"],curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
 
-    theta_chosen = plt.array([4,5,6,1,2])
-    theta_chosen = theta_chosen[:,plt.newaxis]
-    f_calc_rel = plt.array([[100],[100],[100],[100],[100]]) # just start value
-    # while plt.sum(plt.absolute(grad_curr)) < 0.5:
-    # while plt.sum(plt.absolute(theta_chosen - theta)) > 0.5:
-
-    while any(plt.absolute(f_calc_rel-1) >= 1e-4):
-        print('rec is: ',rec)
-        plotting_calc = 0
-        [data_s, f_calc] = optim_weights_ideal(theta,init_plot,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
-        init_plot = 0
         dict_sol_list.append(data_s)
         # Normalization for plots
         f_calc_rel = f_calc/f_data
