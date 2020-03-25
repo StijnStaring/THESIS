@@ -8,16 +8,16 @@ from casadi import *
 def optim_weights_ideal(theta,init_plot,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
     # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
     theta = plt.squeeze(theta)
-    # norm0 = 0.007276047781441449
-    # norm1 = 2.6381715506137424
-    # norm2 = 11.283498669013454
-    # norm3 = 0.046662223759442054
-    # norm4 = 17.13698903738383
-    norm0 = 1.0
-    norm1 = 1.0
-    norm2 = 1.0
-    norm3 = 1.0
-    norm4 = 1.0
+    norm0 = 0.007276047781441449
+    norm1 = 2.6381715506137424
+    norm2 = 11.283498669013454
+    norm3 = 0.046662223759442054
+    norm4 = 17.13698903738383
+    # norm0 = 1.0
+    # norm1 = 1.0
+    # norm2 = 1.0
+    # norm3 = 1.0
+    # norm4 = 1.0
     [data_cl,_,width_road, vx_start] = import_data2(file,0)
 
     # data_cl = dict_list[0]
