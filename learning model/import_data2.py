@@ -96,10 +96,6 @@ def import_data2(file,ak):
         print(f4_cal)
 
     features = plt.array([f0_cal,f1_cal,f2_cal,f3_cal,f4_cal])
-    data_cl['f0_cal'] = f0_cal
-    data_cl['f1_cal'] = f1_cal
-    data_cl['f2_cal'] = f2_cal
-    data_cl['f3_cal'] = f3_cal
-    data_cl['f4_cal'] = f4_cal
+    data_cl['features'] = features
 
     return data_cl,features,width_road,vx_start
