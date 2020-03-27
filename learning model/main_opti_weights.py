@@ -28,6 +28,8 @@ his_multi_grads = []
 his_grad_current = []
 his_weights = []
 his_exception = []
+his_update = []
+his_del_theta_prev = []
 his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
 rec = 1
@@ -114,6 +116,9 @@ while any(converged != 1):
     print("----------------------------------------------")
     his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
     his_grad_current.append([str(rec) + "//", grad_curr_list])
+    his_exception.append(exception)
+    his_update.append(update)
+    his_del_theta_prev.append(del_theta_prev)
 
     # Check if all features are converged
     for i in plt.arange(0,len(file_list),1):
@@ -144,6 +149,7 @@ while any(converged != 1):
 
     his_multi_grads.append([str(rec) + "//", case[:,plt.newaxis]])
 
+
     conflict = [] # list with conflicts
     for j in plt.arange(0,amount_features):
         for i in plt.arange(0, len(file_list), 1):
@@ -158,10 +164,15 @@ while any(converged != 1):
 
     if any(converged != 1):
         if len(conflict) != 0:
-            theta = his_weights[-2][1]
-            grad_prev_list =  his_grad_current[-2][1]
+            # del_theta_prev = his_del_theta_prev
+            # exception = his_exception[0]
+            # theta = his_weights[-2][1]
+            # grad_prev_list = his_grad_current[-3][1]
             for j in conflict:
-                theta[j] = his_weights[-2][1][j] * n_neg
+                update[j] = n_neg*update[j]
+                if n_neg*update[j] <= 10^-7:
+                    sys.exit("Can't go any smaller")
+
         else:
             length = len(grad_curr_list[0])
             [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0],n_neg,case,length,update,theta,del_theta_prev,exception)
