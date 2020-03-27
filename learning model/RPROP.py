@@ -1,4 +1,4 @@
-def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,exception):
+def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev):
     import pylab as plt
     # Expects grad in shape n x 1
     # definition of parameters:
@@ -6,8 +6,10 @@ def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,exception):
     # n_neg = 0.5
     del_max = 1.0
     del_min = 1e-7
+    update_out = plt.zeros([length,1]) # if not have been initialized, would directely change global var and all vars in his_list/ if change something in array --> still pointing to same location and not a new point is made.
     w_new = plt.zeros([length,1])
     del_w = plt.zeros([length,1])
+    exception = plt.zeros([length,1])
     # multi_grads = plt.zeros([length,1])
 
     # algorithm
@@ -38,5 +40,8 @@ def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,exception):
             exception[i] = 0
             print('2x grad = 0')
 
+    for i in plt.arange(0,len(update),1):
+        update_out[i] = update[i]
 
-    return del_w, exception, w_new, update
+
+    return del_w, exception, w_new, update_out

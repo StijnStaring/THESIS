@@ -87,12 +87,13 @@ converged = plt.zeros(len(file_list))
 for i in range(len(file_list)):
     grad_prev_list.append(plt.zeros([amount_features,1]))
 
-# while rec <= 2:
-while any(converged != 1):
+while rec <= 10:
+# while any(converged != 1):
     converged = plt.zeros(len(file_list))
     print('Iteration: ', rec)
     print('This is the difference of theta: ', theta_chosen - theta)
     his_diff_theta.append([str(rec) + "//", theta_chosen - theta])
+
 
     for k in range(len(file_list)):
         file = file_list[k]
@@ -113,9 +114,14 @@ while any(converged != 1):
         axfn.plot([f_calc[0], f_calc[1], f_calc[2], f_calc[3], f_calc[4]], '-', marker='o', markersize=6,label="Calc Features iter: " + str(rec))
         axfn.legend()
 
+
     print("----------------------------------------------")
     his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
     his_grad_current.append([str(rec) + "//", grad_curr_list])
+    # Problem was: exception is specified as an specific global array (not for integers) and added each time to a list. When this global variable itself is updated --> changes all values in list because all point to the same global variable.
+    # Can be solved by recalling the variable in the loop so that it now points to a local definition. (Again called in RPROP) Global var exception is updated by an array (local var) exception = plt.array([])..., no relation with previous value added to his_exception. Create a new point.
+    # if make a list of exception and add an array and later what is on this place in exception add to his_exception and then later update this place in exception, will also change all variables in his_exception becaue they point to the same place in the excepion list.
+    # In grad_curr adds two item to the list and below in code is refreshing the variable. Always adding, not pointing to the same spot. What is added is always local retreived.
     his_exception.append(exception)
     his_update.append(update)
     his_del_theta_prev.append(del_theta_prev)
@@ -148,13 +154,13 @@ while any(converged != 1):
                 print("case["+str(j)+")] is: ", case[j])
 
     his_multi_grads.append([str(rec) + "//", case[:,plt.newaxis]])
-
-
     conflict = [] # list with conflicts
     for j in plt.arange(0,amount_features):
+        flag = 1
         for i in plt.arange(0, len(file_list), 1):
-            if grad_curr_list[0][j]*grad_curr_list[i][j]<0 and (case[j] == 1 or case[j] == 3):
+            if grad_curr_list[0][j]*grad_curr_list[i][j]<0 and (case[j] == 1 or case[j] == 3) and flag == 1:
                 conflict.append(j)
+                flag = 0
                 if case[j] == 1:
                     sys.exit('Conflict concerning case 1!')
                 print('\n')
@@ -164,18 +170,31 @@ while any(converged != 1):
 
     if any(converged != 1):
         if len(conflict) != 0:
-            # del_theta_prev = his_del_theta_prev
-            # exception = his_exception[0]
-            # theta = his_weights[-2][1]
-            # grad_prev_list = his_grad_current[-3][1]
+            print('-----------------------')
+            print('New variables in conflict: ')
+            del_theta_prev = his_del_theta_prev[-3]
+            theta = his_weights[-3][1]
+            grad_curr_list = his_grad_current[-3][1]
+            case = his_multi_grads[-3][1]
+            update = his_update[-3]
+            print('del_theta_prev: ',del_theta_prev)
+            print('theta: ',theta)
+            print('grad_curr_list: ',grad_curr_list)
+            print('case: ',case)
+            print('update: ', update)
+            print('-----------------------')
             for j in conflict:
                 update[j] = n_neg*update[j]
                 if n_neg*update[j] <= 10^-7:
                     sys.exit("Can't go any smaller")
 
+            length = len(grad_curr_list[0])
+            [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0], n_neg, case, length, update, theta,del_theta_prev)
+            grad_prev_list = grad_curr_list
+
         else:
             length = len(grad_curr_list[0])
-            [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0],n_neg,case,length,update,theta,del_theta_prev,exception)
+            [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0],n_neg,case,length,update,theta,del_theta_prev)
             grad_prev_list = grad_curr_list
         rec = rec + 1
         his_weights.append([str(rec) + "//", theta])
