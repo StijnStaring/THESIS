@@ -11,7 +11,6 @@ def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,conflict_flags):
     del_w = plt.zeros([length,1])
     exception = plt.zeros([length,1])
 
-
     # algorithm
     for i in plt.arange(0,length,1):
         print('feature in RPROP  = ',i)
@@ -43,8 +42,8 @@ def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,conflict_flags):
                 exception[i] = 0
                 print('2x grad = 0')
 
-        for i in plt.arange(0,len(update),1):
-            update_out[i] = update[i]
-
+    for i in plt.arange(0,len(update),1):
+        update_out[i] = update[i] # now is pointing to local defined here
+    # update_out = update --> if use this is still pointing to original update (changes all in list)
 
     return del_w, exception, w_new, update_out

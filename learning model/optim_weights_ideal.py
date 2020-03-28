@@ -2,7 +2,6 @@ import pylab as plt
 from scipy import signal
 from define_plots import define_plots
 from derivative import derivative
-from import_data2 import import_data2
 from casadi import *
 
 def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
