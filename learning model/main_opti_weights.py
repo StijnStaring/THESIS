@@ -163,7 +163,7 @@ while any(converged != 1):
     for j in plt.arange(0, amount_features):
         flag = 1
         for i in plt.arange(1, len(file_list), 1):
-            if grad_curr_list[0][j] * grad_curr_list[i][j] < 0:
+            if grad_curr_list[0][j] * grad_curr_list[i][j] < 0 and flag == 1:
                 conflict_flags[j] = 1
                 flag = 0
                 if case[j] == 1:
