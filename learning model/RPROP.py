@@ -1,4 +1,4 @@
-def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev):
+def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,conflict_flags):
     import pylab as plt
     # Expects grad in shape n x 1
     # definition of parameters:
@@ -10,38 +10,41 @@ def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev):
     w_new = plt.zeros([length,1])
     del_w = plt.zeros([length,1])
     exception = plt.zeros([length,1])
-    # multi_grads = plt.zeros([length,1])
+
 
     # algorithm
     for i in plt.arange(0,length,1):
         print('feature in RPROP  = ',i)
         print('\n')
 
-        # storage of mutli_grads
-        # multi_grads[i] = grad_curr[i]*grad_prev[i]
+        if conflict_flags[i] == 1:
+            del_w[i] = 0
+            w_new[i] = w_curr[i]
+            exception[i] = 1 #stands for in conflict - after is solved --> go to case 3
 
-        if case[i] == 1:
-            update[i] = min(update[i]*n_pos,del_max)
-            del_w[i] = -plt.sign(grad_curr[i])*update[i]
-            w_new[i] = w_curr[i] + del_w[i]
-            exception[i] = 0
-            print('2x pos grad')
+        else:
+            if case[i] == 1:
+                update[i] = min(update[i]*n_pos,del_max)
+                del_w[i] = -plt.sign(grad_curr[i])*update[i]
+                w_new[i] = w_curr[i] + del_w[i]
+                exception[i] = 0
+                print('2x pos grad')
 
-        elif case[i] == 2:
-            update[i] = max(update[i] * n_neg, del_min)
-            del_w[i] = - del_w_prev[i]
-            w_new[i] = w_curr[i] +del_w[i]
-            exception[i] = 1
-            print('2x neg grad')
+            elif case[i] == 2:
+                update[i] = max(update[i] * n_neg, del_min)
+                del_w[i] = - del_w_prev[i]
+                w_new[i] = w_curr[i] +del_w[i]
+                exception[i] = 1
+                print('2x neg grad')
 
-        elif case[i] == 3:
-            del_w[i] = -plt.sign(grad_curr[i]) * update[i]
-            w_new[i] = w_curr[i] + del_w[i]
-            exception[i] = 0
-            print('2x grad = 0')
+            elif case[i] == 3:
+                del_w[i] = -plt.sign(grad_curr[i]) * update[i]
+                w_new[i] = w_curr[i] + del_w[i]
+                exception[i] = 0
+                print('2x grad = 0')
 
-    for i in plt.arange(0,len(update),1):
-        update_out[i] = update[i]
+        for i in plt.arange(0,len(update),1):
+            update_out[i] = update[i]
 
 
     return del_w, exception, w_new, update_out

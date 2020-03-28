@@ -32,6 +32,7 @@ his_update = []
 his_del_theta_prev = []
 his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
+conflict_flags = plt.zeros([amount_features,1])
 rec = 1
 N = 500 # amount of data points
 # width_road = 3.46990715
@@ -133,11 +134,11 @@ while rec <= 10:
     print('Converged vector: ',converged)
 
     # Check if there is a sign conflict - only needed initial weights used
-    if rec == 1:
-        for j in plt.arange(0,amount_features):
-            for i in plt.arange(0, len(file_list), 1):
-                if grad_curr_list[0][j]*grad_curr_list[i][j]<0:
-                    sys.exit('Need an other initial guess of weights')
+    # if rec == 1:
+    #     for j in plt.arange(0,amount_features):
+    #         for i in plt.arange(0, len(file_list), 1):
+    #             if grad_curr_list[0][j]*grad_curr_list[i][j]<0:
+    #                 sys.exit('Need an other initial guess of weights')
 
     # Check what direction to go in optimization
     case = plt.ones(amount_features)
@@ -154,52 +155,34 @@ while rec <= 10:
                 print("case["+str(j)+")] is: ", case[j])
 
     his_multi_grads.append([str(rec) + "//", case[:,plt.newaxis]])
-    conflict = [] # list with conflicts
-    for j in plt.arange(0,amount_features):
+
+    for j in plt.arange(0, amount_features):
         flag = 1
         for i in plt.arange(0, len(file_list), 1):
-            if grad_curr_list[0][j]*grad_curr_list[i][j]<0 and (case[j] == 1 or case[j] == 3) and flag == 1:
-                conflict.append(j)
+            if grad_curr_list[0][j] * grad_curr_list[i][j] < 0 and flag == 1:
+                conflict_flags[j] = 1
                 flag = 0
                 if case[j] == 1:
                     sys.exit('Conflict concerning case 1!')
                 print('\n')
                 print('-----------------------------------')
-                print('Direction conflict: F'+str(j))
+                print('Direction conflict: F' + str(j))
                 print('-----------------------------------')
+            elif grad_curr_list[0][j] * grad_curr_list[i][j] > 0 and flag == 1:
+                conflict_flags[j] = 0  # conflict is resolved
+                flag = 0
+            else:
+                sys.exit('Error - grad_curr cannot be equal to zero')
 
     if any(converged != 1):
-        if len(conflict) != 0:
-            print('-----------------------')
-            print('New variables in conflict: ')
-            del_theta_prev = his_del_theta_prev[-3]
-            theta = his_weights[-3][1]
-            grad_curr_list = his_grad_current[-3][1]
-            case = his_multi_grads[-3][1]
-            update = his_update[-3]
-            print('del_theta_prev: ',del_theta_prev)
-            print('theta: ',theta)
-            print('grad_curr_list: ',grad_curr_list)
-            print('case: ',case)
-            print('update: ', update)
-            print('-----------------------')
-            for j in conflict:
-                update[j] = n_neg*update[j]
-                if n_neg*update[j] <= 10^-7:
-                    sys.exit("Can't go any smaller")
-
-            length = len(grad_curr_list[0])
-            [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0], n_neg, case, length, update, theta,del_theta_prev)
-            grad_prev_list = grad_curr_list
-
-        else:
-            length = len(grad_curr_list[0])
-            [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0],n_neg,case,length,update,theta,del_theta_prev)
-            grad_prev_list = grad_curr_list
+        length = amount_features
+        [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0],n_neg,case,length,update,theta,del_theta_prev,conflict_flags)
+        grad_prev_list = grad_curr_list
         rec = rec + 1
         his_weights.append([str(rec) + "//", theta])
         acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4]], '-', marker='o', markersize=6,label="iter " + str(rec))
         acw.legend()
+
 
     # solutions.append([str(rec) + "//", dict_sol_list])
     solutions.append(dict_sol_list)
