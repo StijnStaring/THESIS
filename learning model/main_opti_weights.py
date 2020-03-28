@@ -49,8 +49,8 @@ grad_prev_list = []
 update = del_0*plt.ones([amount_features,1])
 #################
 # Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-# theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0]])
-theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
+theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0]])
+# theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
 # theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
 # theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
 
@@ -88,8 +88,8 @@ converged = plt.zeros(len(file_list))
 for i in range(len(file_list)):
     grad_prev_list.append(plt.zeros([amount_features,1]))
 
-while rec <= 10:
-# while any(converged != 1):
+# while rec <= 20:
+while any(converged != 1):
     converged = plt.zeros(len(file_list))
     print('Iteration: ', rec)
     print('This is the difference of theta: ', theta_chosen - theta)
@@ -117,6 +117,7 @@ while rec <= 10:
 
 
     print("----------------------------------------------")
+    print(str(rec) + "// ", f_calc_rel)
     his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
     his_grad_current.append([str(rec) + "//", grad_curr_list])
     # Problem was: exception is specified as an specific global array (not for integers) and added each time to a list. When this global variable itself is updated --> changes all values in list because all point to the same global variable.
@@ -136,16 +137,18 @@ while rec <= 10:
     # Check if there is a sign conflict - only needed initial weights used
     # if rec == 1:
     #     for j in plt.arange(0,amount_features):
-    #         for i in plt.arange(0, len(file_list), 1):
+    #         for i in plt.arange(1, len(file_list), 1):
     #             if grad_curr_list[0][j]*grad_curr_list[i][j]<0:
-    #                 sys.exit('Need an other initial guess of weights')
+    #                 print('Need an other initial guess of weights')
+    #                 sys.exit(-1)
 
     # Check what direction to go in optimization
     case = plt.ones(amount_features)
     for j in plt.arange(0,amount_features):
         print('*********')
         for i in plt.arange(0, len(file_list), 1):
-            if grad_curr_list[i][j]*grad_prev_list[i][j]==0 or exception[j] == 1:
+            # if  exception[j] == 1 or grad_curr_list[i][j]*grad_prev_list[i][j]  == 0:
+            if exception[j] == 1 or grad_curr_list[i][j] * grad_prev_list[i][j] == 0:
                 case[j] = 3
                 print("case["+str(j)+")] is: ",case[j])
             elif grad_curr_list[i][j]*grad_prev_list[i][j]<0:
@@ -158,21 +161,32 @@ while rec <= 10:
 
     for j in plt.arange(0, amount_features):
         flag = 1
-        for i in plt.arange(0, len(file_list), 1):
-            if grad_curr_list[0][j] * grad_curr_list[i][j] < 0 and flag == 1:
+        for i in plt.arange(1, len(file_list), 1):
+            if grad_curr_list[0][j] * grad_curr_list[i][j] < 0:
                 conflict_flags[j] = 1
                 flag = 0
                 if case[j] == 1:
-                    sys.exit('Conflict concerning case 1!')
+                    print('Conflict concerning case 1!')
+                    sys.exit(-1)
                 print('\n')
                 print('-----------------------------------')
                 print('Direction conflict: F' + str(j))
                 print('-----------------------------------')
             elif grad_curr_list[0][j] * grad_curr_list[i][j] > 0 and flag == 1:
                 conflict_flags[j] = 0  # conflict is resolved
-                flag = 0
-            else:
-                sys.exit('Error - grad_curr cannot be equal to zero')
+            elif grad_curr_list[0][j] * grad_curr_list[i][j] == 0:
+                print('Error - grad_curr cannot be equal to zero')
+                sys.exit(-1)
+
+    # Check if can still improve something?
+    if any(conflict_flags ==0):
+        print('Still improvement possible in a certain direction for all datasets')
+        for j in plt.arange(0,len(conflict_flags),1):
+            if conflict_flags[j] == 0:
+                print("Improvement possible in feature: ", j)
+    else:
+        print('Cannot improve solution further')
+        break
 
     if any(converged != 1):
         length = amount_features
@@ -182,7 +196,6 @@ while rec <= 10:
         his_weights.append([str(rec) + "//", theta])
         acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4]], '-', marker='o', markersize=6,label="iter " + str(rec))
         acw.legend()
-
 
     # solutions.append([str(rec) + "//", dict_sol_list])
     solutions.append(dict_sol_list)
@@ -221,7 +234,7 @@ for i in plt.arange(0,len(his_weights),1):
 print("This is the history of the update of the weights.")
 print("----------------------------------------------------")
 print('\n')
-if len(his_weights) != 1:
+if len(his_weights) != 1: # takes current iterate minus the previous one
     for i in plt.arange(1,len(his_weights),1):
         print("This is update " + his_weights[i][0])
         print(his_weights[i][1] - his_weights[i-1][1])

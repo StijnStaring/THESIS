@@ -20,7 +20,7 @@ def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,conflict_flags):
         if conflict_flags[i] == 1:
             del_w[i] = 0
             w_new[i] = w_curr[i]
-            exception[i] = 1 #stands for in conflict - after is solved --> go to case 3
+            exception[i] = 1 # Stands for in conflict - after is solved --> go to case 3
 
         else:
             if case[i] == 1:
