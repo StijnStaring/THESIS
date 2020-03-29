@@ -31,8 +31,8 @@ his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
 rec = 1
 plot_opti_weights = 1
-# N = 500 # amount of data points
-N = 600
+N = 550 # amount of data points
+# N = 550
 # width_road = 3.46990715
 # vx_start = 23.10159175
 # time_guess = 4.01
@@ -79,8 +79,9 @@ for file in file_list:
     f_calc_rel = plt.array([[100],[100],[100],[100],[100]]) # just start value
     # while plt.sum(plt.absolute(grad_curr)) < 0.5:
     # while plt.sum(plt.absolute(theta_chosen - theta)) > 0.5:
-
-    while any(plt.absolute(f_calc_rel-1) >= 1e-4):
+    tol = 1e-1
+    # while any(plt.absolute(f_calc_rel-1) >= tol):
+    while any(plt.absolute(f_calc_rel-1) >=tol ):
         print('rec is: ',rec)
         plotting_calc = 0
         [data_s, f_calc] = optim_weights_ideal(theta,init_plot,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
@@ -104,7 +105,7 @@ for file in file_list:
         axfn.legend()
         his_grad_current.append([str(rec) + "//", grad_curr])
 
-        if any(plt.absolute(f_calc_rel - 1) >= 1e-4):
+        if any(plt.absolute(f_calc_rel - 1) >= tol):
             [grad_prev, del_theta_prev, exception, theta, update, multi_grads] = RPROP(grad_curr,grad_prev,update,theta,del_theta_prev,exception)
             his_multi_grads.append([str(rec)+"//",multi_grads])
             rec = rec + 1
