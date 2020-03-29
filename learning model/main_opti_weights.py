@@ -32,7 +32,7 @@ amount_features = 5
 rec = 1
 plot_opti_weights = 1
 # N = 500 # amount of data points
-N = 500
+N = 600
 # width_road = 3.46990715
 # vx_start = 23.10159175
 # time_guess = 4.01
@@ -46,8 +46,8 @@ grad_prev = plt.zeros([amount_features,1])
 update = del_0*plt.ones([amount_features,1])
 #################
 # Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-# theta = plt.array([[1.5],[1.5],[1.5],[1.5],[1.5]])
-theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
+theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0]])
+# theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
 # theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
 # theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
 theta_tracker = []
@@ -89,8 +89,8 @@ for file in file_list:
         # Normalization for plots
         f_calc_rel = f_calc/f_data
         his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
+        print('\n')
         print('f_calc_rel, ', f_calc_rel)
-        print("********************************************************************************************")
 
         # Update theta with RPROP
         ##########################
@@ -111,6 +111,8 @@ for file in file_list:
             his_weights.append([str(rec) + "//", theta])
             acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4]], '-', marker='o', markersize=6,label="iter " + str(rec))
             acw.legend()
+
+        print("********************************************************************************************")
 
         ###########################
 
