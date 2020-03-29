@@ -59,7 +59,7 @@ data_2 = ['17//', [plt.array([[1.01466279],
  [1.01738989]])]]
 
 acc_1 = accuracy(data_1,5)
-acc_2 = accuracy(data_1,5)
+acc_2 = accuracy(data_2,5)
 
 
 # # Accuracy figure
@@ -87,7 +87,7 @@ plt.grid(True)
 features = [0,1,2,3,4]
 acc.plot(features, acc_1, '-',marker = '*',linewidth=3.0)
 acc.plot(features, acc_2, '-', marker = 'o', linewidth=3.0)
-plt.legend(['Initial guess 1','Initial guess 2'])
+plt.legend(['Initial guess V22.22_L6.94','Initial guess V25.0_L3.47'])
 plt.show()
 
 
