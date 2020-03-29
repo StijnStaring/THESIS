@@ -95,7 +95,7 @@ while any(converged != 1):
     his_diff_theta.append([str(rec) + "//", theta_chosen - theta])
 
 
-    for k in range(len(file_list)):
+    for k in range(len(file_list)): 
         file = file_list[k]
         curr_data = data_list[k]
         [data_s, f_calc] = optim_weights_ideal(theta,curr_data["width_road"],curr_data["vx_start"],curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
