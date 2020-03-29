@@ -31,7 +31,8 @@ his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
 rec = 1
 plot_opti_weights = 1
-N = 500 # amount of data points
+# N = 500 # amount of data points
+N = 500
 # width_road = 3.46990715
 # vx_start = 23.10159175
 # time_guess = 4.01
@@ -88,6 +89,7 @@ for file in file_list:
         # Normalization for plots
         f_calc_rel = f_calc/f_data
         his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
+        print('f_calc_rel, ', f_calc_rel)
         print("********************************************************************************************")
 
         # Update theta with RPROP
