@@ -199,6 +199,7 @@ while converged != 1 and rec <= 200:
     f_calc_rel = []
     grad_curr_list = []
     dict_sol_list = []
+
     print("********************************************************************************************")
 
 # Post - processing
@@ -292,6 +293,13 @@ for i in plt.arange(0,len(file_list),1):
     axcom8a.legend()
     axcom8b.legend()
     axcom9.legend()
+print("")
+for i in plt.arange(0,len(file_list),1):
+    file = file_list[i]
+    final_calculated = solutions[-1][i]['features']
+    final_data = data_list[i]['features']
+    print("This is f_cal_rel of file ",file[16:-4],": ", + final_calculated/final_data)
+    print("")
 
 print('This is the theta_tracker: ',theta_tracker)
 post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)

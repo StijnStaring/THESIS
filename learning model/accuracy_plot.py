@@ -46,21 +46,27 @@ def accuracy(data,amount_features):
 #        [0.9758468 ],
 #        [0.99630615]])]]
 
-data_1 = ['17//', [plt.array([[0.99372266],
- [1.0364602 ],
- [1.05047609],
- [0.96796123],
- [0.99053099]])]]
+data_V22_L3 = ['111//', [plt.array([[1.00003019],
+       [0.99974506],
+       [0.99989975],
+       [1.00011264],
+       [1.0000876 ]])]]
 
-data_2 = ['17//', [plt.array([[1.01466279],
- [0.94177966],
- [0.91670696],
- [1.05395378],
- [1.01738989]])]]
+data_V22_L6 = ['111//', [plt.array([[0.99990027],
+       [1.0002674 ],
+       [1.00059783],
+       [0.99948536],
+       [0.99997304]])]]
 
-acc_1 = accuracy(data_1,5)
-acc_2 = accuracy(data_2,5)
+data_V25_L3 = ['111//', [plt.array([[1.00011468],
+       [0.99940836],
+       [0.99942557],
+       [1.0004103 ],
+       [1.00017899]])]]
 
+acc_1 = accuracy(data_V22_L3,5)
+acc_2 = accuracy(data_V22_L6,5)
+acc_3 = accuracy(data_V25_L3,5)
 
 # # Accuracy figure
 # plt.figure("Average error between f_calculated and f_data")
@@ -87,12 +93,7 @@ plt.grid(True)
 features = [0,1,2,3,4]
 acc.plot(features, acc_1, '-',marker = '*',linewidth=3.0)
 acc.plot(features, acc_2, '-', marker = 'o', linewidth=3.0)
-plt.legend(['Initial guess V22.22_L6.94','Initial guess V25.0_L3.47'])
+acc.plot(features, acc_3, '-', marker = 's', linewidth=3.0)
+plt.legend(['Accuracy V22.22_L3.47','Accuracy V22.22_L6.94','Accuracy V25.00_L3.47'])
 plt.show()
-
-
-
-
-
-
 
