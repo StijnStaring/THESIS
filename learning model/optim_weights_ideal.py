@@ -402,6 +402,7 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
 
     features = plt.array([f0,f1,f2,f3,f4])
     features = features[:,plt.newaxis]
+    data_s['features'] = features
     time_vector = plt.linspace(0, T_sol, len(x_sol))
 
     # Plotting
