@@ -413,8 +413,7 @@ for vx_start in vx_start_a:
         width = plt.around(width_road, 2)
         speed = plt.around(vx_start, 2)
         define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
-
-        print("\n")
+        print("")
         print('Integrated feature values: ')
         print('------------------------------')
         print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
@@ -432,7 +431,7 @@ for vx_start in vx_start_a:
         #    Storing of data in csv-file
         # ----------------------------------
 
-        path = "written_dataset\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
+        path = "dataset_more_features\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
         file = open(path,'w',newline= "")
         writer = csv.writer(file)
         writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
