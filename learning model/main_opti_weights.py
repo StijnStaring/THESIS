@@ -21,6 +21,7 @@ import glob
 
 # Defining weights
 ##################
+fixed_feature_index = 1
 # sns.set_palette(sns.color_palette("hls", 15))
 dict_sol_list = []
 his_diff_theta = []
@@ -46,7 +47,7 @@ grad_prev = plt.zeros([amount_features,1])
 update = del_0*plt.ones([amount_features,1])
 #################
 # Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0]])
+theta = plt.array([[5.0],[5.0],[5.0],[5.0],[5.0]])
 # theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
 # theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
 # theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
@@ -81,7 +82,7 @@ for file in file_list:
     # while plt.sum(plt.absolute(theta_chosen - theta)) > 0.5:
     tol = 1e-1
     # while any(plt.absolute(f_calc_rel-1) >= tol):
-    while any(plt.absolute(f_calc_rel-1) >=tol ):
+    while any(plt.absolute(f_calc_rel-1) >=tol ) and rec <= 200:
         print('rec is: ',rec)
         plotting_calc = 0
         [data_s, f_calc] = optim_weights_ideal(theta,init_plot,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
@@ -106,7 +107,7 @@ for file in file_list:
         his_grad_current.append([str(rec) + "//", grad_curr])
 
         if any(plt.absolute(f_calc_rel - 1) >= tol):
-            [grad_prev, del_theta_prev, exception, theta, update, multi_grads] = RPROP(grad_curr,grad_prev,update,theta,del_theta_prev,exception)
+            [grad_prev, del_theta_prev, exception, theta, update, multi_grads] = RPROP(grad_curr,grad_prev,update,theta,del_theta_prev,exception,fixed_feature_index)
             his_multi_grads.append([str(rec)+"//",multi_grads])
             rec = rec + 1
             his_weights.append([str(rec) + "//", theta])
