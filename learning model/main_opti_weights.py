@@ -49,13 +49,13 @@ del_theta_prev = plt.zeros([amount_features,1])
 update = del_0*plt.ones([amount_features,1])
 #################
 # Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0]])
+theta = plt.array([[5.0],[5.0],[5.0],[5.0],[5.0]])
 # theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
 # theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
 # theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
 
 # Plotting
-###################### 
+######################
 plotting_calc = 0
 axcom1a =0; axcom1b=0; axcom2=0; axcom3a=0;axcom3b=0;axcom4a=0;axcom4b=0;axcom5a=0;axcom5b=0
 axcom6a=0;axcom6b=0;axcom7a=0;axcom7b=0;axcom8a=0;axcom8b=0;axcom9=0;axf=0;axfn=0;acw=0
