@@ -80,7 +80,7 @@ for file in file_list:
     f_calc_rel = plt.array([[100],[100],[100],[100],[100]]) # just start value
     # while plt.sum(plt.absolute(grad_curr)) < 0.5:
     # while plt.sum(plt.absolute(theta_chosen - theta)) > 0.5:
-    tol = 1e-1
+    tol = 1e-4
     # while any(plt.absolute(f_calc_rel-1) >= tol):
     while any(plt.absolute(f_calc_rel-1) >=tol ) and rec <= 200:
         print('rec is: ',rec)
