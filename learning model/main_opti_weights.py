@@ -47,7 +47,9 @@ grad_prev = plt.zeros([amount_features,1])
 update = del_0*plt.ones([amount_features,1])
 #################
 # Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-theta = plt.array([[5.0],[5.0],[5.0],[5.0],[5.0]])
+# theta = plt.array([[5.0],[5.0],[5.0],[5.0],[5.0]])
+theta = plt.array([[1.373426],[5.0],[5.81959468],[1.36204164],[2.07003815]])
+
 # theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
 # theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
 # theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
@@ -81,7 +83,8 @@ for file in file_list:
     # while plt.sum(plt.absolute(grad_curr)) < 0.5:
     # while plt.sum(plt.absolute(theta_chosen - theta)) > 0.5:
     tol = 1e-4
-    # while any(plt.absolute(f_calc_rel-1) >= tol):
+
+    # while recs <= 1:
     while any(plt.absolute(f_calc_rel-1) >=tol ) and rec <= 200:
         print('rec is: ',rec)
         plotting_calc = 0
