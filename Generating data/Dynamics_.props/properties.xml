@@ -1,0 +1,45 @@
+<properties xmlns="amesim-property-instances" version="1">
+ <property id="id0" sticker="" target="model:" name="@special:model_history">
+  <struct/>
+ </property>
+ <property id="id4" sticker="" target="model:" name="@special:prepost_tools_document_scripts">
+  <struct/>
+ </property>
+ <property id="id1" target="model:" name="@special:prepost_tools_document_plots">
+  <struct/>
+ </property>
+ <property id="id2" target="model:" name="@special:prepost_tools_document_animations">
+  <struct>
+   <attribute name="handle_75b7">
+    <struct>
+     <attribute name="PP_TOOLS_TITLE_ATTRIBUTE">
+      <data typename="simple-text">DoubleLaneChange</data>
+     </attribute>
+     <attribute name="PP_TOOLS_AOPEN_ATTRIBUTE">
+      <data typename="simple-text">false</data>
+     </attribute>
+     <attribute name="PP_TOOLS_FILE_ATTRIBUTE">
+      <data typename="simple-text">DoubleLaneChange_.2093_upgraded.sce</data>
+     </attribute>
+    </struct>
+   </attribute>
+  </struct>
+ </property>
+ <property id="id3" target="model:" name="@special:prepost_tools_document_dashboards">
+  <struct>
+   <attribute name="handle_adc">
+    <struct>
+     <attribute name="PP_TOOLS_TITLE_ATTRIBUTE">
+      <data typename="simple-text">Dashboard 1</data>
+     </attribute>
+     <attribute name="PP_TOOLS_AOPEN_ATTRIBUTE">
+      <data typename="simple-text">false</data>
+     </attribute>
+     <attribute name="PP_TOOLS_FILE_ATTRIBUTE">
+      <data typename="simple-text">dashboard.dsk</data>
+     </attribute>
+    </struct>
+   </attribute>
+  </struct>
+ </property>
+</properties>

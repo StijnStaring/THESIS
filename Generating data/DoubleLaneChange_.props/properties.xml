@@ -1,0 +1,41 @@
+<properties xmlns="amesim-property-instances" version="1">
+ <property name="@special:model_history" target="model:" sticker="" id="id0">
+  <struct/>
+ </property>
+ <property name="@special:prepost_tools_document_plots" target="model:" id="id1">
+  <struct/>
+ </property>
+ <property name="@special:prepost_tools_document_animations" target="model:" id="id2">
+  <struct>
+   <attribute name="handle_73a4">
+    <struct>
+     <attribute name="PP_TOOLS_TITLE_ATTRIBUTE">
+      <data typename="simple-text">Animation 1</data>
+     </attribute>
+     <attribute name="PP_TOOLS_AOPEN_ATTRIBUTE">
+      <data typename="simple-text">false</data>
+     </attribute>
+     <attribute name="PP_TOOLS_FILE_ATTRIBUTE">
+      <data typename="simple-text">animation.sce</data>
+     </attribute>
+    </struct>
+   </attribute>
+   <attribute name="handle_63b7">
+    <struct>
+     <attribute name="PP_TOOLS_TITLE_ATTRIBUTE">
+      <data typename="simple-text">Animation 2</data>
+     </attribute>
+     <attribute name="PP_TOOLS_AOPEN_ATTRIBUTE">
+      <data typename="simple-text">false</data>
+     </attribute>
+     <attribute name="PP_TOOLS_FILE_ATTRIBUTE">
+      <data typename="simple-text">animation_1.sce</data>
+     </attribute>
+    </struct>
+   </attribute>
+  </struct>
+ </property>
+ <property name="@special:prepost_tools_document_dashboards" target="model:" id="id3">
+  <struct/>
+ </property>
+</properties>
