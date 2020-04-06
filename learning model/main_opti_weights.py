@@ -187,7 +187,7 @@ while converged != 1 and rec <= 200:
 
     if converged != 1:
         length = amount_features
-        [del_theta_prev, exception, theta, update] = RPROP(grad_curr,n_neg,case,length,update,theta,del_theta_prev,conflict_flags)
+        [del_theta_prev, exception, theta, update] = RPROP(grad_curr,n_neg,case,length,update,theta,del_theta_prev,conflict_flags,index_fixed_value = 1)
         grad_prev = grad_curr
         rec = rec + 1
         his_weights.append([str(rec) + "//", theta])
