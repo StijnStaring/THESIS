@@ -1,0 +1,24 @@
+Lane change: V_25.00_L_6.94
+-----------------------------
+Lane change duration of:  7.958739938605606  [s]
+
+Integrated feature values: 
+------------------------------
+integrand = plt.squeeze(data_cl[ax_cl]**2)
+0.01771643076015521
+integrand = plt.squeeze(data_cl[ay_cl] ** 2)
+6.212356102257129
+integrand = plt.squeeze(data_cl[jy_cl] ** 2)
+13.406714242332825
+integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)
+0.44202802570958727
+integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)
+85.08816462788056
+integrand = plt.squeeze(psi_dot) ** 2)
+0.010705633636739148
+integrand = plt.squeeze(throttle) ** 2)
+0.00017100278526273633
+dt of the optimization is:  0.01591747987721121
+
+
+Solution when using as absolute weights: 1.0,1.0,1.0,1.0,1.0,1.0,1.0

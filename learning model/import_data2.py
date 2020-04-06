@@ -2,7 +2,6 @@ def import_data2(file,ak):
     import pylab as plt
     import pandas as pd
 
-
     # data = pd.read_csv(file[0])
     data = pd.read_csv(file)
     # theta_rel used in data = plt.array([4,5,6,1,2] with norms:
@@ -80,6 +79,18 @@ def import_data2(file,ak):
     for i in plt.arange(0, len(integrand) - 1, 1):
         f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * data_cl['dt_cl']
 
+    # f5: yaw rate of the vehicle
+    integrand = data_cl['psi_dot_cl']** 2
+    f5_cal = 0
+    for i in plt.arange(0, len(integrand) - 1, 1):
+        f5_cal = f5_cal + 0.5 * (integrand[i] + integrand[i + 1]) * data_cl['dt_cl']
+
+    # f6: throttle (accelerating and bracking) --> relation with ax
+    integrand = data_cl['throttle_cl'] ** 2
+    f6_cal = 0
+    for i in plt.arange(0, len(integrand) - 1, 1):
+        f6_cal = f6_cal + 0.5 * (integrand[i] + integrand[i + 1]) * data_cl['dt_cl']
+
     if ak == 1:
         print("\n")
         print('Integrated feature values of the DATA ')
@@ -94,6 +105,10 @@ def import_data2(file,ak):
         print(f3_cal)
         print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
         print(f4_cal)
+        print('integrand = plt.squeeze(psi_dot) ** 2)')
+        print(f5_cal)
+        print('integrand = plt.squeeze(throttle) ** 2)')
+        print(f6_cal)
 
     features = plt.array([f0_cal,f1_cal,f2_cal,f3_cal,f4_cal])
     data_cl['features'] = features

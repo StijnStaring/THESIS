@@ -4,14 +4,22 @@ from define_plots import define_plots
 from derivative import derivative
 from casadi import *
 
-def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
+def optim_weights_ideal(hotstart,hotstart_prev,turn,theta,width_road,vx_start,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
     # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
     theta = plt.squeeze(theta)
-    norm0 = 0.007276047781441449
-    norm1 = 2.6381715506137424
-    norm2 = 11.283498669013454
-    norm3 = 0.046662223759442054
-    norm4 = 17.13698903738383
+    # norm0 = 0.007276047781441449
+    # norm1 = 2.6381715506137424
+    # norm2 = 11.283498669013454
+    # norm3 = 0.046662223759442054
+    # norm4 = 17.13698903738383
+
+    # new normalization factors used --> match with ones used in generation of data:
+    norm0 = 0.01771643076015521
+    norm1 = 6.212356102257129
+    norm2 = 13.406714242332825
+    norm3 = 0.44202802570958727
+    norm4 = 85.08816462788056
+
     # norm0 = 1.0
     # norm1 = 1.0
     # norm2 = 1.0
@@ -280,12 +288,19 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     print('Relative weights: ', theta)
 
     # Implementation of the solver
+    if len(hotstart_prev) != 0:
+        opti.set_initial(opti.x, hotstart_prev[turn][0])  # decision variables
+        opti.set_initial(opti.lam_g, hotstart_prev[turn][1])  # multipliers
+
     opti.solver('ipopt')
     sol = opti.solve()
 
     # ----------------------------------
     #    Post processing
     # ----------------------------------
+    # Set the initial values to the previous results
+    hotstart.append([sol.value(opti.x),sol.value(opti.lam_g)])
+
     x_sol = sol.value(x)
     y_sol = sol.value(y)
     vx_sol = sol.value(vx)
@@ -366,6 +381,19 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     f3 = sol.value(f3_cal)
     f4 = sol.value(f4_cal)
 
+    # solution of features 5 and 6
+    # f5: yaw rate of the vehicle
+    integrand = psi_dot_sol** 2
+    f5 = 0
+    for i in plt.arange(0, len(integrand) - 1, 1):
+        f5 = f5 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_sol
+
+    # f6: throttle (accelerating and bracking) --> relation with ax
+    integrand = throttle_sol ** 2
+    f6 = 0
+    for i in plt.arange(0, len(integrand) - 1, 1):
+        f6 = f6 + 0.5 * (integrand[i] + integrand[i + 1]) * dt_sol
+
     print("\n")
     print('Integrated feature values: iterations ',str(iteration))
     print('------------------------------')
@@ -379,6 +407,10 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     print(f3)
     print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
     print(f4)
+    print('integrand = plt.squeeze(psi_dot) ** 2)')
+    print(f5)
+    print('integrand = plt.squeeze(throttle) ** 2)')
+    print(f6)
     print('dt of the optimization is: ', dt_sol)
 
     data_s = dict()
@@ -456,6 +488,6 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
         axcom8b.legend()
         axcom9.legend()
 
-    return data_s, features
+    return data_s, features,hotstart
 
 

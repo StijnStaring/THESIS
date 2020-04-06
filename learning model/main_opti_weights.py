@@ -89,6 +89,9 @@ print('av_features_data: ',av_features_data)
 solutions = []
 f_calc_rel = plt.zeros([amount_features,1])
 dict_sol_list = []
+his_hotstart = []
+hotstart = []
+hotstart_prev = []
 converged = 0
 grad_prev = plt.zeros([amount_features,1])
 
@@ -98,11 +101,14 @@ while converged != 1 and rec <= 200:
     print('Iteration: ', rec)
     print('This is the difference of theta: ', theta_chosen - theta)
     his_diff_theta.append([str(rec) + "//", theta_chosen - theta])
+    if len(his_hotstart) != 0:
+        hotstart_prev = his_hotstart[-1]
 
     for k in range(len(file_list)):
         file = file_list[k]
         curr_data = data_list[k]
-        [data_s, f_calc] = optim_weights_ideal(theta,curr_data["width_road"],curr_data["vx_start"],curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
+        [data_s, f_calc,hotstart] = optim_weights_ideal(hotstart,hotstart_prev,k,theta,curr_data["width_road"],curr_data["vx_start"],curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
+
         dict_sol_list.append(data_s)
 
     # Calculating averaged calculated solution
@@ -196,9 +202,11 @@ while converged != 1 and rec <= 200:
 
     # solutions.append([str(rec) + "//", dict_sol_list])
     solutions.append(dict_sol_list)
+    his_hotstart.append(hotstart)
     f_calc_rel = []
     grad_curr_list = []
     dict_sol_list = []
+    hotstart = []
 
     print("********************************************************************************************")
 

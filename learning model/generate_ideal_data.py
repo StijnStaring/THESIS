@@ -24,15 +24,41 @@ from casadi import *
 # [_,_,_,_,_,init_matrix,des_matrix,dict_list,files] = import_data(0)
 # width_road = 3.46990715
 # vx_start = 23.10159175
-time_guess = 4.01
+# time_guess = 4.01
 data_cl = import_ideal_data()
 
 # theta = plt.array([4,5,6,1,2]) en met data guess 1 berekende norm waarden en data guess 1 zelf. (example lane change)
-norm0 = 0.007276047781441449
-norm1 = 2.6381715506137424
-norm2 = 11.283498669013454
-norm3 = 0.046662223759442054
-norm4 = 17.13698903738383
+# old ones
+# norm0 = 0.007276047781441449
+# norm1 = 2.6381715506137424
+# norm2 = 11.283498669013454
+# norm3 = 0.046662223759442054
+# norm4 = 17.13698903738383
+
+# new ones - retrieved from
+# norm0 = 0.014875239918496064
+# norm1 = 3.3273182501571386
+# norm2 = 5.235429169537848
+# norm3 = 0.26089346699488375
+# norm4 = 103.30331209757703
+# norm5 = 0.005633029563200289
+# norm6 = 9.063828849890758e-05
+
+norm0 = 0.01771643076015521
+norm1 = 6.212356102257129
+norm2 = 13.406714242332825
+norm3 = 0.44202802570958727
+norm4 = 85.08816462788056
+norm5 = 0.010705633636739148
+norm6 = 0.00017100278526273633
+
+# norm0 = 1.0
+# norm1 = 1.0
+# norm2 = 1.0
+# norm3 = 1.0
+# norm4 = 1.0
+# norm5 = 1.0
+# norm6 = 1.0
 
 # data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
@@ -72,6 +98,7 @@ psi_guess = signal.resample(data_cl['psi_cl'],N+1).T
 psi_dot_guess = signal.resample(data_cl['psi_dot_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
 delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siemens --> SWA not 40 degrees
+time_guess = data_cl['time_cl'][-1]
 # time_guess = des_matrix[0,2]
 # delta_guess = generate_delta_guess(time_guess,N)[plt.newaxis,:]
 # plt.figure()
@@ -86,6 +113,9 @@ delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siem
 # ----------------------------------
 vx_start_a = plt.array([80/3.6,90/3.6,100/3.6,110/3.6])
 width_road_a = plt.array([3.46990715, 3.46990715*2])
+# vx_start_a = plt.array([90/3.6])
+# width_road_a = plt.array([3.46990715*2])
+
 # vx_start_a = plt.array([80/3.6])
 # width_road_a = plt.array([3.46990715])
 for vx_start in vx_start_a:
@@ -96,8 +126,8 @@ for vx_start in vx_start_a:
         # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
         # theta = plt.array([4,5,6,1,2]) # deze wegingsfactoren dienen achterhaald te worden. (in ax en ay zit ook de normal acceleration)
         # theta = plt.array([4,5,6,1,2])
-        theta = plt.array([4,5,6,1,2])
-
+        theta = plt.array([4,5,6,1,2,3,2])
+        # theta = plt.array([1,1,1,1,1,1,1])
         # Equations of the vehicle model
         x = MX.sym('x') # in global axis
         y = MX.sym('y') # in global axis
@@ -279,6 +309,14 @@ for vx_start in vx_start_a:
         for k in range(N+1):
             y_des_list.append(y[k]-width_road)
 
+        psi_dot_list = []
+        for k in range(N + 1):
+            psi_dot_list.append(psi_dot[k])
+
+        throttle_list = []
+        for k in range(N):
+            throttle_list.append(throttle[k])
+
         # Extra constraints on acceleration and jerk:
         opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
         opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
@@ -325,12 +363,23 @@ for vx_start in vx_start_a:
             f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
         # f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
+        # f5: yaw rate of the vehicle
+        integrand = plt.array(psi_dot_list) ** 2
+        f5_cal = 0
+        for i in plt.arange(0, len(integrand) - 1, 1):
+            f5_cal = f5_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
+
+        # f6: throttle (accelerating and bracking) --> relation with ax
+        integrand = plt.array(throttle_list) ** 2
+        f6_cal = 0
+        for i in plt.arange(0, len(integrand) - 1, 1):
+            f6_cal = f6_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
 
         # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-        opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
+        opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal+theta[6]/norm6*f6_cal)
         # opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
 
-        print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4]))
+        print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5,norm6]))
         print('Relative weights: ', theta)
 
         # Implementation of the solver
@@ -426,6 +475,10 @@ for vx_start in vx_start_a:
         print(sol.value(f3_cal))
         print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
         print(sol.value(f4_cal))
+        print('integrand = plt.squeeze(psi_dot) ** 2)')
+        print(sol.value(f5_cal))
+        print('integrand = plt.squeeze(throttle) ** 2)')
+        print(sol.value(f6_cal))
 
         # ----------------------------------
         #    Storing of data in csv-file

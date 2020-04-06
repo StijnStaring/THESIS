@@ -60,34 +60,48 @@ data_average = ['111//', [plt.array([[1.00003019],
        [1.0004103 ],
        [1.00017899]])]]
 
-data_conflict = ['17//', [plt.array([[0.99889349],
-       [0.99992747],
-       [1.01140094],
-       [0.99539895],
-       [1.00052086]]), plt.array([[1.00268378],
-       [0.98423694],
-       [0.98948475],
-       [1.00947011],
-       [1.00485724]]), plt.array([[0.99456194],
-       [1.01872307],
-       [1.04055215],
-       [0.9758468 ],
-       [0.99630615]])]]
+data_am = ['200//', [plt.array([[0.99350915],
+ [1.02572855],
+ [1.02509922],
+ [0.97819004],
+ [0.99380865]]),  plt.array([[1.00101583],
+ [0.99938828],
+ [0.9875581 ],
+ [1.0035735 ],
+ [1.00055727]]),  plt.array([[1.00358855],
+ [0.98086201],
+ [0.99720561],
+ [1.01190786],
+ [1.00415984]])]]
 
-data_seq = ['1//', [plt.array([[0.99372266],
- [1.0364602 ],
- [1.05047609],
- [0.96796123],
- [0.99053099]]), plt.array([[1.01466279],
- [0.94177966],
- [0.91670696],
- [1.05395378],
- [1.01738989]])]]
+# data_conflict = ['17//', [plt.array([[0.99889349],
+#        [0.99992747],
+#        [1.01140094],
+#        [0.99539895],
+#        [1.00052086]]), plt.array([[1.00268378],
+#        [0.98423694],
+#        [0.98948475],
+#        [1.00947011],
+#        [1.00485724]]), plt.array([[0.99456194],
+#        [1.01872307],
+#        [1.04055215],
+#        [0.9758468 ],
+#        [0.99630615]])]]
+
+# data_seq = ['1//', [plt.array([[0.99372266],
+#  [1.0364602 ],
+#  [1.05047609],
+#  [0.96796123],
+#  [0.99053099]]), plt.array([[1.01466279],
+#  [0.94177966],
+#  [0.91670696],
+#  [1.05395378],
+#  [1.01738989]])]]
 
 
 acc_a = accuracy(data_average,5)
-acc_c = accuracy(data_conflict,5)
-acc_s = accuracy(data_seq,5)
+# acc_c = accuracy(data_conflict,5)
+acc_am = accuracy(data_am,5)
 
 
 # # Accuracy figure
@@ -114,8 +128,8 @@ plt.grid(True)
 
 features = [0,1,2,3,4]
 acc.plot(features, acc_a, '-',marker = '*',linewidth=3.0)
-acc.plot(features, acc_c, '-',marker = 'o',linewidth=3.0)
-acc.plot(features, acc_s, '-',marker = 's',linewidth=3.0)
-plt.legend(['Average method','Conflict method','Seq method'])
+# acc.plot(features, acc_c, '-',marker = 'o',linewidth=3.0)
+acc.plot(features, acc_am, '-',marker = 's',linewidth=3.0)
+plt.legend(['Standard AM','More features AM'])
 plt.show()
 

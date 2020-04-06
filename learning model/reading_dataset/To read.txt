@@ -1,0 +1,2 @@
+this csv file is used so in order to avoid a solution that is driving 
+very brusque.
