@@ -122,7 +122,6 @@ while converged != 1 and rec <= 200:
     axfn.plot([av_features_calc[0], av_features_calc[1], av_features_calc[2], av_features_calc[3], av_features_calc[4]], '-', marker='o', markersize=6,label="Calc Features iter: " + str(rec))
     axfn.legend()
 
-
     print("----------------------------------------------")
     print('This is f_calc_rel: ')
     print(str(rec) + "// ", f_calc_rel)
