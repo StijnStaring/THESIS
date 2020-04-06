@@ -13,7 +13,7 @@ def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,conflict_flags,in
 
     # algorithm
     for i in plt.arange(0,length,1):
-        if index_fixed_value == 1:
+        if i == index_fixed_value:
             w_new[i] = w_curr[i]
         else:
             print('feature in RPROP  = ',i)
