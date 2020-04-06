@@ -55,7 +55,7 @@ theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0]])
 # theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
 
 # Plotting
-######################
+###################### 
 plotting_calc = 0
 axcom1a =0; axcom1b=0; axcom2=0; axcom3a=0;axcom3b=0;axcom4a=0;axcom4b=0;axcom5a=0;axcom5b=0
 axcom6a=0;axcom6b=0;axcom7a=0;axcom7b=0;axcom8a=0;axcom8b=0;axcom9=0;axf=0;axfn=0;acw=0
