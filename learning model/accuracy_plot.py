@@ -133,44 +133,6 @@ import pylab as plt
 
 #####################################################################################################################
 #####################################################################################################################
-data_V22_L3 = ['1//', [plt.array([[1.00003019],
-       [0.99974506],
-       [0.99989975],
-       [1.00011264],
-       [1.0000876 ]])]]
-
-
-data_V22_L6 = ['1//', [plt.array([[0.99990027],
-       [1.0002674 ],
-       [1.00059783],
-       [0.99948536],
-       [0.99997304]])]]
-#
-data_V25_L3 = ['1//', [plt.array([[1.00011468],
-       [0.99940836],
-       [0.99942557],
-       [1.0004103 ],
-       [1.00017899]])]]
-
-
-data_V22_L3_a = ['1//', [plt.array([[1.00003673],
- [0.9997213 ],
- [0.99981519],
- [1.00013025],
- [1.00011234]])]]
-
-
-data_V22_L6_a = ['1//', [plt.array([[0.99987162],
- [1.00038572],
- [1.00068069],
- [0.99933004],
- [0.9999664 ]])]]
-
-data_V25_L3_a = ['1//', [plt.array([[1.00014396],
- [0.99929104],
- [0.99921824],
- [1.00051168],
- [1.0002288 ]])]]
 
 
 def accuracy(data,amount_features):
@@ -182,14 +144,39 @@ def accuracy(data,amount_features):
 
     return sum5 / len(data[1])
 
+data_conflict = ['17//', [plt.array([[0.99889349],
+       [0.99992747],
+       [1.01140094],
+       [0.99539895],
+       [1.00052086]]), plt.array([[1.00268378],
+       [0.98423694],
+       [0.98948475],
+       [1.00947011],
+       [1.00485724]]), plt.array([[0.99456194],
+       [1.01872307],
+       [1.04055215],
+       [0.9758468 ],
+       [0.99630615]])]]
+
+data_conflict_a = ['21//', [plt.array([[1.00204961],
+       [1.0080903 ],
+       [0.95750835],
+       [1.00591906],
+       [1.00403272]]), plt.array([[0.99448379],
+       [1.05350138],
+       [1.00799275],
+       [0.96608065],
+       [0.99211508]]), plt.array([[1.00721714],
+       [0.9861091 ],
+       [0.93144953],
+       [1.02511269],
+       [1.01047258]])]]
 
 
-acc_V22_L3 = accuracy(data_V22_L3 ,5)
-acc_V22_L6 = accuracy(data_V22_L6 ,5)
-acc_V25_L3 = accuracy(data_V25_L3 ,5)
-acc_V22_L3_a = accuracy(data_V22_L3_a ,5)
-acc_V22_L6_a = accuracy(data_V22_L6_a ,5)
-acc_V25_L3_a = accuracy(data_V25_L3_a ,5)
+
+acc_error = accuracy(data_conflict ,5)
+acc_error_a = accuracy(data_conflict_a ,5)
+
 
 # Accuracy figure
 plt.figure("Average error between f_calculated and f_data")
@@ -200,12 +187,8 @@ plt.title("Comparison average error between different methods",fontsize=14)
 plt.grid(True)
 
 features = [0,1,2,3,4]
-acc.plot(features, acc_V22_L3, '-',marker = '*',linewidth=3.0)
-acc.plot(features, acc_V22_L6, '-',marker = '*',linewidth=3.0)
-acc.plot(features, acc_V25_L3, '-',marker = '*',linewidth=3.0)
-acc.plot(features, acc_V22_L3_a, '-',marker = 'o',linewidth=3.0)
-acc.plot(features, acc_V22_L6_a, '-',marker = 'o',linewidth=3.0)
-acc.plot(features, acc_V25_L3_a, '-',marker = 'o',linewidth=3.0)
-plt.legend(['data_V22_L3','data_V22_L6','data_V25_L3','data_V22_L3_a','data_V22_L6_a','data_V25_L3_a'])
+acc.plot(features, acc_error, '-',marker = '*',linewidth=3.0)
+acc.plot(features, acc_error_a, '-',marker = 'o',linewidth=3.0)
+plt.legend(['data_conflict','data_conflict_NS'])
 plt.show()
 

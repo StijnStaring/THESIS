@@ -95,7 +95,7 @@ converged = 0
 grad_prev = plt.zeros([amount_features,1])
 
 # while rec <= 2:
-while converged != 1 and rec <= 200:
+while converged != 1 and rec <= 300:
     converged = 0
     print('Iteration: ', rec)
     print('This is the difference of theta: ', theta_chosen - theta)
