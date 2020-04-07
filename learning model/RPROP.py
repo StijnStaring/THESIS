@@ -1,4 +1,4 @@
-def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,conflict_flags):
+def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,conflict_flags,index_of_fixed_feature):
     import pylab as plt
     # Expects grad in shape n x 1
     # definition of parameters:
@@ -13,34 +13,37 @@ def RPROP(grad_curr,n_neg,case,length,update,w_curr,del_w_prev,conflict_flags):
 
     # algorithm
     for i in plt.arange(0,length,1):
-        print('feature in RPROP  = ',i)
-        print('\n')
-
-        if conflict_flags[i] == 1:
-            del_w[i] = 0
+        if i == index_of_fixed_feature:
             w_new[i] = w_curr[i]
-            exception[i] = 1 # Stands for in conflict - after is solved --> go to case 3
-
         else:
-            if case[i] == 1:
-                update[i] = min(update[i]*n_pos,del_max)
-                del_w[i] = -plt.sign(grad_curr[i])*update[i]
-                w_new[i] = w_curr[i] + del_w[i]
-                exception[i] = 0
-                print('2x pos grad')
+            print('feature in RPROP  = ',i)
+            print('\n')
 
-            elif case[i] == 2:
-                update[i] = max(update[i] * n_neg, del_min)
-                del_w[i] = - del_w_prev[i]
-                w_new[i] = w_curr[i] +del_w[i]
-                exception[i] = 1
-                print('2x neg grad')
+            if conflict_flags[i] == 1:
+                del_w[i] = 0
+                w_new[i] = w_curr[i]
+                exception[i] = 1 # Stands for in conflict - after is solved --> go to case 3
 
-            elif case[i] == 3:
-                del_w[i] = -plt.sign(grad_curr[i]) * update[i]
-                w_new[i] = w_curr[i] + del_w[i]
-                exception[i] = 0
-                print('2x grad = 0')
+            else:
+                if case[i] == 1:
+                    update[i] = min(update[i]*n_pos,del_max)
+                    del_w[i] = -plt.sign(grad_curr[i])*update[i]
+                    w_new[i] = w_curr[i] + del_w[i]
+                    exception[i] = 0
+                    print('2x pos grad')
+
+                elif case[i] == 2:
+                    update[i] = max(update[i] * n_neg, del_min)
+                    del_w[i] = - del_w_prev[i]
+                    w_new[i] = w_curr[i] +del_w[i]
+                    exception[i] = 1
+                    print('2x neg grad')
+
+                elif case[i] == 3:
+                    del_w[i] = -plt.sign(grad_curr[i]) * update[i]
+                    w_new[i] = w_curr[i] + del_w[i]
+                    exception[i] = 0
+                    print('2x grad = 0')
 
     for i in plt.arange(0,len(update),1):
         update_out[i] = update[i] # now is pointing to local defined here

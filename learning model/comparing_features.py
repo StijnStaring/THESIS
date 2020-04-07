@@ -105,7 +105,7 @@ def comparing_features(data_cl,file_name):
 
     # yaw(t)/yaw/s(t)
 
-    plt.figure("Yaw angle: iter ", figsize=(10, 4))
+    plt.figure("Yaw angle", figsize=(10, 4))
     plt.subplot(1, 2, 1)
     axcom6a = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
@@ -121,7 +121,7 @@ def comparing_features(data_cl,file_name):
     plt.grid(True)
 
     # Inputs
-    plt.figure("throttle: iter ", figsize=(10, 4))
+    plt.figure("throttle", figsize=(10, 4))
     plt.subplot(1, 2, 1)
     axcom7a = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
@@ -137,7 +137,7 @@ def comparing_features(data_cl,file_name):
     plt.grid(True)
 
     # Different parts of the local lateral acceleration
-    plt.figure("Ayt: iter ", figsize=(10, 4))
+    plt.figure("Ayt", figsize=(10, 4))
     plt.subplot(1, 2, 1)
     axcom8a = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
@@ -154,7 +154,7 @@ def comparing_features(data_cl,file_name):
 
     # yaw acceleration
 
-    plt.figure("Yaw acceleration: iter ", figsize=(10, 4))
+    plt.figure("Yaw acceleration", figsize=(10, 4))
     axcom9 = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("Yaw acceleration [degrees/s^2]", fontsize=14)

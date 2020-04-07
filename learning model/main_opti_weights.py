@@ -23,6 +23,7 @@ import glob
 # Defining weights
 ##################
 # sns.set_palette(sns.color_palette("hls", 15))
+index_of_fixed_feature = 1
 his_diff_theta = []
 his_multi_grads = []
 his_grad_current = []
@@ -75,8 +76,10 @@ for file in file_list:
     data_list.append(data_cl)
     [axf, acw, axfn, axcom1a, axcom1b, axcom2, axcom3a, axcom3b, axcom4a, axcom4b, axcom5a, axcom5b, axcom6a, axcom6b,axcom7a, axcom7b, axcom8a, axcom8b, axcom9] = comparing_features(data_cl,file)
     # plotting
-    axf.plot([1, 1, 1, 1, 1], '-', marker='*', markersize=6, label="Observed features")
-    axfn.plot([f_data[0], f_data[1], f_data[2], f_data[3], f_data[4]], '-', marker='*', markersize=6,label="Observed features")
+    axf.plot([1, 1, 1, 1, 1], '-', marker='*', markersize=6, label= file[16:-4])
+    axfn.plot([f_data[0], f_data[1], f_data[2], f_data[3], f_data[4]], '-', marker='*', markersize=6,label=file[16:-4])
+    axf.legend()
+    axfn.legend()
     ###########
 
 solutions = []
@@ -107,10 +110,10 @@ while any(converged != 1):
         print('This is grad current: ' + file[16:-4], plt.sum(plt.absolute(grad_curr)))
         print('\n')
         grad_curr_list.append(grad_curr)
-        axf.plot([f_calc_rel[k][0], f_calc_rel[k][1], f_calc_rel[k][2], f_calc_rel[k][3], f_calc_rel[k][4]], '-', marker='o', markersize=6,label="Calc Features iter: " + str(rec)+"/"+file[6:])
-        axf.legend()
-        axfn.plot([f_calc[0], f_calc[1], f_calc[2], f_calc[3], f_calc[4]], '-', marker='o', markersize=6,label="Calc Features iter: " + str(rec))
-        axfn.legend()
+        axf.plot([f_calc_rel[k][0], f_calc_rel[k][1], f_calc_rel[k][2], f_calc_rel[k][3], f_calc_rel[k][4]], '-', marker='o', markersize=6)
+
+        axfn.plot([f_calc[0], f_calc[1], f_calc[2], f_calc[3], f_calc[4]], '-', marker='o', markersize=6)
+
 
 
     print("----------------------------------------------")
@@ -178,12 +181,11 @@ while any(converged != 1):
 
     if any(converged != 1):
         length = amount_features
-        [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0],n_neg,case,length,update,theta,del_theta_prev,conflict_flags)
+        [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0],n_neg,case,length,update,theta,del_theta_prev,conflict_flags,index_of_fixed_feature)
         grad_prev_list = grad_curr_list
         rec = rec + 1
         his_weights.append([str(rec) + "//", theta])
-        acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4]], '-', marker='o', markersize=6,label="iter " + str(rec))
-        acw.legend()
+        acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4]], '-', marker='o', markersize=6)
 
     # solutions.append([str(rec) + "//", dict_sol_list])
     solutions.append(dict_sol_list)
