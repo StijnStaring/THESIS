@@ -75,8 +75,10 @@ for file in file_list:
     data_list.append(data_cl)
     [axf, acw, axfn, axcom1a, axcom1b, axcom2, axcom3a, axcom3b, axcom4a, axcom4b, axcom5a, axcom5b, axcom6a, axcom6b,axcom7a, axcom7b, axcom8a, axcom8b, axcom9] = comparing_features(data_cl,file)
     # plotting
-    axf.plot([1, 1, 1, 1, 1], '-', marker='*', markersize=6, label="Observed features")
-    axfn.plot([f_data[0], f_data[1], f_data[2], f_data[3], f_data[4]], '-', marker='*', markersize=6,label="Observed features")
+    axf.plot([1, 1, 1, 1, 1], '-', marker='*', markersize=6, label = file[16:-4])
+    axf.legend()
+    axfn.plot([f_data[0], f_data[1], f_data[2], f_data[3], f_data[4]], '-', marker='*', markersize=6,label = file[16:-4])
+    axfn.legend()
     ###########
 
 # Calculate the averaged
@@ -117,10 +119,8 @@ while converged != 1 and rec <= 200:
     grad_curr = av_features_data - av_features_calc
     print('This is summed grad current: ', plt.sum(plt.absolute(grad_curr)))
     print('\n')
-    axf.plot([f_calc_rel[0], f_calc_rel[1], f_calc_rel[2], f_calc_rel[3], f_calc_rel[4]], '-', marker='o', markersize=6,label="Calc Features iter: " + str(rec))
-    axf.legend()
-    axfn.plot([av_features_calc[0], av_features_calc[1], av_features_calc[2], av_features_calc[3], av_features_calc[4]], '-', marker='o', markersize=6,label="Calc Features iter: " + str(rec))
-    axfn.legend()
+    axf.plot([f_calc_rel[0], f_calc_rel[1], f_calc_rel[2], f_calc_rel[3], f_calc_rel[4]], '-', marker='o', markersize=6)
+    axfn.plot([av_features_calc[0], av_features_calc[1], av_features_calc[2], av_features_calc[3], av_features_calc[4]], '-', marker='o', markersize=6)
 
     print("----------------------------------------------")
     print('This is f_calc_rel: ')
@@ -190,8 +190,7 @@ while converged != 1 and rec <= 200:
         grad_prev = grad_curr
         rec = rec + 1
         his_weights.append([str(rec) + "//", theta])
-        acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4]], '-', marker='o', markersize=6,label="iter " + str(rec))
-        acw.legend()
+        acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4]], '-', marker='o', markersize=6)
 
     # solutions.append([str(rec) + "//", dict_sol_list])
     solutions.append(dict_sol_list)
