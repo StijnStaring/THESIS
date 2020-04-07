@@ -94,6 +94,85 @@ import pylab as plt
 # plt.legend(['5 datasets','3 datasets'])
 # plt.show()
 
+
+
+# data_V22_L6 = ['1//', [plt.array([[0.99372266],
+#        [1.0364602 ],
+#        [1.05047609],
+#        [0.96796123],
+#        [0.99053099]])]]
+#
+# data_V25_L3 = ['1//', [plt.array([[1.01466279],
+#        [0.94177966],
+#        [0.91670696],
+#        [1.05395378],
+#        [1.01738989]])]]
+#
+# data_V22_L6_a = ['1//', [plt.array([[0.99324901],
+#        [1.03941249],
+#        [1.05436148],
+#        [0.96550211],
+#        [0.98981001]])]]
+#
+# data_V25_L3_a = ['1//', [plt.array([[1.01502664],
+#        [0.94043785],
+#        [0.91469953],
+#        [1.05530596],
+#        [1.01782593]])]]
+#
+# acc_V22_L6 = accuracy(data_V22_L6 ,5)
+# acc_V25_L3 = accuracy(data_V25_L3 ,5)
+# acc_V22_L6_a = accuracy(data_V22_L6_a ,5)
+# acc_V25_L3_a = accuracy(data_V25_L3_a ,5)
+
+
+
+
+
+
+
+#####################################################################################################################
+#####################################################################################################################
+data_V22_L3 = ['1//', [plt.array([[1.00003019],
+       [0.99974506],
+       [0.99989975],
+       [1.00011264],
+       [1.0000876 ]])]]
+
+
+data_V22_L6 = ['1//', [plt.array([[0.99990027],
+       [1.0002674 ],
+       [1.00059783],
+       [0.99948536],
+       [0.99997304]])]]
+#
+data_V25_L3 = ['1//', [plt.array([[1.00011468],
+       [0.99940836],
+       [0.99942557],
+       [1.0004103 ],
+       [1.00017899]])]]
+
+
+data_V22_L3_a = ['1//', [plt.array([[1.00003673],
+ [0.9997213 ],
+ [0.99981519],
+ [1.00013025],
+ [1.00011234]])]]
+
+
+data_V22_L6_a = ['1//', [plt.array([[0.99987162],
+ [1.00038572],
+ [1.00068069],
+ [0.99933004],
+ [0.9999664 ]])]]
+
+data_V25_L3_a = ['1//', [plt.array([[1.00014396],
+ [0.99929104],
+ [0.99921824],
+ [1.00051168],
+ [1.0002288 ]])]]
+
+
 def accuracy(data,amount_features):
     ref = plt.ones([amount_features,1])
     sum5 = plt.zeros([amount_features, 1])
@@ -103,32 +182,12 @@ def accuracy(data,amount_features):
 
     return sum5 / len(data[1])
 
-data_V22_L6 = ['1//', [plt.array([[0.99372266],
-       [1.0364602 ],
-       [1.05047609],
-       [0.96796123],
-       [0.99053099]])]]
 
-data_V25_L3 = ['1//', [plt.array([[1.01466279],
-       [0.94177966],
-       [0.91670696],
-       [1.05395378],
-       [1.01738989]])]]
 
-data_V22_L6_a = ['1//', [plt.array([[0.99324901],
-       [1.03941249],
-       [1.05436148],
-       [0.96550211],
-       [0.98981001]])]]
-
-data_V25_L3_a = ['1//', [plt.array([[1.01502664],
-       [0.94043785],
-       [0.91469953],
-       [1.05530596],
-       [1.01782593]])]]
-
+acc_V22_L3 = accuracy(data_V22_L3 ,5)
 acc_V22_L6 = accuracy(data_V22_L6 ,5)
 acc_V25_L3 = accuracy(data_V25_L3 ,5)
+acc_V22_L3_a = accuracy(data_V22_L3_a ,5)
 acc_V22_L6_a = accuracy(data_V22_L6_a ,5)
 acc_V25_L3_a = accuracy(data_V25_L3_a ,5)
 
@@ -141,10 +200,12 @@ plt.title("Comparison average error between different methods",fontsize=14)
 plt.grid(True)
 
 features = [0,1,2,3,4]
+acc.plot(features, acc_V22_L3, '-',marker = '*',linewidth=3.0)
 acc.plot(features, acc_V22_L6, '-',marker = '*',linewidth=3.0)
 acc.plot(features, acc_V25_L3, '-',marker = '*',linewidth=3.0)
+acc.plot(features, acc_V22_L3_a, '-',marker = 'o',linewidth=3.0)
 acc.plot(features, acc_V22_L6_a, '-',marker = 'o',linewidth=3.0)
 acc.plot(features, acc_V25_L3_a, '-',marker = 'o',linewidth=3.0)
-plt.legend(['data_V22_L6','data_V25_L3','data_V22_L6_a','data_V25_L3_a'])
+plt.legend(['data_V22_L3','data_V22_L6','data_V25_L3','data_V22_L3_a','data_V22_L6_a','data_V25_L3_a'])
 plt.show()
 
