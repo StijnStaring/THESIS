@@ -1,16 +1,16 @@
 <properties xmlns="amesim-property-instances" version="1">
- <property id="id0" sticker="" target="model:" name="@special:model_history">
+ <property name="@special:model_history" target="model:" id="id0" sticker="">
   <struct/>
  </property>
- <property id="id4" sticker="" target="model:" name="@special:prepost_tools_document_scripts">
+ <property name="@special:prepost_tools_document_scripts" target="model:" id="id4" sticker="">
   <struct/>
  </property>
- <property id="id1" target="model:" name="@special:prepost_tools_document_plots">
+ <property name="@special:prepost_tools_document_plots" target="model:" id="id1">
   <struct/>
  </property>
- <property id="id2" target="model:" name="@special:prepost_tools_document_animations">
+ <property name="@special:prepost_tools_document_animations" target="model:" id="id2">
   <struct>
-   <attribute name="handle_75b7">
+   <attribute name="handle_283d">
     <struct>
      <attribute name="PP_TOOLS_TITLE_ATTRIBUTE">
       <data typename="simple-text">DoubleLaneChange</data>
@@ -25,9 +25,9 @@
    </attribute>
   </struct>
  </property>
- <property id="id3" target="model:" name="@special:prepost_tools_document_dashboards">
+ <property name="@special:prepost_tools_document_dashboards" target="model:" id="id3">
   <struct>
-   <attribute name="handle_adc">
+   <attribute name="handle_782b">
     <struct>
      <attribute name="PP_TOOLS_TITLE_ATTRIBUTE">
       <data typename="simple-text">Dashboard 1</data>

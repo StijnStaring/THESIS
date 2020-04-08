@@ -1,6 +1,7 @@
 %% CasADi Function generation of Optimal Planning Module
 % this code is used for the planning
 
+% addpath('C:\ProgramsX100\Matlab\casadi-windows-matlabR2016a-v3.5.1')
 import casadi.*
 
 N = 50;
@@ -135,8 +136,9 @@ opti.solver('ipopt',opts);
 
 % CasADi function object: map from initial states to first computed control
 % input (receding horizon)
-Planner = opti.to_function('M',{states, ref_v, rl, ml, ll, cen1, coeffr, coeffl, x},{x},...
-                          {'initial_X', 'ref_v', 'rl', 'ml', 'll', 'cen', 'coeffr', 'coeffl', 'initGuess_X'},{'XSol'});
 
-
-save('Planner','Planner')
+% Planner = opti.to_function('M',{states, ref_v, rl, ml, ll, cen1, coeffr, coeffl, x},{x},...
+%                           {'initial_X', 'ref_v', 'rl', 'ml', 'll', 'cen', 'coeffr', 'coeffl', 'initGuess_X'},{'XSol'});
+% 
+% 
+% save('Planner','Planner')

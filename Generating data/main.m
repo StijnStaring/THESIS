@@ -41,7 +41,7 @@ Planner = Plannerstr.Planner;
 
 %% run simulation
 open('amesimcar_pathplannerv2');
-sim('amesimcar_pathplannerv2');
+sim('amesimcar_pathplannerv2'); % This is running the simulink file
 
 %% Figures and save data
 
