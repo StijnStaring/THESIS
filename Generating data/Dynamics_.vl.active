@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE VL.ACTIVE>
-<VL_ACTIVE checksum="2685666406" VersionId="17.0.0 - 76512-75252 2018" DOC_VERSION="1">
- <RUN_LIST>
-  <RUN checksum="2685666406" DATE="Fri Jan 17 09:44:05 2020" dataset="ref"/>
- </RUN_LIST>
-</VL_ACTIVE>
