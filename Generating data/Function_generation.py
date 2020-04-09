@@ -22,8 +22,8 @@ from scipy import signal
 import scipy.io as sio
 # from import_data import import_data
 from import_ideal_data import import_ideal_data
-from define_plots import define_plots
-from derivative import derivative
+# from define_plots import define_plots
+# from derivative import derivative
 # from find_nearest import find_nearest
 # from generate_delta_guess import generate_delta_guess
 from casadi import *
@@ -172,6 +172,12 @@ opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
 # opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
 opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road
 opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
+
+# Extra vehicle constraints implemented
+opti.subject_to(opti.bounded(-0.4,vy,0.4))
+opti.subject_to(opti.bounded(-10*plt.pi/180,psi,10*plt.pi/180))
+opti.subject_to(opti.bounded(-7*plt.pi/180,psi_dot,7*plt.pi/180))
+
 
 # Initial constraints
 # states: x, y, vx, vy, psi, psi_dot
@@ -348,21 +354,15 @@ inputs = [X0,theta,width_road,opti.x,opti.lam_g]
 outputs = [U[:,0],opti.x,opti.lam_g]
 planner = opti.to_function('planner',inputs,outputs)
 
-toto = np.zeros((1,), dtype=np.object)
-toto[0]={}
-toto[0]['x_sol_prev']=[sol.value(opti.x)]
-toto[0]['lam_prev']=[sol.value(opti.lam_g)]
-sio.savemat('toto.mat', {'toto':toto})
-print('toto: ',toto)
+previous_solution = np.zeros((1,), dtype=np.object)
+previous_solution[0]={}
+previous_solution[0]['x_sol_prev']=[sol.value(opti.x)]
+previous_solution[0]['lam_prev']=[sol.value(opti.lam_g)]
+sio.savemat('previous_solution.mat', {'previous_solution':previous_solution})
+print('previous_solution: ',previous_solution)
 print('');print('Simulation completed!')
-planner.save('planner.casadi')
+planner.save('planner_lane_change.casadi')
 # use DM.set_precision(15) when load function
-
-
-
-
-
-
 
 
 # # ----------------------------------

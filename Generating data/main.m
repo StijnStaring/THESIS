@@ -8,16 +8,14 @@ clc
 % Do NOT change:
 x0 = 0;
 y0 = 0;
-vx0 = 0;
 vy0 = 0;
-phi0 = 0;
-phi_dot0 = 0;
+psi0 = 0;
+psi_dot0 = 0;
 % Maneuver specific variables
 lane_change = 1;
 v0 = 80/3.6; % [m/s]
-width_road = 3.47;
-N = 100;
-
+width_road = 3.46990715;
+% N = 100 --> used in python code
 
 % Simulation sampling time
 Ts = 0.01;
@@ -33,7 +31,7 @@ sim_opt = amegetsimopt('Dynamics');
 amerunsingle('Dynamics', sim_opt);
 
 %% Load the CasADi function for the MPC planner
-global Planner
+% global Planner_lane_change
 
 if lane_change == 1
     Plannerstr = load('Planner_lane_change.mat');
