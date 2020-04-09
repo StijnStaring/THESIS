@@ -19,10 +19,11 @@ Assuming that longitudinal velocity at the start is equal to the desired velocit
 # import csv
 import pylab as plt
 from scipy import signal
+import scipy.io as sio
 # from import_data import import_data
 from import_ideal_data import import_ideal_data
-# from define_plots import define_plots
-# from derivative import derivative
+from define_plots import define_plots
+from derivative import derivative
 # from find_nearest import find_nearest
 # from generate_delta_guess import generate_delta_guess
 from casadi import *
@@ -61,13 +62,7 @@ nx = 6 # amount of states
 nc = 2 # amount of controls
 N = 100
 
-x_start = 0
-y_start = 0
-# vx_start = des_matrix[0,1] # this is the desired velocity
 
-vy_start = 0
-psi_start = 0
-psi_dot_start = 0
 # width_road = des_matrix[0,0]
 
 # Resampling and guesses
@@ -152,8 +147,8 @@ opti = casadi.Opti()
 X = opti.variable(nx,N+1)
 T =  opti.variable() # Time [s]
 theta = opti.parameter(amount_features)
-vx_start = opti.parameter()
 width_road = opti.parameter()
+X0 = opti.parameter(nx)
 
 # Aliases for states
 x    = X[0,:]
@@ -180,7 +175,7 @@ opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
 
 # Initial constraints
 # states: x, y, vx, vy, psi, psi_dot
-opti.subject_to(X[:,0]== vertcat(x_start,y_start,vx_start,vy_start,psi_start,psi_dot_start))
+opti.subject_to(X[:,0]== vertcat(X0[0],X0[1],X0[2],X0[3],X0[4],X0[5]))
 # Controls set on zero in first interval --> want to start from steady state.
 # opti.subject_to(delta[0] == 0)
 # opti.subject_to(throttle[0] == 0)
@@ -274,7 +269,8 @@ jy_tot = plt.array(jy_list_t) + plt.array(jy_list_n)
 
 vx_des_list = []
 for k in range(N+1):
-    vx_des_list.append(vx[k]-vx_start)
+    # vx_des_list.append(vx[k]-vx_start)
+    vx_des_list.append(vx[k] - X0[2])
 
 y_des_list = []
 for k in range(N+1):
@@ -340,15 +336,38 @@ print('Relative weights: ', theta)
 # theta = plt.array([4,5,6,1,2])
 opti.set_value(theta,plt.array([4,5,6,1,2]))
 opti.set_value(width_road,3.46990715)
-opti.set_value(vx_start,80/3.6)
+opti.set_value(X0,vertcat(0,0,80/3.6,0,0,0))
 
 # Implementation of the solver
 opti.solver('ipopt')
 sol = opti.solve()
+# ----------------------------------
+#    Implementing CasADi function
+# ----------------------------------
+inputs = [X0,theta,width_road,opti.x,opti.lam_g]
+outputs = [U[:,0],opti.x,opti.lam_g]
+planner = opti.to_function('planner',inputs,outputs)
 
-# ----------------------------------
-#    Post processing
-# ----------------------------------
+toto = np.zeros((1,), dtype=np.object)
+toto[0]={}
+toto[0]['x_sol_prev']=[sol.value(opti.x)]
+toto[0]['lam_prev']=[sol.value(opti.lam_g)]
+sio.savemat('toto.mat', {'toto':toto})
+print('toto: ',toto)
+print('');print('Simulation completed!')
+planner.save('planner.casadi')
+# use DM.set_precision(15) when load function
+
+
+
+
+
+
+
+
+# # ----------------------------------
+# #    Post processing
+# # ----------------------------------
 # x_sol = sol.value(x)
 # y_sol = sol.value(y)
 # vx_sol = sol.value(vx)
@@ -418,11 +437,11 @@ sol = opti.solve()
 #     jxn_sol.append(-sol.value(psi_dot)[k] * aty_sol[k] - vy_sol[k] * psi_ddot_sol[k])
 #
 # jx_tot_sol = plt.array(jxt_sol) + plt.array(jxn_sol)
-
+#
 # width = plt.around(sol.value(width_road), 2)
-# speed = plt.around(sol.value(vx_start), 2)
+# speed = plt.around(sol.value(X0[2]), 2)
 # define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
-
+#
 # print("\n")
 # print('Integrated feature values: ')
 # print('------------------------------')
@@ -436,28 +455,28 @@ sol = opti.solve()
 # print(sol.value(f3_cal))
 # print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
 # print(sol.value(f4_cal))
-
-# ----------------------------------
-#    Storing of data in csv-file
-# ----------------------------------
-
-# path = "written_dataset\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
-# file = open(path,'w',newline= "")
-# writer = csv.writer(file)
-# writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
 #
-# for i in range(N+1):
-#     if i == N: # last control point has no physical meaning
-#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
-#     else:
-#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+# # ----------------------------------
+# #    Storing of data in csv-file
+# # ----------------------------------
+# #
+# # path = "written_dataset\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
+# # file = open(path,'w',newline= "")
+# # writer = csv.writer(file)
+# # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
+# #
+# # for i in range(N+1):
+# #     if i == N: # last control point has no physical meaning
+# #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
+# #     else:
+# #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+# #
+# # file.close()
+# # print('dt of the optimization is: ', dt_sol)
 #
-# file.close()
-# print('dt of the optimization is: ', dt_sol)
-
-# ----------------------------------
-#    Show
-# ----------------------------------
-
-# plt.show()
+# # ----------------------------------
+# #    Show
+# # ----------------------------------
+#
+# # plt.show()
 

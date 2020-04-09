@@ -1,0 +1,21 @@
+clc
+clearvars
+close all
+
+import casadi.*
+load('toto');
+toto(1)
+% planner = Function.load('planner.casadi');
+% DM.set_precision(15);
+% planner([0,0,80/3.6,0,0,0],[4,5,6,1,2]
+
+
+% inputs = [X0,theta,width_road,opti.x,opti.lam_g]
+% outputs = [U[:,0],opti.x,opti.lam_g]
+% planner = opti.to_function('planner',inputs,outputs)
+% print('');print('Simulation completed!')
+% planner.save('planner.casadi')
+
+
+disp('simulation completed!')
+
