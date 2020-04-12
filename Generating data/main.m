@@ -24,7 +24,8 @@ lam_prev = previous_solution{1, 1}.lam_prev;
 % Ts = 0.01;
 % Ts = 0.01;
 % Ts = 1;
-Tf = 0.1;
+Tf = 10;
+Ts = 0.1;
 % Tf = 6;
 % Tf = 10;
 
@@ -77,39 +78,50 @@ ay       = Accelerations.signals(2).values;
 
 % Plots
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Path
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure('name','Path driven')
+plot(x,y,'b','LineWidth',1)
+xlabel('x [m]','fontsize',12)
+ylabel('y [m]','fontsize',12)
+grid on
+
+
+% States
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure('name','States')
 subplot(2,3,1)
-plot(time,x)
+plot(time,x,'r','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('x [m]','fontsize',12)
 grid on
 
 subplot(2,3,2)
-plot(time,y)
+plot(time,y,'r','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('y [m]','fontsize',12)
 grid on
 
 subplot(2,3,3)
-plot(time,Vx)
+plot(time,Vx,'r','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('vx [m/s]','fontsize',12)
 grid on
 
 subplot(2,3,4)
-plot(time,Vy)
+plot(time,Vy,'r','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('vy [m/s]','fontsize',12)
 grid on
 
 subplot(2,3,5)
-plot(time,yaw)
+plot(time,yaw,'r','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('yaw [°]','fontsize',12)
 grid on
 
 subplot(2,3,6)
-plot(time,r)
+plot(time,r,'r','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('r [°/s]','fontsize',12)
 grid on
@@ -117,19 +129,19 @@ grid on
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure('name','Controls')
 subplot(1,3,1)
-plot(time_control,delta)
+plot(time_control,delta,'b','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('delta [°]','fontsize',12)
 grid on
 
 subplot(1,3,2)
-plot(time_control,throttle)
+plot(time_control,throttle,'b','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('throttle [-]','fontsize',12)
 grid on
 
 subplot(1,3,3)
-plot(time_control,brake)
+plot(time_control,brake,'b','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('brake [-]','fontsize',12)
 grid on
@@ -137,15 +149,34 @@ grid on
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 figure('name','Acceleration')
 subplot(1,2,1)
-plot(time_acc,ax)
+plot(time_acc,ax,'g','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('ax [m/s^2]','fontsize',12)
 grid on
 
 subplot(1,2,2)
-plot(time_acc,ay)
+plot(time_acc,ay,'g','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('ay [m/s^2]','fontsize',12)
 grid on
+%Output of motion planning
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+time_MP = output_motion_planning.time;
+delta_MP = output_motion_planning.signals.values(:,1);
+throttle_MP = output_motion_planning.signals.values(:,2);
 
-            
+fprintf('\n')
+disp('-------------------------------------------')
+disp('OUTPUT OF MOTION PLANNER')
+disp('-------------------------------------------')
+disp('Output of time given by the motion planner: ')
+disp(time_MP')
+fprintf('\n')
+disp('Output of steerwheelangle [°] given by the motion planner: ')
+disp((delta_MP.*180/pi)')
+fprintf('\n')
+disp('Output of throttle [-] given by the motion planner: ')
+disp(throttle_MP')
+fprintf('\n')
+disp('Simulation terminated!')
+

@@ -22,8 +22,8 @@ from scipy import signal
 import scipy.io as sio
 # from import_data import import_data
 from import_ideal_data import import_ideal_data
-# from define_plots import define_plots
-# from derivative import derivative
+from define_plots import define_plots
+from derivative import derivative
 # from find_nearest import find_nearest
 # from generate_delta_guess import generate_delta_guess
 from casadi import *
@@ -375,97 +375,97 @@ planner.save('planner_lane_change.casadi')
 # print('controls:',controls)
 
 
-# # ----------------------------------
-# #    Post processing
-# # ----------------------------------
-# x_sol = sol.value(x)
-# y_sol = sol.value(y)
-# vx_sol = sol.value(vx)
-# vy_sol = sol.value(vy)
-# psi_sol = sol.value(psi)
-# psi_dot_sol = sol.value(psi_dot)
-# throttle_sol = sol.value(throttle)
-# delta_sol = sol.value(delta)
-# T_sol = sol.value(T)
-# dt_sol = T_sol/(len(x_sol)-1)
-#
-# anx_list = []
-# for k in range(N+1):
-#     anx_list.append(sol.value(-vy[k]*psi_dot[k]))
-# anx_sol = plt.array(anx_list)
-#
-# vx_list = []
-# for k in range(N+1):
-#     vx_list.append(vx_sol[k])
-# atx_sol = derivative(vx_list,dt_sol)
-# ax_tot_sol = atx_sol + anx_sol
-#
-# any_list = []
-# for k in range(N+1):
-#     any_list.append(sol.value(vx[k]*psi_dot[k]))
-# any_sol = plt.array(any_list)
-#
-# vy_list = []
-# for k in range(N+1):
-#     vy_list.append(vy_sol[k])
-# aty_sol = derivative(vy_list,dt_sol)
-#
-# ay_tot_sol = aty_sol + any_sol
-#
-# psi_ddot_sol = derivative(sol.value(psi_dot),dt_sol)
-#
-# # Lateral jerk
-# jyt_sol = []
-# for i in plt.arange(0, len(vy_sol), 1):
-#     if i == 0:
-#         jyt_sol.append((aty_sol[i + 1]-aty_sol[i])/dt_sol)
-#     elif i == len(vy_sol)-1:
-#         jyt_sol.append((aty_sol[i]-aty_sol[i-1])/dt_sol)
-#     else:
-#         # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * dt_sol))
-#         jyt_sol.append((vy_sol[i + 1] -2*vy_sol[i] +vy_sol[i - 1]) / (dt_sol**2))
-#
-# jyn_sol = []
-# for k in range(N+1):
-#     jyn_sol.append(sol.value(psi_dot)[k]*atx_sol[k] + vx_sol[k]*psi_ddot_sol[k])
-#
-# jy_tot_sol = plt.array(jyt_sol) + plt.array(jyn_sol)
-#
-# # Longitudinal jerk
-# jxt_sol = []
-# for i in plt.arange(0, len(vx_sol), 1):
-#     if i == 0:
-#         jxt_sol.append((atx_sol[i + 1] - atx_sol[i]) / dt_sol)
-#     elif i == len(vx_sol) - 1:
-#         jxt_sol.append((atx_sol[i] - atx_sol[i - 1]) / dt_sol)
-#     else:
-#         # jx_list.append((ax_tot[i + 1] - ax_tot[i - 1]) / (2 * dt_sol))
-#         jxt_sol.append((vx_sol[i + 1] - 2 * vx_sol[i] + vx_sol[i - 1]) / (dt_sol ** 2))
-#
-# jxn_sol = []
-# for k in range(N + 1):
-#     jxn_sol.append(-sol.value(psi_dot)[k] * aty_sol[k] - vy_sol[k] * psi_ddot_sol[k])
-#
-# jx_tot_sol = plt.array(jxt_sol) + plt.array(jxn_sol)
-#
-# width = plt.around(sol.value(width_road), 2)
-# speed = plt.around(sol.value(X0[2]), 2)
-# define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
-#
-# print("\n")
-# print('Integrated feature values: ')
-# print('------------------------------')
-# print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
-# print(sol.value(f0_cal))
-# print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
-# print(sol.value(f1_cal))
-# print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
-# print(sol.value(f2_cal))
-# print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-# print(sol.value(f3_cal))
-# print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
-# print(sol.value(f4_cal))
-#
+# ----------------------------------
+#    Post processing
+# ----------------------------------
+x_sol = sol.value(x)
+y_sol = sol.value(y)
+vx_sol = sol.value(vx)
+vy_sol = sol.value(vy)
+psi_sol = sol.value(psi)
+psi_dot_sol = sol.value(psi_dot)
+throttle_sol = sol.value(throttle)
+delta_sol = sol.value(delta)
+T_sol = sol.value(T)
+dt_sol = T_sol/(len(x_sol)-1)
+
+anx_list = []
+for k in range(N+1):
+    anx_list.append(sol.value(-vy[k]*psi_dot[k]))
+anx_sol = plt.array(anx_list)
+
+vx_list = []
+for k in range(N+1):
+    vx_list.append(vx_sol[k])
+atx_sol = derivative(vx_list,dt_sol)
+ax_tot_sol = atx_sol + anx_sol
+
+any_list = []
+for k in range(N+1):
+    any_list.append(sol.value(vx[k]*psi_dot[k]))
+any_sol = plt.array(any_list)
+
+vy_list = []
+for k in range(N+1):
+    vy_list.append(vy_sol[k])
+aty_sol = derivative(vy_list,dt_sol)
+
+ay_tot_sol = aty_sol + any_sol
+
+psi_ddot_sol = derivative(sol.value(psi_dot),dt_sol)
+
+# Lateral jerk
+jyt_sol = []
+for i in plt.arange(0, len(vy_sol), 1):
+    if i == 0:
+        jyt_sol.append((aty_sol[i + 1]-aty_sol[i])/dt_sol)
+    elif i == len(vy_sol)-1:
+        jyt_sol.append((aty_sol[i]-aty_sol[i-1])/dt_sol)
+    else:
+        # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * dt_sol))
+        jyt_sol.append((vy_sol[i + 1] -2*vy_sol[i] +vy_sol[i - 1]) / (dt_sol**2))
+
+jyn_sol = []
+for k in range(N+1):
+    jyn_sol.append(sol.value(psi_dot)[k]*atx_sol[k] + vx_sol[k]*psi_ddot_sol[k])
+
+jy_tot_sol = plt.array(jyt_sol) + plt.array(jyn_sol)
+
+# Longitudinal jerk
+jxt_sol = []
+for i in plt.arange(0, len(vx_sol), 1):
+    if i == 0:
+        jxt_sol.append((atx_sol[i + 1] - atx_sol[i]) / dt_sol)
+    elif i == len(vx_sol) - 1:
+        jxt_sol.append((atx_sol[i] - atx_sol[i - 1]) / dt_sol)
+    else:
+        # jx_list.append((ax_tot[i + 1] - ax_tot[i - 1]) / (2 * dt_sol))
+        jxt_sol.append((vx_sol[i + 1] - 2 * vx_sol[i] + vx_sol[i - 1]) / (dt_sol ** 2))
+
+jxn_sol = []
+for k in range(N + 1):
+    jxn_sol.append(-sol.value(psi_dot)[k] * aty_sol[k] - vy_sol[k] * psi_ddot_sol[k])
+
+jx_tot_sol = plt.array(jxt_sol) + plt.array(jxn_sol)
+
+width = plt.around(sol.value(width_road), 2)
+speed = plt.around(sol.value(X0[2]), 2)
+define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
+
+print("\n")
+print('Integrated feature values: ')
+print('------------------------------')
+print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
+print(sol.value(f0_cal))
+print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
+print(sol.value(f1_cal))
+print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
+print(sol.value(f2_cal))
+print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
+print(sol.value(f3_cal))
+print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
+print(sol.value(f4_cal))
+
 # # ----------------------------------
 # #    Storing of data in csv-file
 # # ----------------------------------
@@ -484,9 +484,9 @@ planner.save('planner_lane_change.casadi')
 # # file.close()
 # # print('dt of the optimization is: ', dt_sol)
 #
-# # ----------------------------------
-# #    Show
-# # ----------------------------------
-#
-# # plt.show()
+# ----------------------------------
+#    Show
+# ----------------------------------
+
+plt.show()
 

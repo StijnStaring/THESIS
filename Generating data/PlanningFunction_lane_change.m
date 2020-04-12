@@ -8,9 +8,10 @@ function [result] = PlanningFunction_lane_change(current_states)
     % Solving the optimization problem by calling the CasADi function,
     % previously implemented and loaded as a global variable   
 %     [controls,x_sol_prev,lam_prev] = planner_lane_change(current_states,theta,width_road,x_sol_prev,lam_prev);
-    [controls,~,~] = planner_lane_change(current_states,theta,width_road,x_sol_prev,lam_prev);    
+%     [controls,~,~] = planner_lane_change(current_states,theta,width_road,x_sol_prev,lam_prev);    
 % controls = [throttle (-), delta (rad)]
-    result = full(controls);
+    result = [0.01,0.7]';
+%     result = full(controls);
     disp('simulation completed!')
 
     
