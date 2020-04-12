@@ -345,8 +345,12 @@ opti.set_value(width_road,3.46990715)
 opti.set_value(X0,vertcat(0,0,80/3.6,0,0,0))
 
 # Implementation of the solver
-opti.solver('ipopt')
+options = dict()
+options["print_time"] = False
+options["ipopt"] = {"print_level": 0}
+opti.solver('ipopt',options)
 sol = opti.solve()
+# print('');print('Simulation 1 completed!')
 # ----------------------------------
 #    Implementing CasADi function
 # ----------------------------------
@@ -359,10 +363,16 @@ previous_solution[0]={}
 previous_solution[0]['x_sol_prev']=[sol.value(opti.x)]
 previous_solution[0]['lam_prev']=[sol.value(opti.lam_g)]
 sio.savemat('previous_solution.mat', {'previous_solution':previous_solution})
-print('previous_solution: ',previous_solution)
+# print('previous_solution: ',previous_solution)
 print('');print('Simulation completed!')
 planner.save('planner_lane_change.casadi')
-# use DM.set_precision(15) when load function
+# # use DM.set_precision(15) when load function
+# print('')
+# print('Run a test: ')
+# [controls,x_sol,lam_sol] = planner([0,0,80/3.6,0,0,0],[4,5,6,1,2],3.46990715,sol.value(opti.x),sol.value(opti.lam_g))
+# print('');print('Simulation 2 completed!')
+#
+# print('controls:',controls)
 
 
 # # ----------------------------------

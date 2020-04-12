@@ -1,0 +1,7 @@
+this is generated with the standard weights: [4,5,6,1,2] and the standard normalization factors for 5 features: 
+
+norm0 = 0.007276047781441449
+norm1 = 2.6381715506137424
+norm2 = 11.283498669013454
+norm3 = 0.046662223759442054
+norm4 = 17.13698903738383

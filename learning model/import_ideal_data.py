@@ -23,8 +23,6 @@ def import_ideal_data():
     data_cl['vx_cl'] = plt.array([data.vx]).T
     data_cl['vy_cl'] = plt.array([data.vy]).T
     data_cl['ax_cl'] = plt.array([data.ax]).T #total acc
-    data_cl['ay_cl'] = plt.array([data.ay]).T #total acc
-    data_cl['jx_cl'] = plt.array([data.jx]).T
     data_cl['jy_cl'] = plt.array([data.jy]).T
     data_cl['psi_cl'] = plt.array([data.psi]).T
     data_cl['psi_dot_cl'] = plt.array([data.psi_dot]).T
