@@ -24,10 +24,11 @@ lam_prev = previous_solution{1, 1}.lam_prev;
 % Ts = 0.01;
 % Ts = 0.01;
 % Ts = 1;
-Tf = 10;
+% Tf = 10;
+% Tf = 0.1;
 Ts = 0.1;
 % Tf = 6;
-% Tf = 10;
+Tf = 2;
 
 % Set the initial speed in the Amesim model
 addpath(fullfile(getenv('AME'),'scripting','matlab','amesim'));
@@ -159,6 +160,33 @@ plot(time_acc,ay,'g','LineWidth',1)
 xlabel('t [s]','fontsize',12)
 ylabel('ay [m/s^2]','fontsize',12)
 grid on
+%Plotting the global velocity
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Vg = zeros(2,max(size(Vx)));
+for i = 1:1:max(size(Vx))
+    RotBA = [cos(yaw(i)),-sin(yaw(i));
+            sin(yaw(i)), cos(yaw(i))];
+    Vr = [Vx(i);
+          Vy(i)];
+    Vg(:,i) = RotBA*Vr;
+end
+Vx_g = Vg(1,:);
+Vy_g = Vg(2,:);
+figure('name','Global velocity')
+subplot(1,2,1)
+plot(time,Vx_g,'k','LineWidth',1)
+xlabel('t [s]','fontsize',12)
+ylabel('Vx_g [m/s]','fontsize',12)
+grid on
+
+subplot(1,2,2)
+plot(time,Vy_g,'k','LineWidth',1)
+xlabel('t [s]','fontsize',12)
+ylabel('Vy_g [m/s]','fontsize',12)
+grid on
+
+
+
 %Output of motion planning
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 time_MP = output_motion_planning.time;
@@ -170,13 +198,13 @@ disp('-------------------------------------------')
 disp('OUTPUT OF MOTION PLANNER')
 disp('-------------------------------------------')
 disp('Output of time given by the motion planner: ')
-disp(time_MP')
+% disp(time_MP')
 fprintf('\n')
 disp('Output of steerwheelangle [°] given by the motion planner: ')
-disp((delta_MP.*180/pi)')
+% disp((delta_MP.*180/pi)')
 fprintf('\n')
 disp('Output of throttle [-] given by the motion planner: ')
-disp(throttle_MP')
+% disp(throttle_MP')
 fprintf('\n')
 disp('Simulation terminated!')
 
