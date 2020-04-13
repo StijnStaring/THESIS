@@ -6,7 +6,7 @@ clc
 import casadi.*
 load('previous_solution');
 
-global width_road x_sol_prev lam_prev theta planner_lane_change
+global width_road x_sol_prev lam_prev theta planner_lane_change iteration vx_desired
 
 
 % N = 100 --> used in python code
@@ -18,6 +18,8 @@ width_road = 3.46990715;
 lane_change = 1;
 x_sol_prev = previous_solution{1, 1}.x_sol_prev;
 lam_prev = previous_solution{1, 1}.lam_prev;
+iteration = 1;
+vx_desired = 80/3.6;
 
 
 % Simulation sampling time and duration
@@ -26,9 +28,11 @@ lam_prev = previous_solution{1, 1}.lam_prev;
 % Ts = 1;
 % Tf = 10;
 % Tf = 0.1;
-Ts = 0.1;
-% Tf = 6;
-Tf = 2;
+% Ts = 0.1;
+Ts = 0.01;
+Ts_MP = 0.1;
+Tf = 7;
+% Tf = 0.03;
 
 % Set the initial speed in the Amesim model
 addpath(fullfile(getenv('AME'),'scripting','matlab','amesim'));

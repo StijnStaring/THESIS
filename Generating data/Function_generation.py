@@ -60,7 +60,7 @@ pi = 3.14159265359
 # Parameters of the optimization
 nx = 6 # amount of states
 nc = 2 # amount of controls
-N = 150
+N = 350
 
 
 # width_road = des_matrix[0,0]
@@ -148,6 +148,7 @@ X = opti.variable(nx,N+1)
 T =  opti.variable() # Time [s]
 theta = opti.parameter(amount_features)
 width_road = opti.parameter()
+vx_desired = opti.parameter()
 X0 = opti.parameter(nx)
 
 # Aliases for states
@@ -275,8 +276,8 @@ jy_tot = plt.array(jy_list_t) + plt.array(jy_list_n)
 
 vx_des_list = []
 for k in range(N+1):
-    # vx_des_list.append(vx[k]-vx_start)
-    vx_des_list.append(vx[k] - X0[2])
+    vx_des_list.append(vx[k]-vx_desired)
+    # vx_des_list.append(vx[k] - X0[2])
 
 y_des_list = []
 for k in range(N+1):
@@ -285,8 +286,8 @@ for k in range(N+1):
 # Extra constraints on acceleration and jerk:
 opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
 opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
-opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
-opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
+# opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
+# opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
 
 
 # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
@@ -343,6 +344,7 @@ print('Relative weights: ', theta)
 opti.set_value(theta,plt.array([4,5,6,1,2]))
 opti.set_value(width_road,3.46990715)
 opti.set_value(X0,vertcat(0,0,80/3.6,0,0,0))
+opti.set_value(vx_desired,80/3.6)
 
 # Implementation of the solver
 options = dict()
@@ -354,8 +356,8 @@ sol = opti.solve()
 # ----------------------------------
 #    Implementing CasADi function
 # ----------------------------------
-inputs = [X0,theta,width_road,opti.x,opti.lam_g]
-outputs = [U[:,0],opti.x,opti.lam_g]
+inputs = [X0,theta,width_road,vx_desired,opti.x,opti.lam_g]
+outputs = [X,U,T,opti.x,opti.lam_g]
 planner = opti.to_function('planner',inputs,outputs)
 
 previous_solution = np.zeros((1,), dtype=np.object)
@@ -380,125 +382,125 @@ planner.save('planner_lane_change.casadi')
 # ----------------------------------
 #    Post processing
 # ----------------------------------
-# x_sol = sol.value(x)
-# y_sol = sol.value(y)
-# vx_sol = sol.value(vx)
-# vy_sol = sol.value(vy)
-# psi_sol = sol.value(psi)
-# psi_dot_sol = sol.value(psi_dot)
-# throttle_sol = sol.value(throttle)
-# delta_sol = sol.value(delta)
-# T_sol = sol.value(T)
-# dt_sol = T_sol/(len(x_sol)-1)
-#
-# anx_list = []
-# for k in range(N+1):
-#     anx_list.append(sol.value(-vy[k]*psi_dot[k]))
-# anx_sol = plt.array(anx_list)
-#
-# vx_list = []
-# for k in range(N+1):
-#     vx_list.append(vx_sol[k])
-# atx_sol = derivative(vx_list,dt_sol)
-# ax_tot_sol = atx_sol + anx_sol
-#
-# any_list = []
-# for k in range(N+1):
-#     any_list.append(sol.value(vx[k]*psi_dot[k]))
-# any_sol = plt.array(any_list)
-#
-# vy_list = []
-# for k in range(N+1):
-#     vy_list.append(vy_sol[k])
-# aty_sol = derivative(vy_list,dt_sol)
-#
-# ay_tot_sol = aty_sol + any_sol
-#
-# psi_ddot_sol = derivative(sol.value(psi_dot),dt_sol)
-#
-# # Lateral jerk
-# jyt_sol = []
-# for i in plt.arange(0, len(vy_sol), 1):
-#     if i == 0:
-#         jyt_sol.append((aty_sol[i + 1]-aty_sol[i])/dt_sol)
-#     elif i == len(vy_sol)-1:
-#         jyt_sol.append((aty_sol[i]-aty_sol[i-1])/dt_sol)
-#     else:
-#         # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * dt_sol))
-#         jyt_sol.append((vy_sol[i + 1] -2*vy_sol[i] +vy_sol[i - 1]) / (dt_sol**2))
-#
-# jyn_sol = []
-# for k in range(N+1):
-#     jyn_sol.append(sol.value(psi_dot)[k]*atx_sol[k] + vx_sol[k]*psi_ddot_sol[k])
-#
-# jy_tot_sol = plt.array(jyt_sol) + plt.array(jyn_sol)
-#
-# # Longitudinal jerk
-# jxt_sol = []
-# for i in plt.arange(0, len(vx_sol), 1):
-#     if i == 0:
-#         jxt_sol.append((atx_sol[i + 1] - atx_sol[i]) / dt_sol)
-#     elif i == len(vx_sol) - 1:
-#         jxt_sol.append((atx_sol[i] - atx_sol[i - 1]) / dt_sol)
-#     else:
-#         # jx_list.append((ax_tot[i + 1] - ax_tot[i - 1]) / (2 * dt_sol))
-#         jxt_sol.append((vx_sol[i + 1] - 2 * vx_sol[i] + vx_sol[i - 1]) / (dt_sol ** 2))
-#
-# jxn_sol = []
-# for k in range(N + 1):
-#     jxn_sol.append(-sol.value(psi_dot)[k] * aty_sol[k] - vy_sol[k] * psi_ddot_sol[k])
-#
-# jx_tot_sol = plt.array(jxt_sol) + plt.array(jxn_sol)
-#
-# width = plt.around(sol.value(width_road), 2)
-# speed = plt.around(sol.value(X0[2]), 2)
-# define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
-#
-# print("\n")
-# print('Integrated feature values: ')
-# print('------------------------------')
-# print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
-# print(sol.value(f0_cal))
-# print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
-# print(sol.value(f1_cal))
-# print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
-# print(sol.value(f2_cal))
-# print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-# print(sol.value(f3_cal))
-# print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
-# print(sol.value(f4_cal))
-#
-# # Do the check of the global velocities
-# #######################################
-# plt.figure("Global velocity", figsize=(10, 4))
-# plt.subplot(1, 2, 1)
-# vx_g = plt.gca()
-# plt.xlabel("Time [s]", fontsize=14)
-# plt.ylabel("Longitudinal velocity [m/s]", fontsize=14)
-# plt.grid(True)
-# plt.title('vx(t) global', fontsize=14)
-#
-# plt.subplot(1, 2, 2)
-# vy_g = plt.gca()
-# plt.xlabel("Time [s]", fontsize=14)
-# plt.ylabel("Lateral velocity [m/s]", fontsize=14)
-# plt.grid(True)
-# plt.title('vy(t) global', fontsize=14)
-#
-# Vg = plt.zeros([2,len(vx_sol)])
-# for i in plt.arange(0,len(vx_sol),1):
-#     RotBA = plt.array([[plt.cos(psi_sol[i]),-plt.sin(psi_sol[i])],[plt.sin(psi_sol[i]),plt.cos(psi_sol[i])]])
-#     Vr = plt.array([[vx_sol[i]],[vy_sol[i]]])
-#     Vg[:,i,plt.newaxis] = plt.dot(RotBA,Vr)
-#
-# time_vector_glob = plt.linspace(0,T_sol,len(x_sol))
-# vx_glob = Vg[0,:]
-# vy_glob = Vg[1,:]
-# vx_g.plot(time_vector_glob, vx_glob, '.-', linewidth=3.0, label= "Vx_glob")
-# vy_g.plot(time_vector_glob, vy_glob, '.-', linewidth=3.0, label= "Vy_glob")
-#
-# vx_g.legend()
-# vy_g.legend()
+x_sol = sol.value(x)
+y_sol = sol.value(y)
+vx_sol = sol.value(vx)
+vy_sol = sol.value(vy)
+psi_sol = sol.value(psi)
+psi_dot_sol = sol.value(psi_dot)
+throttle_sol = sol.value(throttle)
+delta_sol = sol.value(delta)
+T_sol = sol.value(T)
+dt_sol = T_sol/(len(x_sol)-1)
+
+anx_list = []
+for k in range(N+1):
+    anx_list.append(sol.value(-vy[k]*psi_dot[k]))
+anx_sol = plt.array(anx_list)
+
+vx_list = []
+for k in range(N+1):
+    vx_list.append(vx_sol[k])
+atx_sol = derivative(vx_list,dt_sol)
+ax_tot_sol = atx_sol + anx_sol
+
+any_list = []
+for k in range(N+1):
+    any_list.append(sol.value(vx[k]*psi_dot[k]))
+any_sol = plt.array(any_list)
+
+vy_list = []
+for k in range(N+1):
+    vy_list.append(vy_sol[k])
+aty_sol = derivative(vy_list,dt_sol)
+
+ay_tot_sol = aty_sol + any_sol
+
+psi_ddot_sol = derivative(sol.value(psi_dot),dt_sol)
+
+# Lateral jerk
+jyt_sol = []
+for i in plt.arange(0, len(vy_sol), 1):
+    if i == 0:
+        jyt_sol.append((aty_sol[i + 1]-aty_sol[i])/dt_sol)
+    elif i == len(vy_sol)-1:
+        jyt_sol.append((aty_sol[i]-aty_sol[i-1])/dt_sol)
+    else:
+        # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * dt_sol))
+        jyt_sol.append((vy_sol[i + 1] -2*vy_sol[i] +vy_sol[i - 1]) / (dt_sol**2))
+
+jyn_sol = []
+for k in range(N+1):
+    jyn_sol.append(sol.value(psi_dot)[k]*atx_sol[k] + vx_sol[k]*psi_ddot_sol[k])
+
+jy_tot_sol = plt.array(jyt_sol) + plt.array(jyn_sol)
+
+# Longitudinal jerk
+jxt_sol = []
+for i in plt.arange(0, len(vx_sol), 1):
+    if i == 0:
+        jxt_sol.append((atx_sol[i + 1] - atx_sol[i]) / dt_sol)
+    elif i == len(vx_sol) - 1:
+        jxt_sol.append((atx_sol[i] - atx_sol[i - 1]) / dt_sol)
+    else:
+        # jx_list.append((ax_tot[i + 1] - ax_tot[i - 1]) / (2 * dt_sol))
+        jxt_sol.append((vx_sol[i + 1] - 2 * vx_sol[i] + vx_sol[i - 1]) / (dt_sol ** 2))
+
+jxn_sol = []
+for k in range(N + 1):
+    jxn_sol.append(-sol.value(psi_dot)[k] * aty_sol[k] - vy_sol[k] * psi_ddot_sol[k])
+
+jx_tot_sol = plt.array(jxt_sol) + plt.array(jxn_sol)
+
+width = plt.around(sol.value(width_road), 2)
+speed = plt.around(sol.value(X0[2]), 2)
+define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
+
+print("\n")
+print('Integrated feature values: ')
+print('------------------------------')
+print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
+print(sol.value(f0_cal))
+print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
+print(sol.value(f1_cal))
+print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
+print(sol.value(f2_cal))
+print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
+print(sol.value(f3_cal))
+print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
+print(sol.value(f4_cal))
+
+# Do the check of the global velocities
+#######################################
+plt.figure("Global velocity", figsize=(10, 4))
+plt.subplot(1, 2, 1)
+vx_g = plt.gca()
+plt.xlabel("Time [s]", fontsize=14)
+plt.ylabel("Longitudinal velocity [m/s]", fontsize=14)
+plt.grid(True)
+plt.title('vx(t) global', fontsize=14)
+
+plt.subplot(1, 2, 2)
+vy_g = plt.gca()
+plt.xlabel("Time [s]", fontsize=14)
+plt.ylabel("Lateral velocity [m/s]", fontsize=14)
+plt.grid(True)
+plt.title('vy(t) global', fontsize=14)
+
+Vg = plt.zeros([2,len(vx_sol)])
+for i in plt.arange(0,len(vx_sol),1):
+    RotBA = plt.array([[plt.cos(psi_sol[i]),-plt.sin(psi_sol[i])],[plt.sin(psi_sol[i]),plt.cos(psi_sol[i])]])
+    Vr = plt.array([[vx_sol[i]],[vy_sol[i]]])
+    Vg[:,i,plt.newaxis] = plt.dot(RotBA,Vr)
+
+time_vector_glob = plt.linspace(0,T_sol,len(x_sol))
+vx_glob = Vg[0,:]
+vy_glob = Vg[1,:]
+vx_g.plot(time_vector_glob, vx_glob, '.-', linewidth=3.0, label= "Vx_glob")
+vy_g.plot(time_vector_glob, vy_glob, '.-', linewidth=3.0, label= "Vy_glob")
+
+vx_g.legend()
+vy_g.legend()
 
 
 # # ----------------------------------
