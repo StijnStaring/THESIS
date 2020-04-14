@@ -435,23 +435,23 @@ for vx_start in vx_start_a:
         # ----------------------------------
         #    Storing of data in csv-file
         # ----------------------------------
-
-        path = "written_data_detailed\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
-        file = open(path,'w',newline= "")
-        writer = csv.writer(file)
-        writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
-
-        for i in range(N+1):
-            if i == N: # last control point has no physical meaning
-                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
-            else:
-                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
-
-        file.close()
-        print('dt of the optimization is: ', dt_sol)
-        print('')
-        print('Simulation completed!')
-        print('\n')
+        #
+        # path = "written_data_detailed\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
+        # file = open(path,'w',newline= "")
+        # writer = csv.writer(file)
+        # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
+        #
+        # for i in range(N+1):
+        #     if i == N: # last control point has no physical meaning
+        #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
+        #     else:
+        #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+        #
+        # file.close()
+        # print('dt of the optimization is: ', dt_sol)
+        # print('')
+        # print('Simulation completed!')
+        # print('\n')
 
 
 # ----------------------------------

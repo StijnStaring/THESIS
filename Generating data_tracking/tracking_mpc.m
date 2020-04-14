@@ -17,7 +17,7 @@ amount_files = max(size(files));
 total_data = cell(1,amount_files);
 data = get_data(char(files(:,1)),sampling_rate,N);
 dt = 1/sampling_rate;
-N_sim = length(data.time) - 1;
+N_sim = length(data.time) - 1 - N;
 vx_start = data.vx(1,1);
 x_ref = data.x';
 y_ref = data.y';
@@ -178,13 +178,16 @@ options.print_time = false;
 options.expand = true; % expand makes function evaluations faster but requires more memory: MX --> SX
 
 % Different solver
-options.qpsol = 'qrqp';
-options.qpsol_options.print_iter = false;
-options.qpsol_options.print_header = false;
-options.print_iteration = false;
-options.print_header = false;
-options.print_status = false;
-opti.solver('sqpmethod',options)
+% options.qpsol = 'qrqp';
+% options.qpsol_options.print_iter = false;
+% options.qpsol_options.print_header = false;
+% options.print_iteration = false;
+% options.print_header = false;
+% options.print_status = false;
+% opti.solver('sqpmethod',options)
+options.ipopt.print_level = 0;
+opti.solver('ipopt',options)
+
 %sqp --> this approximates the lagrangian of the problam by a quadratic problem with
 %the same KKT conditions. :) 
 % sqp is faster --> required for MPC.

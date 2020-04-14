@@ -24,7 +24,7 @@ from casadi import *
 # [_,_,_,_,_,init_matrix,des_matrix,dict_list,files] = import_data(0)
 # width_road = 3.46990715
 # vx_start = 23.10159175
-time_guess = 4.01
+# time_guess = 4.01
 data_cl = import_ideal_data()
 
 # theta = plt.array([4,5,6,1,2]) en met data guess 1 berekende norm waarden en data guess 1 zelf. (example lane change)
@@ -52,7 +52,10 @@ pi = 3.14159265359
 # Parameters of the optimization
 nx = 6 # amount of states
 nc = 2 # amount of controls
-N = 1500
+# N = 500
+dt = 0.01
+tot_time = 8.5
+N = int(tot_time/dt)
 
 x_start = 0
 y_start = 0
@@ -141,13 +144,13 @@ for vx_start in vx_start_a:
         # -----------------------------------
         #    Discrete system x_next = F(x,u)
         # -----------------------------------
-        dt = MX.sym('dt')
+        # dt = MX.sym('dt')
         k1 = f(states, controls)
         k2 = f(states + dt/2 * k1, controls)
         k3 = f(states + dt/2 * k2, controls)
         k4 = f(states + dt * k3, controls)
         states_next = states+dt/6*(k1 +2*k2 +2*k3 +k4)
-        F = Function('F', [states, controls, dt], [states_next],['states','controls','dt'],['states_next'])
+        F = Function('F', [states, controls], [states_next],['states','controls'],['states_next'])
 
         ##
         # -----------------------------------------------
@@ -156,8 +159,8 @@ for vx_start in vx_start_a:
 
         opti = casadi.Opti()
         X = opti.variable(nx,N+1)
-        T =  opti.variable() # Time [s]
-
+        # T =  opti.variable() # Time [s]
+        T = tot_time
         # Aliases for states
         x    = X[0,:]
         y  = X[1,:]
@@ -173,7 +176,7 @@ for vx_start in vx_start_a:
 
         # Gap-closing shooting constraints
         for k in range(N):
-            opti.subject_to(X[:, k + 1] == F(X[:, k], U[k],T/N))
+            opti.subject_to(X[:, k + 1] == F(X[:, k], U[k]))
 
         # Path constraints
         opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
@@ -204,7 +207,7 @@ for vx_start in vx_start_a:
         opti.set_initial(psi_dot,psi_dot_guess)
         opti.set_initial(throttle,throttle_guess)
         opti.set_initial(delta,delta_guess)
-        opti.set_initial(T, time_guess)
+        # opti.set_initial(T, time_guess)
 
         ##
         # -----------------------------------------------
@@ -436,22 +439,22 @@ for vx_start in vx_start_a:
         #    Storing of data in csv-file
         # ----------------------------------
 
-        path = "written_data_detailed_fixed_time\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
-        file = open(path,'w',newline= "")
-        writer = csv.writer(file)
-        writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
-
-        for i in range(N+1):
-            if i == N: # last control point has no physical meaning
-                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
-            else:
-                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
-
-        file.close()
-        print('dt of the optimization is: ', dt_sol)
-        print('')
-        print('Simulation completed!')
-        print('\n')
+        # path = "written_data_detailed_fixed_time\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
+        # file = open(path,'w',newline= "")
+        # writer = csv.writer(file)
+        # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
+        #
+        # for i in range(N+1):
+        #     if i == N: # last control point has no physical meaning
+        #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
+        #     else:
+        #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+        #
+        # file.close()
+        # print('dt of the optimization is: ', dt_sol)
+        # print('')
+        # print('Simulation completed!')
+        # print('\n')
 
 
 # ----------------------------------
