@@ -14,10 +14,9 @@ N = 50; % Control horizon of one optimization of the MPC.
 sampling_rate = 100;
 files = {'DATA2_V22.22_L3.47.csv'};
 amount_files = max(size(files));
-total_data = cell(1,amount_files);
 data = get_data(char(files(:,1)),sampling_rate,N);
 dt = 1/sampling_rate;
-N_sim = length(data.time) - 1 - N;
+N_sim = length(data.time) - N;
 vx_start = data.vx(1,1);
 x_ref = data.x';
 y_ref = data.y';
@@ -127,9 +126,9 @@ delta = U(2,:);
 
 % Parameters
 x0 = opti.parameter(nx);
-ref = opti.parameter(nx,N+1);
+ref = opti.parameter(nx,N);
 opti.set_value(x0,[0;0;vx_start;0;0;0]);
-opti.set_value(ref,[x_ref(1:N+1);y_ref(1:N+1);vx_ref(1:N+1);vy_ref(1:N+1);psi_ref(1:N+1);psi_dot_ref(1:N+1)]);
+opti.set_value(ref,[x_ref(2:N+1);y_ref(2:N+1);vx_ref(2:N+1);vy_ref(2:N+1);psi_ref(2:N+1);psi_dot_ref(2:N+1)]);
 
 % Gap-closing shooting constraints
 for k=1:N
@@ -156,7 +155,7 @@ opti.subject_to(X(:,1)==x0);
 
 % Objective: vehicle tries to follow a moving point model: x(t) and y(t)
 % opti.minimize((x-ref(1,1:N+1))*transpose((x-ref(1,1:N+1)))+(y-ref(2,1:N+1))*transpose((y-ref(2,1:N+1)))+(psi-ref(5,1:N+1))*transpose((psi-ref(5,1:N+1))));
-opti.minimize((x-ref(1,1:N+1))*transpose((x-ref(1,1:N+1)))+(y-ref(2,1:N+1))*transpose((y-ref(2,1:N+1))));
+opti.minimize((x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))));
 disp('opti.minimize((x-ref(1,1:N+1))*transpose((x-ref(1,1:N+1)))+(y-ref(2,1:N+1))*transpose((y-ref(2,1:N+1))));')
 
 % opti.minimize(sumsqr((x-ref(1,1:N+1)))+sumsqr((y-ref(2,1:N+1)))+ sumsqr(U(1,:))+sumsqr(U(2,:)));
@@ -178,15 +177,15 @@ options.print_time = false;
 options.expand = true; % expand makes function evaluations faster but requires more memory: MX --> SX
 
 % Different solver
-% options.qpsol = 'qrqp';
-% options.qpsol_options.print_iter = false;
-% options.qpsol_options.print_header = false;
-% options.print_iteration = false;
-% options.print_header = false;
-% options.print_status = false;
-% opti.solver('sqpmethod',options)
-options.ipopt.print_level = 0;
-opti.solver('ipopt',options)
+options.qpsol = 'qrqp';
+options.qpsol_options.print_iter = false;
+options.qpsol_options.print_header = false;
+options.print_iteration = false;
+options.print_header = false;
+options.print_status = false;
+opti.solver('sqpmethod',options)
+% options.ipopt.print_level = 0;
+% opti.solver('ipopt',options)
 
 %sqp --> this approximates the lagrangian of the problam by a quadratic problem with
 %the same KKT conditions. :) 
@@ -207,7 +206,7 @@ opti.set_initial(psi_dot,psi_dot_ref(1:N+1));
 tic
 sol = opti.solve();
 toc
-%% plotting
+%% plotting one time solving
 % These are graphs when the optimization is solved for the first time.
 
 % Retrieving solution
@@ -318,6 +317,8 @@ xlabel('t [s]','fontsize',12)
 ylabel('throttle [-]','fontsize',12)
 
 % Calculate the total error made 
+disp('Error calculation - first MPC iteration')
+disp('--------------------------------------------')
 x_error = sum(abs(x_sol-x_ref(1:N+1)));
 y_error = sum(abs(y_sol-y_ref(1:N+1)));
 vx_error = sum(abs(vx_sol-vx_ref(1:N+1)));
@@ -355,7 +356,7 @@ fprintf('This is the total psi dot error: %i \n',mpsi_dot_error)
 % -----------------------------------------------
 
 current_x = [0;0;vx_start;0;0;0];
-current_ref = zeros(nx,N+1);
+current_ref = zeros(nx,N);
 
 x_history = zeros(nx,N_sim+1);
 u_history = zeros(nc,N_sim);
@@ -373,40 +374,49 @@ lam = sol.value(opti.lam_g);
 
 for i=1:N_sim
     tic
-    u_history(:,i) = full(u);
-
   % Simulate the system over dt
+    current_ref(1,1:N) = x_ref(i+1:N+i);
+    current_ref(2,1:N) = y_ref(i+1:N+i);
+    current_ref(3,1:N) = vx_ref(i+1:N+i);
+    current_ref(4,1:N) = vy_ref(i+1:N+i);
+    current_ref(5,1:N) = psi_ref(i+1:N+i);
+    current_ref(6,1:N) = psi_dot_ref(i+1:N+i);
+    [u,X_sol,lam] = mpc_step(current_x,current_ref,X_sol,lam);
+    u_history(:,i) = full(u);
     current_x = full(F(current_x,u));
-    current_ref(1,1:N+1) = x_ref(i+1:(N+1)+i);
-    current_ref(2,1:N+1) = y_ref(i+1:(N+1)+i);
-    current_ref(3,1:N+1) = vx_ref(i+1:(N+1)+i);
-    current_ref(4,1:N+1) = vy_ref(i+1:(N+1)+i);
-    current_ref(5,1:N+1) = psi_ref(i+1:(N+1)+i);
-    current_ref(6,1:N+1) = psi_dot_ref(i+1:(N+1)+i);
-    
-%     % Adding model mismatch
-%     SNR = 40; % Signal to noise ratio
-%     current_x = 0*current_x + 1*[awgn(current_x(1,1), SNR);awgn(current_x(2,1), SNR);awgn(current_x(3,1), SNR);awgn(current_x(4,1), SNR);awgn(current_x(5,1), SNR);awgn(current_x(6,1), SNR);];
-%   
-  [u,X_sol,lam] = mpc_step(current_x,current_ref,X_sol,lam);
-
-  x_history(:,i+1) = current_x;
-  toc
+    x_history(:,i+1) = current_x;
+    toc
   
 end
   
-%% Plotting (report)
+%% Plotting MPC
+t_mpc = 0:dt:dt*N_sim;
+t_ref_mpc = t_mpc;
+t_max = 8.5;
+x_max = 160;
+x_mpc = x_history(1,:);
+y_mpc = x_history(2,:);
+vx_mpc = x_history(3,:);
+vy_mpc = x_history(4,:);
+psi_mpc = x_history(5,:);
+psi_dot_mpc = x_history(6,:);
+throttle_mpc = u_history(1,:);
+delta_mpc = u_history(2,:);
 
-t_max = 4;
-x_max = 103;
-N_diff = 50;
+x_ref_mpc = x_ref(1:N_sim+1);
+y_ref_mpc = y_ref(1:N_sim+1);
+vx_ref_mpc = vx_ref(1:N_sim+1);
+vy_ref_mpc = vy_ref(1:N_sim+1);
+psi_ref_mpc = psi_ref(1:N_sim+1);
+psi_dot_ref_mpc = psi_dot_ref(1:N_sim+1);
 
+close all
 % Path tracking
 % Path (x,y)
 figure('name', 'Path')
-plot(x_ref,y_ref,'r.','LineWidth',1.0)
+plot(x_ref_mpc,y_ref_mpc,'r.','LineWidth',1.0)
 hold on
-plot(x_sol,y_sol,'b--','LineWidth',1.0)
+plot(x_mpc,y_mpc,'b--','LineWidth',1.0)
 title('Vehicle path','fontsize',12,'fontweight','bold')
 xlabel('X [m]','fontsize',12)
 xlim([0, x_max])
@@ -417,31 +427,31 @@ legend('Reference path','Calculated path','Location','southeast')
 % Postion vs time
 figure('name', 'Pos')
 subplot(2,2,1)
-plot(t_ref,x_ref,'r.','LineWidth',1.0)
+plot(t_ref_mpc,x_ref_mpc,'r.','LineWidth',1.0)
 hold on
-plot(t_sol,x_sol,'b--','LineWidth',1.0)
+plot(t_mpc,x_mpc,'b--','LineWidth',1.0)
 title('X [m]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('position X [m]','fontsize',12)
 legend('Reference x path','Calculated x path','Location','southeast')
 subplot(2,2,3)
-plot(t_sol,abs(x_ref(1:end-N_diff)-x_sol),'b','LineWidth',1.0)
+plot(t_mpc,abs(x_ref_mpc-x_mpc),'b','LineWidth',1.0)
 title('Error [m]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('position error X [m]','fontsize',12)
 subplot(2,2,2)
-plot(t_ref,y_ref,'r.','LineWidth',1.0)
+plot(t_ref_mpc,y_ref_mpc,'r.','LineWidth',1.0)
 hold on
-plot(t_sol,y_sol,'b--','LineWidth',1.0)
+plot(t_mpc,y_mpc,'b--','LineWidth',1.0)
 title('Y [m]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('position Y [m]','fontsize',12)
 legend('Reference y path','Calculated y path','Location','southeast')
 subplot(2,2,4)
-plot(t_sol,abs(y_ref(1:end-N_diff)-y_sol),'b','LineWidth',1.0)
+plot(t_ref_mpc,abs(y_ref_mpc-y_mpc),'b','LineWidth',1.0)
 title('Error [m]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
@@ -450,101 +460,176 @@ ylabel('position error Y [m]','fontsize',12)
 % Velocity vs time
 figure('name', 'Vel')
 subplot(2,2,1)
-plot(t_ref,vx_ref,'r.','LineWidth',1.0)
+plot(t_ref_mpc,vx_ref_mpc,'r.','LineWidth',1.0)
 hold on
-plot(t_sol,vx_global,'b--','LineWidth',1.0)
+plot(t_mpc,vx_mpc,'b--','LineWidth',1.0)
 title('v_X [m/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('velocity X [m/s]','fontsize',12)
 legend('Reference X velocity','Calculated X velocity','Location','southeast')
 subplot(2,2,3)
-plot(t_sol,abs(vx_ref(1:end-N_diff)-vx_global),'b','LineWidth',1.0)
+plot(t_mpc,abs(vx_ref_mpc-vx_mpc),'b','LineWidth',1.0)
 title('Error [m/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('velocity error X [m/s]','fontsize',12)
 subplot(2,2,2)
-plot(t_ref,vy_ref,'r.','LineWidth',1.0)
+plot(t_ref_mpc,vy_ref_mpc,'r.','LineWidth',1.0)
 hold on
-plot(t_sol,vy_global,'b--','LineWidth',1.0)
+plot(t_mpc,vy_mpc,'b--','LineWidth',1.0)
 title('v_Y [m/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('velocity Y [m/s]','fontsize',12)
 legend('Reference Y velocity','Calculated Y velocity','Location','southeast')
 subplot(2,2,4)
-plot(t_sol,abs(vy_ref(1:end-N_diff)-vy_global),'b','LineWidth',1.0)
+plot(t_mpc,abs(vy_ref_mpc-vy_mpc),'b','LineWidth',1.0)
 title('Error [m/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('velocity error Y [m/s]','fontsize',12)
 
-% Acceleration vs time
-vx_ref_local = vx_ref.*cos(psi_ref)+vy_ref.*sin(psi_ref);
-vy_ref_local= -vx_ref.*sin(psi_ref)+vy_ref.*cos(psi_ref);
+% Need plots of ay_tot, aty, any, ax_tot, atx, any
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+aty_mpc = derivative(vy_mpc,dt);
+any_mpc = vx_mpc.*psi_mpc;
+ay_tot_mpc = aty_mpc + any_mpc;
+atx_mpc = derivative(vx_mpc,dt);
+anx_mpc = -vy_mpc.*psi_mpc;
+ax_tot_mpc = atx_mpc + anx_mpc;
 
-figure('name', 'Acc')
+aty_ref_mpc = derivative(vy_ref_mpc,dt);
+any_ref_mpc = vx_ref_mpc.*psi_ref_mpc;
+ay_tot_ref_mpc = aty_ref_mpc + any_ref_mpc;
+atx_ref_mpc = derivative(vx_ref_mpc,dt);
+anx_ref_mpc = -vy_ref_mpc.*psi_ref_mpc;
+ax_tot_ref_mpc = atx_ref_mpc + anx_ref_mpc;
+
+figure('name', 'Acc\_y')
 subplot(2,2,1)
-plot(t_ref(1:end-1),diff(vx_ref)./diff(t_ref),'r.','LineWidth',1.0)
+plot(t_ref_mpc,aty_ref_mpc,'r.','LineWidth',1.0)
 hold on
-plot(t_sol(1:end-1),diff(vx_global)./diff(t_sol),'b--','LineWidth',1.0)
-title('a_X [m/s²]','fontsize',12,'fontweight','bold')
+plot(t_mpc,aty_mpc,'b--','LineWidth',1.0)
+title('atY [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
-ylabel('acceleration X [m/s²]','fontsize',12)
-legend('Reference X acceleration','Calculated X acceleration','Location','southeast')
+ylabel('acceleration atY [m/s²]','fontsize',12)
+legend('Reference aty acceleration','Calculated aty acceleration','Location','southeast')
 subplot(2,2,3)
-plot(t_sol(1:end-1),abs(diff(vx_ref_local(1:end-N_diff))./diff(t_ref(1:end-N_diff))-diff(vx_global)./diff(t_sol)),'b','LineWidth',1.0)
+plot(t_mpc,abs(aty_ref_mpc-aty_mpc),'b','LineWidth',1.0)
 title('Error [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
-ylabel('acceleration error X [m/s²]','fontsize',12)
+ylabel('acceleration error aty [m/s²]','fontsize',12)
 subplot(2,2,2)
-plot(t_ref(1:end-1),diff(vy_ref)./diff(t_ref),'r.','LineWidth',1.0)
+plot(t_ref_mpc,any_ref_mpc,'r.','LineWidth',1.0)
 hold on
-plot(t_sol(1:end-1),diff(vy_global)./diff(t_sol),'b--','LineWidth',1.0)
-title('a_Y [m/s²]','fontsize',12,'fontweight','bold')
+plot(t_mpc,any_mpc,'b--','LineWidth',1.0)
+title('anY [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
-ylabel('acceleration Y [m/s²]','fontsize',12)
-legend('Reference Y acceleration','Calculated Y acceleration','Location','southeast')
+ylabel('acceleration any [m/s²]','fontsize',12)
+legend('Reference any acceleration','Calculated any acceleration','Location','southeast')
 subplot(2,2,4)
-plot(t_sol(1:end-1),abs(diff(vy_ref(1:end-N_diff))./diff(t_ref(1:end-N_diff))-diff(vy_global)./diff(t_sol)),'b','LineWidth',1.0)
+plot(t_mpc,abs(any_ref_mpc-any_mpc),'b','LineWidth',1.0)
 title('Error [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
-ylabel('acceleration error Y [m/s²]','fontsize',12)
+ylabel('acceleration error anY [m/s²]','fontsize',12)
 
+figure('name', 'Acc\_x')
+subplot(2,2,1)
+plot(t_ref_mpc,atx_ref_mpc,'r.','LineWidth',1.0)
+hold on
+plot(t_mpc,atx_mpc,'b--','LineWidth',1.0)
+title('atx [m/s²]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('acceleration atx [m/s²]','fontsize',12)
+legend('Reference atx acceleration','Calculated atx acceleration','Location','southeast')
+subplot(2,2,3)
+plot(t_mpc,abs(atx_ref_mpc-atx_mpc),'b','LineWidth',1.0)
+title('Error [m/s²]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('acceleration error atx [m/s²]','fontsize',12)
+subplot(2,2,2)
+plot(t_ref_mpc,anx_ref_mpc,'r.','LineWidth',1.0)
+hold on
+plot(t_mpc,anx_mpc,'b--','LineWidth',1.0)
+title('anx [m/s²]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('acceleration anx [m/s²]','fontsize',12)
+legend('Reference anx acceleration','Calculated anx acceleration','Location','southeast')
+subplot(2,2,4)
+plot(t_mpc,abs(anx_ref_mpc-anx_mpc),'b','LineWidth',1.0)
+title('Error [m/s²]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('acceleration error anx [m/s²]','fontsize',12)
+
+figure('name', 'Acc\_tot')
+subplot(2,2,1)
+plot(t_ref_mpc,ay_tot_ref_mpc,'r.','LineWidth',1.0)
+hold on
+plot(t_mpc,ay_tot_mpc,'b--','LineWidth',1.0)
+title('aytot [m/s²]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('acceleration aytot [m/s²]','fontsize',12)
+legend('Reference aytot acceleration','Calculated aytot acceleration','Location','southeast')
+subplot(2,2,3)
+plot(t_mpc,abs(ay_tot_ref_mpc-ay_tot_mpc),'b','LineWidth',1.0)
+title('Error [m/s²]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('acceleration error aytot [m/s²]','fontsize',12)
+subplot(2,2,2)
+plot(t_ref_mpc,ax_tot_ref_mpc,'r.','LineWidth',1.0)
+hold on
+plot(t_mpc,ax_tot_mpc,'b--','LineWidth',1.0)
+title('axtot [m/s²]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('acceleration axtot [m/s²]','fontsize',12)
+legend('Reference axtot acceleration','Calculated axtot acceleration','Location','southeast')
+subplot(2,2,4)
+plot(t_mpc,abs(ax_tot_mpc-ax_tot_ref_mpc),'b','LineWidth',1.0)
+title('Error [m/s²]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('acceleration error axtot [m/s²]','fontsize',12)
 
 % Yaw and Yaw rate 
 figure('name', 'Yaw')
 subplot(2,2,1)
-plot(t_ref,psi_ref*180/pi,'r.','LineWidth',1.0)
+plot(t_ref_mpc,psi_ref_mpc*180/pi,'r.','LineWidth',1.0)
 hold on
-plot(t_sol,psi_sol*180/pi,'b--','LineWidth',1.0)
+plot(t_mpc,psi_mpc*180/pi,'b--','LineWidth',1.0)
 title('\psi [deg]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('yaw angle \psi [deg]','fontsize',12)
 legend('Reference yaw angle','Calculated yaw angle','Location','northeast')
 subplot(2,2,3)
-plot(t_sol,abs(psi_ref(1:end-N_diff)-psi_sol)*180/pi,'b','LineWidth',1.0)
+plot(t_mpc,abs(psi_ref_mpc-psi_mpc)*180/pi,'b','LineWidth',1.0)
 title('Error [deg]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('yaw angle error \psi [deg]','fontsize',12)
 subplot(2,2,2)
-plot(t_ref,psi_dot_ref*180/pi,'r.','LineWidth',1.0)
+plot(t_ref_mpc,psi_dot_ref_mpc*180/pi,'r.','LineWidth',1.0)
 hold on
-plot(t_sol,psi_dot_sol*180/pi,'b--','LineWidth',1.0)
+plot(t_mpc,psi_dot_mpc*180/pi,'b--','LineWidth',1.0)
 title('d\psi [deg/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('yaw velocity d\psi [deg/s]','fontsize',12)
 legend('Reference yaw velocity','Calculated yaw velocity','Location','northeast')
 subplot(2,2,4)
-plot(t_sol,abs(psi_dot_ref(1:end-N_diff)-psi_dot_sol)*180/pi,'b','LineWidth',1.0)
+plot(t_mpc,abs(psi_dot_ref_mpc-psi_dot_mpc)*180/pi,'b','LineWidth',1.0)
 title('Error [deg/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
@@ -554,335 +639,31 @@ ylabel('yaw velocity error d\psi [deg/s]','fontsize',12)
 % delta & throttle
 figure('name', 'inputs')
 subplot(2,1,1)
-plot(t_sol(1:end-1),delta_sol*180/pi,'b','LineWidth',1.0)
+plot(t_mpc(1:end-1),delta_mpc*180/pi,'b','LineWidth',1.0)
 title('\delta [deg]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('\delta [deg]','fontsize',12)
 subplot(2,1,2)
-plot(t_sol(1:end-1),throttle_sol,'b','LineWidth',1.0)
+plot(t_mpc(1:end-1),throttle_mpc,'b','LineWidth',1.0)
 title('Throttle coefficient t_r [-]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('throttle coefficient t_r [-]','fontsize',12)
 
 % Slipangles
-slipangle_f = atan2(vy_sol(1:end-1)+psi_dot_sol(1:end-1)*a,vx_sol(1:end-1)) - delta_sol;
-slipangle_r = atan2(vy_sol(1:end-1)-psi_dot_sol(1:end-1)*b,vx_sol(1:end-1));
+part1 = atan2(vy_mpc+psi_dot_mpc*a,vx_mpc); 
+slipangle_f = part1(1:end-1) - delta_mpc;
+slipangle_r = atan2(vy_mpc-psi_dot_mpc*b,vx_mpc);
 figure('name', 'slipangles')
-plot(t_sol(1:end-1),slipangle_f*180/pi,'b.','LineWidth',1.0)
+plot(t_mpc(1:end-1),slipangle_f*180/pi,'b.','LineWidth',1.0)
 hold on
-plot(t_sol(1:end-1),slipangle_r*180/pi,'b--','LineWidth',1.0)
+plot(t_mpc,slipangle_r*180/pi,'b--','LineWidth',1.0)
 title('Slipangle [deg]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('\alpha [deg]','fontsize',12)
 legend('\alpha_f','\alpha_r')
 
-% Robustness check
-res_noerror = load('MPC_results_noerror.mat');
-res_error = load('MPC_results_error.mat');
-
-% Path tracking
-% Path (x,y)
-figure('name', 'Path - Robustness check')
-plot(x_ref,y_ref,'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.x_sol,res_noerror.y_sol,'b--','LineWidth',1.0)
-plot(res_error.x_sol,res_error.y_sol,'g--','LineWidth',1.0)
-title('Vehicle path','fontsize',12,'fontweight','bold')
-xlabel('X [m]','fontsize',12)
-xlim([0, x_max])
-ylabel('Y [m]','fontsize',12)
-legend('Reference path','MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-
-% Postion vs time
-figure('name', 'Pos - Robustness check')
-subplot(2,2,1)
-plot(t_ref,x_ref,'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol,res_noerror.x_sol,'b--','LineWidth',1.0)
-plot(res_error.t_sol,res_error.x_sol,'g--','LineWidth',1.0)
-title('X [m]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('position X [m]','fontsize',12)
-legend('Reference x path','MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,3)
-plot(res_noerror.t_sol,abs(x_ref(1:end-N_diff)-res_noerror.x_sol),'b','LineWidth',1.0)
-hold on
-plot(res_error.t_sol,abs(x_ref(1:end-N_diff)-res_error.x_sol),'g','LineWidth',1.0)
-title('Error [m]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('position error X [m]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,2)
-plot(t_ref,y_ref,'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol,res_noerror.y_sol,'b--','LineWidth',1.0)
-plot(res_error.t_sol,res_error.y_sol,'g--','LineWidth',1.0)
-title('Y [m]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('position Y [m]','fontsize',12)
-legend('Reference y path','MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,4)
-plot(res_noerror.t_sol,abs(y_ref(1:end-N_diff)-res_noerror.y_sol),'b','LineWidth',1.0)
-hold on
-plot(res_error.t_sol,abs(y_ref(1:end-N_diff)-res_error.y_sol),'g','LineWidth',1.0)
-title('Error [m]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('position error Y [m]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-
-% Velocity vs time
-figure('name', 'Vel - Robustness check')
-subplot(2,2,1)
-plot(t_ref,vx_ref,'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol,res_noerror.vx_global,'b--','LineWidth',1.0)
-plot(res_error.t_sol,res_error.vx_global,'g--','LineWidth',1.0)
-title('v_X [m/s]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('velocity X [m/s]','fontsize',12)
-legend('Reference X velocity','MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,3)
-plot(res_noerror.t_sol,abs(vx_ref(1:end-N_diff)-res_noerror.vx_global),'b','LineWidth',1.0)
-hold on
-plot(res_error.t_sol,abs(vx_ref(1:end-N_diff)-res_error.vx_global),'g','LineWidth',1.0)
-title('Error [m/s]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('velocity error X [m/s]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,2)
-plot(t_ref,vy_ref,'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol,res_noerror.vy_global,'b--','LineWidth',1.0)
-plot(res_error.t_sol,res_error.vy_global,'g--','LineWidth',1.0)
-title('v_Y [m/s]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('velocity Y [m/s]','fontsize',12)
-legend('Reference Y velocity','MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,4)
-plot(res_noerror.t_sol,abs(vy_ref(1:end-N_diff)-res_noerror.vy_global),'b','LineWidth',1.0)
-hold on
-plot(res_error.t_sol,abs(vy_ref(1:end-N_diff)-res_error.vy_global),'g','LineWidth',1.0)
-title('Error [m/s]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('velocity error Y [m/s]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-
-accx_ref = diff(vx_ref)./diff(t_ref);
-accx_sol_noerror = diff(res_noerror.vx_global)./diff(res_noerror.t_sol);
-accx_sol_error = diff(res_error.vx_global)./diff(res_error.t_sol);
-accy_ref = diff(vy_ref)./diff(t_ref);
-accy_sol_noerror = diff(res_noerror.vy_global)./diff(res_noerror.t_sol);
-accy_sol_error = diff(res_error.vy_global)./diff(res_error.t_sol);
-
-figure('name', 'Acc - Robustness check')
-subplot(2,2,1)
-plot(t_ref(1:end-1),accx_ref,'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol(1:end-1),diff(res_noerror.vx_global)./diff(res_noerror.t_sol),'b--','LineWidth',1.0)
-plot(res_error.t_sol(1:end-1),diff(res_error.vx_global)./diff(res_error.t_sol),'g--','LineWidth',1.0)
-title('a_X [m/s²]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('acceleration X [m/s²]','fontsize',12)
-legend('Reference X acceleration','MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,3)
-plot(res_noerror.t_sol(1:end-1),abs(diff(vx_ref_local(1:end-N_diff))./diff(t_ref(1:end-N_diff))-diff(res_noerror.vx_global)./diff(res_noerror.t_sol)),'b','LineWidth',1.0)
-hold on
-plot(res_error.t_sol(1:end-1),abs(diff(vx_ref_local(1:end-N_diff))./diff(t_ref(1:end-N_diff))-diff(res_error.vx_global)./diff(res_error.t_sol)),'g','LineWidth',1.0)
-title('Error [m/s²]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('acceleration error X [m/s²]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,2)
-plot(t_ref(1:end-1),diff(vy_ref)./diff(t_ref),'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol(1:end-1),diff(res_noerror.vy_global)./diff(res_noerror.t_sol),'b--','LineWidth',1.0)
-plot(res_error.t_sol(1:end-1),diff(res_error.vy_global)./diff(res_error.t_sol),'g--','LineWidth',1.0)
-title('a_Y [m/s²]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('acceleration Y [m/s²]','fontsize',12)
-legend('Reference Y acceleration','MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,4)
-plot(res_noerror.t_sol(1:end-1),abs(diff(vy_ref(1:end-N_diff))./diff(t_ref(1:end-N_diff))-diff(res_noerror.vy_global)./diff(res_noerror.t_sol)),'b','LineWidth',1.0)
-hold on
-plot(res_error.t_sol(1:end-1),abs(diff(vy_ref(1:end-N_diff))./diff(t_ref(1:end-N_diff))-diff(res_error.vy_global)./diff(res_error.t_sol)),'g','LineWidth',1.0)
-title('Error [m/s²]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('acceleration error Y [m/s²]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-
-% Yaw and Yaw rate 
-figure('name', 'Yaw - Robustness check')
-subplot(2,2,1)
-plot(t_ref,psi_ref*180/pi,'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol,res_noerror.psi_sol*180/pi,'b--','LineWidth',1.0)
-plot(res_error.t_sol,res_error.psi_sol*180/pi,'g--','LineWidth',1.0)
-title('\psi [deg]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('yaw angle \psi [deg]','fontsize',12)
-legend('Reference yaw angle','MPC (ideal model)','MPC (model mismatch)','Location','northeast')
-subplot(2,2,3)
-plot(res_noerror.t_sol,abs(psi_ref(1:end-N_diff)-res_noerror.psi_sol)*180/pi,'b','LineWidth',1.0)
-hold on
-plot(res_error.t_sol,abs(psi_ref(1:end-N_diff)-res_error.psi_sol)*180/pi,'g','LineWidth',1.0)
-title('Error [deg]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('yaw angle error \psi [deg]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-subplot(2,2,2)
-plot(t_ref,psi_dot_ref*180/pi,'r.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol,res_noerror.psi_dot_sol*180/pi,'b--','LineWidth',1.0)
-plot(res_error.t_sol,res_error.psi_dot_sol*180/pi,'g--','LineWidth',1.0)
-title('d\psi [deg/s]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('yaw velocity d\psi [deg/s]','fontsize',12)
-legend('Reference yaw velocity','MPC (ideal model)','MPC (model mismatch)','Location','northeast')
-subplot(2,2,4)
-plot(res_noerror.t_sol,abs(psi_dot_ref(1:end-N_diff)-res_noerror.psi_dot_sol)*180/pi,'b','LineWidth',1.0)
-hold on
-plot(res_error.t_sol,abs(psi_dot_ref(1:end-N_diff)-res_error.psi_dot_sol)*180/pi,'g','LineWidth',1.0)
-title('Error [deg/s]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('yaw velocity error d\psi [deg/s]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','southeast')
-
-% Inputs
-% delta & throttle
-figure('name', 'inputs - Robustness check')
-subplot(2,1,1)
-plot(res_noerror.t_sol(1:end-1),res_noerror.delta_sol*180/pi,'r.','LineWidth',1.0)
-hold on
-plot(res_error.t_sol(1:end-1),res_error.delta_sol*180/pi,'b--','LineWidth',1.0)
-title('\delta [deg]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('\delta [deg]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','northeast')
-subplot(2,1,2)
-plot(res_noerror.t_sol(1:end-1),res_noerror.throttle_sol,'r.','LineWidth',1.0)
-hold on
-plot(res_error.t_sol(1:end-1),res_error.throttle_sol,'b--','LineWidth',1.0)
-title('Throttle coefficient t_r [-]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('throttle coefficient t_r [-]','fontsize',12)
-legend('MPC (ideal model)','MPC (model mismatch)','Location','northeast')
-
-% Slipangles
-res_noerror.slipangle_f = atan2(res_noerror.vy_sol(1:end-1)+res_noerror.psi_dot_sol(1:end-1)*a,res_noerror.vx_sol(1:end-1)) - res_noerror.delta_sol;
-res_noerror.slipangle_r = atan2(res_noerror.vy_sol(1:end-1)-res_noerror.psi_dot_sol(1:end-1)*b,res_noerror.vx_sol(1:end-1));
-
-res_error.slipangle_f = atan2(res_error.vy_sol(1:end-1)+res_error.psi_dot_sol(1:end-1)*a,res_error.vx_sol(1:end-1)) - res_error.delta_sol;
-res_error.slipangle_r = atan2(res_error.vy_sol(1:end-1)-res_error.psi_dot_sol(1:end-1)*b,res_error.vx_sol(1:end-1));
-
-figure('name', 'slipangles - Robustness check')
-plot(res_noerror.t_sol(1:end-1),res_noerror.slipangle_f*180/pi,'b.','LineWidth',1.0)
-hold on
-plot(res_noerror.t_sol(1:end-1),res_noerror.slipangle_r*180/pi,'b--','LineWidth',1.0)
-plot(res_error.t_sol(1:end-1),res_error.slipangle_f*180/pi,'g.','LineWidth',1.0)
-plot(res_error.t_sol(1:end-1),res_error.slipangle_r*180/pi,'g--','LineWidth',1.0)
-title('Slipangle [deg]','fontsize',12,'fontweight','bold')
-xlabel('t [s]','fontsize',12)
-xlim([0, t_max])
-ylabel('\alpha [deg]','fontsize',12)
-legend('\alpha_f (ideal model)','\alpha_r (ideal model)','\alpha_f (model mismatch)','\alpha_r (ideal model mismatch)')
-
-% Relative errors
-signalx = abs((x_ref(1:end-N_diff)-res_noerror.x_sol)./x_ref(1:end-N_diff));
-signalx(isnan(signalx)) = 0;
-signalx(isinf(signalx)) = 0;
-signaly = abs((y_ref(1:end-N_diff)-res_noerror.y_sol)./y_ref(1:end-N_diff));
-signaly(isnan(signaly)) = 0;
-signaly(isinf(signaly)) = 0;
-error_pos_noerror = mean(sqrt(signalx.^2 + signaly.^2));
-
-signalx = abs((x_ref(1:end-N_diff)-res_error.x_sol)./x_ref(1:end-N_diff));
-signalx(isnan(signalx)) = 0;
-signalx(isinf(signalx)) = 0;
-signaly = abs((y_ref(1:end-N_diff)-res_error.y_sol)./y_ref(1:end-N_diff));
-signaly(isnan(signaly)) = 0;
-signaly(isinf(signaly)) = 0;
-error_pos_error = mean(sqrt(signalx.^2 + signaly.^2));
-
-signalx = abs((vx_ref(1:end-N_diff)-res_noerror.vx_global)./vx_ref(1:end-N_diff));
-signalx(isnan(signalx)) = 0;
-signalx(isinf(signalx)) = 0;
-signaly = abs((vy_ref(1:end-N_diff)-res_noerror.vy_global)./vy_ref(1:end-N_diff));
-signaly(isnan(signaly)) = 0;
-signaly(isinf(signaly)) = 0;
-error_vel_noerror = mean(sqrt(signalx.^2 + signaly.^2));
-
-signalx = abs((vx_ref(1:end-N_diff)-res_error.vx_global)./vx_ref(1:end-N_diff));
-signalx(isnan(signalx)) = 0;
-signalx(isinf(signalx)) = 0;
-signaly = abs((vy_ref(1:end-N_diff)-res_error.vy_global)./vy_ref(1:end-N_diff));
-signaly(isnan(signaly)) = 0;
-signaly(isinf(signaly)) = 0;
-error_vel_error = mean(sqrt(signalx.^2 + signaly.^2));
-
-signalx = abs((accx_ref(1:end-N_diff)-accx_sol_noerror)./accx_ref(1:end-N_diff));
-signalx(isnan(signalx)) = 0;
-signalx(isinf(signalx)) = 0;
-signaly = abs((accy_ref(1:end-N_diff)-accy_sol_noerror)./accy_ref(1:end-N_diff));
-signaly(isnan(signaly)) = 0;
-signaly(isinf(signaly)) = 0;
-error_acc_noerror = mean(sqrt(signalx.^2 + signaly.^2));
-
-signalx = abs((accx_ref(1:end-N_diff)-accx_sol_error)./accx_ref(1:end-N_diff));
-signalx(isnan(signalx)) = 0;
-signalx(isinf(signalx)) = 0;
-signaly = abs((accy_ref(1:end-N_diff)-accy_sol_error)./accy_ref(1:end-N_diff));
-signaly(isnan(signaly)) = 0;
-signaly(isinf(signaly)) = 0;
-error_acc_error = mean(sqrt(signalx.^2 + signaly.^2));
-
-signalx = abs((psi_ref(1:end-N_diff)-res_noerror.psi_sol)./x_ref(1:end-N_diff));
-signalx(isnan(signalx)) = 0;
-signalx(isinf(signalx)) = 0;
-signaly = abs((psi_ref(1:end-N_diff)-res_noerror.psi_sol)./psi_ref(1:end-N_diff));
-signaly(isnan(signaly)) = 0;
-signaly(isinf(signaly)) = 0;
-error_yaw_noerror = mean(sqrt(signalx.^2 + signaly.^2));
-
-signalx = abs((psi_ref(1:end-N_diff)-res_error.psi_sol)./psi_ref(1:end-N_diff));
-signalx(isnan(signalx)) = 0;
-signalx(isinf(signalx)) = 0;
-signaly = abs((psi_ref(1:end-N_diff)-res_error.psi_sol)./psi_ref(1:end-N_diff));
-signaly(isnan(signaly)) = 0;
-signaly(isinf(signaly)) = 0;
-error_yaw_error = mean(sqrt(signalx.^2 + signaly.^2));
-
-disp('Relative errors')
-disp('---------------')
-disp('   Position:')
-disp(['     No error: ', string(error_pos_noerror)])
-disp(['     Error: ', string(error_pos_error)])
-disp('   Velocity:')
-disp(['     No error: ', string(error_vel_noerror)])
-disp(['     Error: ', string(error_vel_error)])
-disp('   Acceleration:')
-disp(['     No error: ', string(error_acc_noerror)])
-disp(['     Error: ', string(error_acc_error)])
-disp('   Yaw angle:')
-disp(['     No error: ', string(error_yaw_noerror)])
-disp(['     Error: ', string(error_yaw_error)])
+disp('End of tracking!')
+disp('**********************************')
