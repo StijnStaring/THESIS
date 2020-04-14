@@ -125,4 +125,7 @@ log.txt
 !Generating data_tracking/tracking_mpc.m
 /Generating data/__pycache__/import_ideal_data.cpython-37.pyc
 /learning model/__pycache__/import_ideal_data.cpython-37.pyc
+/learning model/written_data_detailed_fixed_time/
+/learning model/written_data/
+/learning model/written_dataset/
 

@@ -45,7 +45,7 @@ function data = get_data(file,sampling_rate,N)
     
     data.x = zeros(length(time)+N-1,1);
     data.x(1:length(time),1) = x;
-    data.x(length(time)+1:end,1) = vx(end)*(time(end)+1/sampling_rate:1/sampling_rate:time(end)+(N-1)*1/sampling_rate);
+    data.x(length(time)+1:end,1) = diff([x(end-1),x(end)])/diff([time(end-1),time(end)])*(time(end)+1/sampling_rate:1/sampling_rate:time(end)+(N-1)*1/sampling_rate);
     
     data.y = zeros(length(time)+N-1,1);
     data.y(1:length(time),1) = y;
@@ -103,72 +103,72 @@ function data = get_data(file,sampling_rate,N)
     data.any(1:length(time),1) = any;
     data.any(length(time)+1:end,1) = 0*(time(end)+1/sampling_rate:1/sampling_rate:time(end)+(N-1)*1/sampling_rate);
     
-    %% plotting
-    % Postion vs time
-    figure('name', 'pos')
-    subplot(1,2,1)
-    plot(data.time,data.x,'LineWidth',2.0)
-    title('X [m]','fontsize',12,'fontweight','bold')
-    xlabel('t [s]','fontsize',12)
-    ylabel('Position X [m]','fontsize',12)
-    legend('data\_pathx')
-
-
-    subplot(1,2,2)
-    plot(data.time,data.y,'LineWidth',2.0)
-    title('Y [m]','fontsize',12,'fontweight','bold')
-    xlabel('t [s]','fontsize',12)
-    ylabel('Position Y [m]','fontsize',12)
-    legend('data\_pathy')
-
-     % Velocity vs time
-    figure('name', 'vel')
-    subplot(1,2,1)
-    plot(data.time,data.vx,'LineWidth',1.0)
-    title('vx [m/s] local axis','fontsize',12,'fontweight','bold')
-    xlabel('t [s]','fontsize',12)
-    ylabel('Velocity x [m/s]','fontsize',12)
-    legend('data\_vx')
-    
-
-    subplot(1,2,2)
-    plot(data.time,data.vy,'LineWidth',1.0)
-    title('vy [m/s] local axis','fontsize',12,'fontweight','bold')
-    xlabel('t [s]','fontsize',12)
-    ylabel('Velocity y [m/s]','fontsize',12)
-    legend('calc\_vy')
-
-
-     % Yaw and Yaw rate 
-    figure('name', 'yaws')
-    subplot(1,2,1)
-    plot(data.time,data.psi*180/pi,'LineWidth',1.0)
-    title('yaw [°]','fontsize',12,'fontweight','bold')
-    xlabel('t [s]','fontsize',12)
-    ylabel('yaw [°]','fontsize',12)
-    legend('calc\_psi')
-
-
-    subplot(1,2,2)
-    plot(data.time,data.psi_dot*180/pi,'LineWidth',2.0)
-    title('yaw\_rate [°/s]','fontsize',12,'fontweight','bold')
-    xlabel('t [s]','fontsize',12)
-    ylabel('yaw/s [°/s]','fontsize',12)
-    legend('calc\_psi_dot')
-
-     % deltas
-    figure('name', 'delta')
-    plot(data.time,data.delta*180/pi,'LineWidth',2.0)
-    title('Delta [°]','fontsize',12,'fontweight','bold')
-    xlabel('t [s]','fontsize',12)
-    ylabel('delta [°]','fontsize',12)
-
-     % throttle
-    figure('name', 'throttle')
-    plot(data.time,data.throttle,'LineWidth',2.0)
-    title('throttle [-]','fontsize',12,'fontweight','bold')
-    xlabel('t [s]','fontsize',12)
-    ylabel('throttle [-]','fontsize',12)
+%     % plotting
+%     Postion vs time
+%     figure('name', 'pos')
+%     subplot(1,2,1)
+%     plot(data.time,data.x,'LineWidth',1.0)
+%     title('X [m]','fontsize',12,'fontweight','bold')
+%     xlabel('t [s]','fontsize',12)
+%     ylabel('Position X [m]','fontsize',12)
+%     legend('data\_pathx')
+% 
+% 
+%     subplot(1,2,2)
+%     plot(data.time,data.y,'LineWidth',1.0)
+%     title('Y [m]','fontsize',12,'fontweight','bold')
+%     xlabel('t [s]','fontsize',12)
+%     ylabel('Position Y [m]','fontsize',12)
+%     legend('data\_pathy')
+% 
+%      Velocity vs time
+%     figure('name', 'vel')
+%     subplot(1,2,1)
+%     plot(data.time,data.vx,'LineWidth',1.0)
+%     title('vx [m/s] local axis','fontsize',12,'fontweight','bold')
+%     xlabel('t [s]','fontsize',12)
+%     ylabel('Velocity x [m/s]','fontsize',12)
+%     legend('data\_vx')
+%     
+% 
+%     subplot(1,2,2)
+%     plot(data.time,data.vy,'LineWidth',1.0)
+%     title('vy [m/s] local axis','fontsize',12,'fontweight','bold')
+%     xlabel('t [s]','fontsize',12)
+%     ylabel('Velocity y [m/s]','fontsize',12)
+%     legend('calc\_vy')
+% 
+% 
+%      Yaw and Yaw rate 
+%     figure('name', 'yaws')
+%     subplot(1,2,1)
+%     plot(data.time,data.psi*180/pi,'LineWidth',1.0)
+%     title('yaw [°]','fontsize',12,'fontweight','bold')
+%     xlabel('t [s]','fontsize',12)
+%     ylabel('yaw [°]','fontsize',12)
+%     legend('calc\_psi')
+% 
+% 
+%     subplot(1,2,2)
+%     plot(data.time,data.psi_dot*180/pi,'LineWidth',1.0)
+%     title('yaw\_rate [°/s]','fontsize',12,'fontweight','bold')
+%     xlabel('t [s]','fontsize',12)
+%     ylabel('yaw/s [°/s]','fontsize',12)
+%     legend('calc\_psi_dot')
+% 
+%      deltas
+%     figure('name', 'delta')
+%     plot(data.time,data.delta*180/pi,'LineWidth',1.0)
+%     title('Delta [°]','fontsize',12,'fontweight','bold')
+%     xlabel('t [s]','fontsize',12)
+%     ylabel('delta [°]','fontsize',12)
+% 
+%      throttle
+%     figure('name', 'throttle')
+%     plot(data.time,data.throttle,'LineWidth',1.0)
+%     title('throttle [-]','fontsize',12,'fontweight','bold')
+%     xlabel('t [s]','fontsize',12)
+%     ylabel('throttle [-]','fontsize',12)
     
     
 end

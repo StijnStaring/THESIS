@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/learning model" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/checks/local-global-min" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Generating data" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Generating data_tracking" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

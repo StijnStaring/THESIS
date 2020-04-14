@@ -17,15 +17,15 @@ amount_files = max(size(files));
 total_data = cell(1,amount_files);
 data = get_data(char(files(:,1)),sampling_rate,N);
 dt = 1/sampling_rate;
-amount_simulations = length(data.time) - 1;
+N_sim = length(data.time) - 1;
 vx_start = data.vx(1,1);
-x_ref = data.x(1:N+1)';
-y_ref = data.y(1:N+1)';
-vx_ref = data.vx(1:N+1)';
-vy_ref = data.vy(1:N+1)';
-psi_ref = data.psi(1:N+1)';
-psi_dot_ref = data.psi_dot(1:N+1)';
-t_ref = data.time(1:N+1)';
+x_ref = data.x';
+y_ref = data.y';
+vx_ref = data.vx';
+vy_ref = data.vy';
+psi_ref = data.psi';
+psi_dot_ref = data.psi_dot';
+t_ref = data.time';
 
 %% Parameters of the optimization
 disp('Start of Simulation')
@@ -315,22 +315,35 @@ xlabel('t [s]','fontsize',12)
 ylabel('throttle [-]','fontsize',12)
 
 % Calculate the total error made 
-x_error = sum(abs(x_sol-x_ref));
-y_error = sum(abs(y_sol-y_ref));
-vx_error = sum(abs(vx_sol-vx_ref));
-vy_error = sum(abs(vy_sol-vy_ref));
-psi_error = sum(abs(psi_sol-psi_ref));
-psi_dot_error = sum(abs(psi_dot_sol-psi_dot_ref));
+x_error = sum(abs(x_sol-x_ref(1:N+1)));
+y_error = sum(abs(y_sol-y_ref(1:N+1)));
+vx_error = sum(abs(vx_sol-vx_ref(1:N+1)));
+vy_error = sum(abs(vy_sol-vy_ref(1:N+1)));
+psi_error = sum(abs(psi_sol-psi_ref(1:N+1)));
+psi_dot_error = sum(abs(psi_dot_sol-psi_dot_ref(1:N+1)));
+mx_error = mean(abs(x_sol-x_ref(1:N+1)));
+my_error = mean(abs(y_sol-y_ref(1:N+1)));
+mvx_error = mean(abs(vx_sol-vx_ref(1:N+1)));
+mvy_error = mean(abs(vy_sol-vy_ref(1:N+1)));
+mpsi_error = mean(abs(psi_sol-psi_ref(1:N+1)));
+mpsi_dot_error = mean(abs(psi_dot_sol-psi_dot_ref(1:N+1)));
 disp('**************************************************')
 disp('This are the errors: ')
 disp('------------------------')
+disp('total error')
 fprintf('This is the total x error: %i \n',x_error)
 fprintf('This is the total y error: %i \n',y_error)
 fprintf('This is the total vx error: %i \n',vx_error)
 fprintf('This is the total vy error: %i \n',vy_error)
 fprintf('This is the total psi error: %i \n',psi_error)
 fprintf('This is the total psi dot error: %i \n',psi_dot_error)
-
+disp('mean error')
+fprintf('This is the total x error: %i \n',mx_error)
+fprintf('This is the total y error: %i \n',my_error)
+fprintf('This is the total vx error: %i \n',mvx_error)
+fprintf('This is the total vy error: %i \n',mvy_error)
+fprintf('This is the total psi error: %i \n',mpsi_error)
+fprintf('This is the total psi dot error: %i \n',mpsi_dot_error)
 
 
 %%
@@ -338,14 +351,13 @@ fprintf('This is the total psi dot error: %i \n',psi_dot_error)
 %    MPC loop
 % -----------------------------------------------
 
-current_x = [0;0;25.91;0;0;0];
+current_x = [0;0;vx_start;0;0;0];
 current_ref = zeros(nx,N+1);
 
 x_history = zeros(nx,N_sim+1);
 u_history = zeros(nc,N_sim);
 x_history(:,1) = current_x;
 
-rand ("state", 0) % state is the seed of the random number.
 disp('MPC running')
 % hot start --> start optimization with solution of lagrange multipliers and optimal states of previous optimization.
 inputs = {x0,ref,opti.x,opti.lam_g}; 
