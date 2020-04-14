@@ -52,7 +52,7 @@ pi = 3.14159265359
 # Parameters of the optimization
 nx = 6 # amount of states
 nc = 2 # amount of controls
-N = 500
+N = 1500
 
 x_start = 0
 y_start = 0
@@ -84,12 +84,16 @@ delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siem
 # ----------------------------------
 #    for loop over optimization
 # ----------------------------------
-vx_start_a = plt.array([80/3.6,90/3.6,100/3.6,110/3.6])
-width_road_a = plt.array([3.46990715, 3.46990715*2])
+# vx_start_a = plt.array([80/3.6,90/3.6,100/3.6,110/3.6])
+# width_road_a = plt.array([3.46990715, 3.46990715*2])
+vx_start_a = plt.array([80/3.6])
+width_road_a = plt.array([3.46990715])
 # vx_start_a = plt.array([80/3.6])
 # width_road_a = plt.array([3.46990715])
 for vx_start in vx_start_a:
     for width_road in width_road_a:
+        print("")
+        print("vx_start: ",vx_start," and width_road: ",width_road)
 
 
         # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
@@ -432,22 +436,22 @@ for vx_start in vx_start_a:
         #    Storing of data in csv-file
         # ----------------------------------
 
-        # path = "written_dataset\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
-        # file = open(path,'w',newline= "")
-        # writer = csv.writer(file)
-        # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
-        #
-        # for i in range(N+1):
-        #     if i == N: # last control point has no physical meaning
-        #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
-        #     else:
-        #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
-        #
-        # file.close()
-        # print('dt of the optimization is: ', dt_sol)
-        # print('')
-        # print('Simulation completed!')
-        # print('\n')
+        path = "written_data_detailed\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
+        file = open(path,'w',newline= "")
+        writer = csv.writer(file)
+        writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
+
+        for i in range(N+1):
+            if i == N: # last control point has no physical meaning
+                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
+            else:
+                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+
+        file.close()
+        print('dt of the optimization is: ', dt_sol)
+        print('')
+        print('Simulation completed!')
+        print('\n')
 
 
 # ----------------------------------
