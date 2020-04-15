@@ -1,7 +1,4 @@
-function [x_sol_prev,lam_prev] = Function_generation(data)
-close all
-clc
-clearvars
+function [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function)
 import casadi.*
 %% Assumptions
 % Instantanous torque and steerwheelangle change --> okay (small values)
@@ -119,7 +116,8 @@ psi_dot = X(6,:);
 % Decision variables for control vector
 U =  opti.variable(nc,N);
 throttle = U(1,:);
-% delta = U(2,:);
+delta = U(2,:);
+delta_dot = diff(delta)./dt; % for smoothing the delta signal
 
 % Parameters
 x0 = opti.parameter(nx);
@@ -150,8 +148,7 @@ opti.subject_to(X(:,1)==x0);
 
 % Objective: vehicle tries to follow a moving point model: x(t) and y(t)
 % opti.minimize((x-ref(1,1:N+1))*transpose((x-ref(1,1:N+1)))+(y-ref(2,1:N+1))*transpose((y-ref(2,1:N+1)))+(psi-ref(5,1:N+1))*transpose((psi-ref(5,1:N+1))));
-opti.minimize((x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))));
-disp('opti.minimize((x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))))');
+opti.minimize((x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))) + 10*sumsqr(U(1,:)) + 0.01*sumsqr(delta_dot));
 
 % opti.minimize(sumsqr((x-ref(1,1:N+1)))+sumsqr((y-ref(2,1:N+1)))+ sumsqr(U(1,:))+sumsqr(U(2,:)));
 % opti.minimize((x-x_ref_obj)*transpose((x-x_ref_obj))+(y-y_ref_obj)*transpose((y-y_ref_obj)));
@@ -207,9 +204,11 @@ x_sol_prev = sol.value(opti.x);
 lam_prev = sol.value(opti.lam_g);
 % hot start --> start optimization with solution of lagrange multipliers and optimal states of previous optimization.
 inputs = {x0,ref,opti.x,opti.lam_g}; 
-outputs = {U(:,1),opti.x,opti.lam_g};
-planner_lane_change = opti.to_function('planner_lane_change',inputs,outputs);
-planner_lane_change.save('planner_lane_change.casadi');
+outputs = {X,U,opti.x,opti.lam_g};
+tracking_lane_change = opti.to_function('tracking_lane_change',inputs,outputs);
+if update_casadi_function == 1
+    tracking_lane_change.save('tracking_lane_change.casadi');
+end
 % when loading -> DM.set_precision(15)
 
 end

@@ -47,7 +47,7 @@ function data = get_data(file,sampling_rate,N)
     data.x = zeros(length(time)+N-1,1);
     data.x(1:length(time),1) = x;
     x_dot = cos(psi(end))*vx(end)-sin(psi(end))*vy(end);
-    data.x(length(time)+1:end,1) = x(end)+x_dot*[1/sampling_rate:1/sampling_rate:(N-1)*1/sampling_rate];
+    data.x(length(time)+1:end,1) = x(end)+x_dot*(1/sampling_rate:1/sampling_rate:(N-1)*1/sampling_rate);
        
     data.y = zeros(length(time)+N-1,1);
     data.y(1:length(time),1) = y;

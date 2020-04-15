@@ -52,7 +52,7 @@ pi = 3.14159265359
 # Parameters of the optimization
 nx = 6 # amount of states
 nc = 2 # amount of controls
-N = 1500
+N = 500
 
 x_start = 0
 y_start = 0
