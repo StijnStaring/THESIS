@@ -21,6 +21,7 @@ function data = get_data(file,sampling_rate,N)
     delta_d = read(:,14);
     aty_d = read(:,15);
     any_d = read(:,16);  
+    
     % adjusting sampling rate --> amount of samples per second
     
     [x,time] = resample(x_d,time_d,sampling_rate,1,1);
@@ -171,5 +172,6 @@ function data = get_data(file,sampling_rate,N)
     xlabel('t [s]','fontsize',12)
     ylabel('throttle [-]','fontsize',12)
     
-    
+    close all
+      
 end
