@@ -10,7 +10,8 @@ files = {'DATA2_V22.22_L3.47.csv'};
 N = 50; % Control horizon of one optimization of the MPC.
 sampling_rate = 100;
 dt = 1/sampling_rate;
-data = get_data(char(files(:,1)),sampling_rate,N);
+Tf = 8.0; % if want same length as reference lane change set Tf = 0
+data = get_data(char(files(:,1)),sampling_rate,N,Tf);
 N_sim = length(data.time) - N;
 update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
@@ -21,7 +22,9 @@ lane_change = 1;
 % Simulation sampling time and duration
 Ts = dt;
 Ts_MP = dt;
-Tf = dt*N_sim;
+if Tf == 0
+    Tf = dt*N_sim;
+end
 
 % Set the initial speed in the Amesim model
 addpath(fullfile(getenv('AME'),'scripting','matlab','amesim'));
@@ -80,16 +83,6 @@ vx_ref_mpc = vx_ref(1:N_sim+1);
 vy_ref_mpc = vy_ref(1:N_sim+1);
 psi_ref_mpc = psi_ref(1:N_sim+1);
 psi_dot_ref_mpc = psi_dot_ref(1:N_sim+1);
-
-% % Save values
-% [X, Y, Vx, Vy, r, yaw, steering_degree, throttle, brake, ax, ay]
-% M = [time, X(:,1), Y(:,1), vx(:,1), vy(:,1), R(:,1), Phi(:,1), Control_signals(:,1).*(180/pi), Control_signals(:,2), Control_signals(:,3), ax, ay];
-% % Convert cell to a table and use first row as variable names
-% T = array2table(M,'VariableNames',{'time', 'X', 'Y', 'Vx', 'Vy', 'r', 'yaw', 'steering_deg', 'throttle', ...
-% 'brake', 'ax', 'ay'});
-% % Write the table to a CSV file
-% writetable(T,['.\Datasets\Dataset_Xchange',num2str(X_change),'_V0=',num2str(v0*3.6),'.csv'])
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plots
@@ -329,10 +322,43 @@ xlim([0, t_max])
 ylabel('\delta [deg]','fontsize',12)
 subplot(2,1,2)
 plot(t_mpc(1:end-1),throttle_mpc,'b','LineWidth',1.0)
-title('Throttle coefficient t_r [-]','fontsize',12,'fontweight','bold')
+hold on
+plot(t_mpc(1:end-1),brake_mpc,'k','LineWidth',1.0)
+title('Throttle & Brake [-]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
-ylabel('throttle coefficient t_r [-]','fontsize',12)
+ylabel('throttle & brake [-]','fontsize',12)
+
+% Calculate the jerks
+psi_ddot_mpc = deriv2(psi_mpc,dt);
+jy_t = deriv2(vy_mpc,dt);
+jy_n =  zeros(1,length(t_mpc));
+for i =1:1:length(t_mpc)
+    jy_n(i) = psi_dot_mpc(i)*atx_mpc(i) + vx_mpc(i)*psi_ddot_mpc(i);
+end
+jy_tot_mpc = jy_t+jy_n;
+
+jx_t = deriv2(vx_mpc,dt);
+jx_n =  zeros(1,length(t_mpc));
+for i =1:1:length(t_mpc)
+    jx_n(i) = -psi_dot_mpc(i) * aty_mpc(i) - vy_mpc(i) * psi_ddot_mpc(i);
+end
+jx_tot_mpc = jx_t+jx_n;
+
+% Jerks
+figure('name', 'jerks')
+subplot(2,1,1)
+plot(t_mpc(1:end),jx_tot_mpc,'b','LineWidth',1.0)
+title('jerk x [m/s^3]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('jerk\_tot\_x [m/s^3]','fontsize',12)
+subplot(2,1,2)
+plot(t_mpc,jy_tot_mpc,'b','LineWidth',1.0)
+title('jerk y [m/s^3]','fontsize',12,'fontweight','bold')
+xlabel('t [s]','fontsize',12)
+xlim([0, t_max])
+ylabel('jerk\_tot\_y [m/s^3]','fontsize',12)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Output of motion planning
@@ -355,4 +381,27 @@ disp('Output of throttle [-] given by the motion planner: ')
 % disp(throttle_MP')
 fprintf('\n')
 disp('Simulation terminated!')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write data to a csv file
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+name = char(files(:,1));
+delta_mpc_save = zeros(length(delta_mpc)+1,1);
+delta_mpc_save(1:length(delta_mpc)) = delta_mpc';
+
+throttle_mpc_save = zeros(length(throttle_mpc)+1,1);
+throttle_mpc_save(1:length(throttle_mpc)) = throttle_mpc';
+
+brake_mpc_save = zeros(length(brake_mpc)+1,1);
+brake_mpc_save(1:length(brake_mpc)) = brake_mpc';
+% Save values
+M = [t_mpc', x_mpc',y_mpc',vx_mpc',vy_mpc',ax_tot_mpc',ay_tot_mpc',jx_tot_mpc',jy_tot_mpc',psi_mpc',psi_dot_mpc',psi_ddot_mpc',throttle_mpc_save,delta_mpc_save,aty_mpc',any_mpc',atx_mpc',anx_mpc',brake_mpc_save];
+% Convert cell to a table and use first row as variable names
+T = array2table(M,'VariableNames',{'time','x','y','vx','vy','ax','ay','jx','jy','psi','psi_dot','psi_ddot','throttle','delta','aty','any','atx','anx','brake'});
+% Write the table to a CSV file
+writetable(T,convertStringsToChars(".\written_data\DataA_V"+convertCharsToStrings(name(8:12))+"_L"+ convertCharsToStrings(name(15:18))+".csv"))
+disp('CSV-file written')
+
+
+
 

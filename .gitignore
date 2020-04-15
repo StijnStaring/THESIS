@@ -123,6 +123,7 @@ log.txt
 !Generating data_tracking/PlanningFunction.m
 !Generating data_tracking/previous_solution.mat
 !Generating data_tracking/tracking_mpc.m
+!Generating data_tracking/deriv2.m
 /Generating data/__pycache__/import_ideal_data.cpython-37.pyc
 /learning model/__pycache__/import_ideal_data.cpython-37.pyc
 /learning model/written_data_detailed_fixed_time/
