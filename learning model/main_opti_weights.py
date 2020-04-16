@@ -34,7 +34,8 @@ his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
 conflict_flags = plt.zeros([amount_features,1])
 rec = 1
-N = 500 # amount of data points
+N = 500
+# N = 500 # amount of data points
 tol = 1e-4
 # width_road = 3.46990715
 # vx_start = 23.10159175
@@ -135,9 +136,11 @@ while converged != 1 and rec <= 300:
     his_update.append(update)
     his_del_theta_prev.append(del_theta_prev)
 
-    # Check if all features are converged
-    if all(plt.absolute(f_calc_rel - 1) <= tol):
+    # Check if all features are converged or that the weights are not changing anymore
+    if all(plt.absolute(f_calc_rel - 1) <= tol) or all(update <= 1e-4):
         converged = 1
+        if all(update <= 1e-4):
+            print('No change in theta detected anymore - learning terminated')
     print('Converged vector: ',converged)
 
     # Check what direction to go in optimization
