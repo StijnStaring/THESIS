@@ -149,7 +149,7 @@ opti.subject_to(X(:,1)==x0);
 
 % Objective: vehicle tries to follow a moving point model: x(t) and y(t)
 % opti.minimize((x-ref(1,1:N+1))*transpose((x-ref(1,1:N+1)))+(y-ref(2,1:N+1))*transpose((y-ref(2,1:N+1)))+(psi-ref(5,1:N+1))*transpose((psi-ref(5,1:N+1))));
-opti.minimize(800*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+800*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+10*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))) + 5*sumsqr(throttle_dot) + 0.01*sumsqr(delta_dot));
+opti.minimize(20*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+20*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+15*(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+100*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+5*(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))) + 0.01*sumsqr(throttle_dot) + 0.01*sumsqr(delta_dot));
 
 % opti.minimize(sumsqr((x-ref(1,1:N+1)))+sumsqr((y-ref(2,1:N+1)))+ sumsqr(U(1,:))+sumsqr(U(2,:)));
 % opti.minimize((x-x_ref_obj)*transpose((x-x_ref_obj))+(y-y_ref_obj)*transpose((y-y_ref_obj)));
