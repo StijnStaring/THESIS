@@ -50,7 +50,8 @@ del_theta_prev = plt.zeros([amount_features,1])
 update = del_0*plt.ones([amount_features,1])
 #################
 # Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-theta = plt.array([[5.0],[5.0],[5.0],[5.0],[5.0]])
+# theta = plt.array([[5.0],[5.0],[5.0],[5.0],[5.0]])
+theta = plt.array([[500.0],[500.0],[500.0],[500.0],[500.0]])
 # theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
 # theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
 # theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
@@ -113,7 +114,7 @@ while converged != 1 and rec <= 300:
     for i in plt.arange(0, len(file_list), 1):
         av_features_calc = av_features_calc + dict_sol_list[i]['features']
     av_features_calc = av_features_calc / len(file_list)
-    print('av_features_data: ', av_features_calc)
+    print('av_features_calc: ', av_features_calc)
 
     # Normalization for plots
     f_calc_rel = av_features_calc/av_features_data
@@ -304,6 +305,11 @@ for i in plt.arange(0,len(file_list),1):
 
 print('This is the theta_tracker: ',theta_tracker)
 post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
+
+# Save figures and CSV file - still to be implemented (use solutions array for csv file)
+#call figure again and then save it
+# fname = "results/test.png"
+# plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w',orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches=None, pad_inches=0.1,metadata=None)
 
 plt.show()
 #####################
