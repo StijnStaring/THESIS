@@ -34,7 +34,6 @@ his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 5
 conflict_flags = plt.zeros([amount_features,1])
 rec = 1
-N = 500
 # N = 500 # amount of data points
 tol = 1e-4
 # width_road = 3.46990715
@@ -106,7 +105,7 @@ while converged != 1 and rec <= 300:
     for k in range(len(file_list)):
         file = file_list[k]
         curr_data = data_list[k]
-        [data_s, f_calc] = optim_weights_ideal(theta,curr_data["width_road"],curr_data["vx_start"],curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
+        [data_s, f_calc] = optim_weights_ideal(theta,curr_data["width_road"],curr_data["vx_start"],curr_data,rec,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
         dict_sol_list.append(data_s)
 
     # Calculating averaged calculated solution
@@ -138,7 +137,7 @@ while converged != 1 and rec <= 300:
     his_del_theta_prev.append(del_theta_prev)
 
     # Check if all features are converged or that the weights are not changing anymore
-    if all(plt.absolute(f_calc_rel - 1) <= tol) or all(update <= 1e-4):
+    if all(plt.absolute(f_calc_rel - 1) <= tol) or (all(del_theta_prev <= 1e-5) and rec != 1):
         converged = 1
         if all(update <= 1e-4):
             print('No change in theta detected anymore - learning terminated')
@@ -310,6 +309,6 @@ post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_curren
 #call figure again and then save it
 # fname = "results/test.png"
 # plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w',orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches=None, pad_inches=0.1,metadata=None)
-
+# axcom1a.savefig(fname)
 plt.show()
 #####################

@@ -4,7 +4,7 @@ from define_plots import define_plots
 from derivative import derivative
 from casadi import *
 
-def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
+def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file):
     # theta = plt.array([4,5,6,1,2]) en met data guess berekende norm waarden en data guess zelf. (example lane change)
     theta = plt.squeeze(theta)
     norm0 = 0.007276047781441449
@@ -44,7 +44,10 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     psi_dot_start = 0
 
     # Resampling and guesses
-    time_guess = data_cl['time_cl'][-1]
+    T = data_cl['time_cl'][-1][0] # duration of lane change
+    dt = data_cl['time_cl'][1] - data_cl['time_cl'][0]
+    N = len(data_cl['time_cl']) - 1
+    # time_guess = data_cl['time_cl'][-1]
     x_guess = signal.resample(data_cl['x_cl'], N + 1).T
     y_guess = signal.resample(data_cl['y_cl'], N + 1).T
     vx_guess = signal.resample(data_cl['vx_cl'], N + 1).T
@@ -96,13 +99,13 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     # -----------------------------------
     #    Discrete system x_next = F(x,u)
     # -----------------------------------
-    dt = MX.sym('dt')
+    # dt = MX.sym('dt')
     k1 = f(states, controls)
     k2 = f(states + dt / 2 * k1, controls)
     k3 = f(states + dt / 2 * k2, controls)
     k4 = f(states + dt * k3, controls)
     states_next = states + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
-    F = Function('F', [states, controls, dt], [states_next], ['states', 'controls', 'dt'], ['states_next'])
+    F = Function('F', [states, controls], [states_next], ['states', 'controls'], ['states_next'])
 
     ##
     # -----------------------------------------------
@@ -111,7 +114,7 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
 
     opti = casadi.Opti()
     X = opti.variable(nx, N + 1)
-    T = opti.variable()  # Time [s]
+    # T = opti.variable()  # Time [s]
 
     # Aliases for states
     x = X[0, :]
@@ -128,14 +131,14 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
 
     # Gap-closing shooting constraints
     for k in range(N):
-        opti.subject_to(X[:, k + 1] == F(X[:, k], U[k], T / N))
+        opti.subject_to(X[:, k + 1] == F(X[:, k], U[k]))
 
     # Path constraints
     opti.subject_to(opti.bounded(-1, throttle, 1))  # local axis [m/s^2]
     opti.subject_to(opti.bounded(-20*pi/180,delta,20*pi/180)) # Limit on steeringwheelangle (150°)
     opti.subject_to(opti.bounded(-width_road / 2, y, width_road * 3 / 2))  # Stay on road
     opti.subject_to(x[0, 1:] >= 0)  # vehicle has to drive forward
-    opti.subject_to(T > 3)  # every lane change is taking at least 3 seconds
+    # opti.subject_to(T > 3)  # every lane change is taking at least 3 seconds
     opti.subject_to(opti.bounded(-1, vy, 1))
 
     # Initial constraints
@@ -155,7 +158,7 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     opti.set_initial(psi_dot, psi_dot_guess)
     opti.set_initial(throttle, throttle_guess)
     opti.set_initial(delta, delta_guess)
-    opti.set_initial(T, time_guess)
+    # opti.set_initial(T, time_guess)
 
     ##
     # -----------------------------------------------
@@ -299,8 +302,8 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     psi_dot_sol = sol.value(psi_dot)
     throttle_sol = sol.value(throttle)
     delta_sol = sol.value(delta)
-    T_sol = sol.value(T)
-    dt_sol = T_sol / (len(x_sol) - 1)
+    # T_sol = sol.value(T)
+    dt_sol = T / (len(x_sol) - 1)
 
     anx_list = []
     for k in range(N + 1):
@@ -362,7 +365,7 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     jx_tot_sol = plt.array(jxt_sol) + plt.array(jxn_sol)
 
     if plotting == 1:
-        define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,vx_start,width_road)
+        define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T,aty_sol,any_sol,vx_start,width_road)
 
 
     f0 = sol.value(f0_cal)
@@ -395,7 +398,7 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     data_s['psi_dot_s'] = sol.value(psi_dot)
     data_s['throttle_s'] = sol.value(throttle)
     data_s['delta_s'] = sol.value(delta)
-    data_s['T_s'] = sol.value(T)
+    data_s['T_s'] = T
     data_s['dt_s'] = data_s['T_s'] / (len(data_s['x_s']) - 1)
     data_s['ax_tot_s'] = ax_tot_sol
     data_s['ay_tot_s'] = ay_tot_sol
@@ -408,7 +411,7 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     features = plt.array([f0,f1,f2,f3,f4])
     features = features[:,plt.newaxis]
     data_s['features'] = features
-    time_vector = plt.linspace(0, T_sol, len(x_sol))
+    time_vector = plt.linspace(0, T, len(x_sol))
 
     # Plotting
     # axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0,label="it: "+str(iteration))
