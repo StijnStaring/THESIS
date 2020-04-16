@@ -4,13 +4,13 @@ clear vars
 close all 
 clc
 import casadi.*
-global x_sol_prev lam_prev tracking_lane_change iteration dt N data N_sim
+global x_sol_prev lam_prev tracking_lane_change iteration dt N data N_sim Ts_MP
 
 files = {'DATA2_V22.22_L3.47.csv'};
-N = 50; % Control horizon of one optimization of the MPC.
+N = 580; % Control horizon of one optimization of the MPC.
 sampling_rate = 100;
 dt = 1/sampling_rate;
-Tf = 8.0; % if want same length as reference lane change set Tf = 0
+Tf = 10.0; % if want same length as reference lane change set Tf = 0
 data = get_data(char(files(:,1)),sampling_rate,N,Tf);
 N_sim = length(data.time) - N;
 update_casadi_function = 1; % in order to save time when developing
@@ -20,8 +20,8 @@ lane_change = 1;
 
 
 % Simulation sampling time and duration
-Ts = dt;
-Ts_MP = dt;
+Ts = dt; % sampling rate Amesim 
+Ts_MP = 0.1; % sampling rate of tracking algorithm
 if Tf == 0
     Tf = dt*N_sim;
 end
@@ -96,8 +96,8 @@ title('Vehicle path','fontsize',12,'fontweight','bold')
 xlabel('X [m]','fontsize',12)
 xlim([0, x_max])
 ylabel('Y [m]','fontsize',12)
-legend('Reference path','Calculated path','Location','southeast')
-
+% legend('R\_path','C\_path','Location','southeast')
+saveas(gcf,".\written_data\1path_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 % Postion vs time
 figure('name', 'Pos')
@@ -109,7 +109,7 @@ title('X [m]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('position X [m]','fontsize',12)
-legend('Reference x path','Calculated x path','Location','southeast')
+% legend('R\_x path','C\_x path','Location','southeast')
 subplot(2,2,3)
 plot(t_mpc,abs(x_ref_mpc-x_mpc),'b','LineWidth',1.0)
 title('Error [m]','fontsize',12,'fontweight','bold')
@@ -124,13 +124,14 @@ title('Y [m]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('position Y [m]','fontsize',12)
-legend('Reference y path','Calculated y path','Location','southeast')
+% legend('R\_y path','C\_y path','Location','southeast')
 subplot(2,2,4)
 plot(t_ref_mpc,abs(y_ref_mpc-y_mpc),'b','LineWidth',1.0)
 title('Error [m]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('position error Y [m]','fontsize',12)
+saveas(gcf,".\written_data\2xy_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 % Velocity vs time
 figure('name', 'Vel')
@@ -142,7 +143,7 @@ title('v_X [m/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('velocity X [m/s]','fontsize',12)
-legend('Reference X velocity','Calculated X velocity','Location','southeast')
+% legend('R\_X vel','C\_X vel','Location','southeast')
 subplot(2,2,3)
 plot(t_mpc,abs(vx_ref_mpc-vx_mpc),'b','LineWidth',1.0)
 title('Error [m/s]','fontsize',12,'fontweight','bold')
@@ -157,13 +158,14 @@ title('v_Y [m/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('velocity Y [m/s]','fontsize',12)
-legend('Reference Y velocity','Calculated Y velocity','Location','southeast')
+% legend('R\_Y vel','C\_Y vel','Location','southeast')
 subplot(2,2,4)
 plot(t_mpc,abs(vy_ref_mpc-vy_mpc),'b','LineWidth',1.0)
 title('Error [m/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('velocity error Y [m/s]','fontsize',12)
+saveas(gcf,".\written_data\3vxy_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Need plots of ay_tot, aty, any, ax_tot, atx, any
@@ -191,7 +193,7 @@ title('atY [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration atY [m/s²]','fontsize',12)
-legend('Reference aty acceleration','Calculated aty acceleration','Location','southeast')
+% legend('R\_aty acc','C\_aty acc','Location','southeast')
 subplot(2,2,3)
 plot(t_mpc,abs(aty_ref_mpc-aty_mpc),'b','LineWidth',1.0)
 title('Error [m/s²]','fontsize',12,'fontweight','bold')
@@ -206,13 +208,14 @@ title('anY [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration any [m/s²]','fontsize',12)
-legend('Reference any acceleration','Calculated any acceleration','Location','southeast')
+% legend('R\_any acc','C\_any acc','Location','southeast')
 subplot(2,2,4)
 plot(t_mpc,abs(any_ref_mpc-any_mpc),'b','LineWidth',1.0)
 title('Error [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration error anY [m/s²]','fontsize',12)
+saveas(gcf,".\written_data\4ay_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 figure('name', 'Acc\_x')
 subplot(2,2,1)
@@ -223,7 +226,7 @@ title('atx [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration atx [m/s²]','fontsize',12)
-legend('Reference atx acceleration','Calculated atx acceleration','Location','southeast')
+% legend('R\_atx acc','C\_atx acc','Location','southeast')
 subplot(2,2,3)
 plot(t_mpc,abs(atx_ref_mpc-atx_mpc),'b','LineWidth',1.0)
 title('Error [m/s²]','fontsize',12,'fontweight','bold')
@@ -238,13 +241,14 @@ title('anx [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration anx [m/s²]','fontsize',12)
-legend('Reference anx acceleration','Calculated anx acceleration','Location','southeast')
+% legend('R\_anx acc','C\_anx acc','Location','southeast')
 subplot(2,2,4)
 plot(t_mpc,abs(anx_ref_mpc-anx_mpc),'b','LineWidth',1.0)
 title('Error [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration error anx [m/s²]','fontsize',12)
+saveas(gcf,".\written_data\5ax_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 figure('name', 'Acc\_tot')
 subplot(2,2,1)
@@ -255,7 +259,7 @@ title('aytot [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration aytot [m/s²]','fontsize',12)
-legend('Reference aytot acceleration','Calculated aytot acceleration','Location','southeast')
+% legend('R\_aytot acc','C\_aytot acc','Location','southeast')
 subplot(2,2,3)
 plot(t_mpc,abs(ay_tot_ref_mpc-ay_tot_mpc),'b','LineWidth',1.0)
 title('Error [m/s²]','fontsize',12,'fontweight','bold')
@@ -270,13 +274,14 @@ title('axtot [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration axtot [m/s²]','fontsize',12)
-legend('Reference axtot acceleration','Calculated axtot acceleration','Location','southeast')
+% legend('R\_axtot acc','C\_axtot acc','Location','southeast')
 subplot(2,2,4)
 plot(t_mpc,abs(ax_tot_mpc-ax_tot_ref_mpc),'b','LineWidth',1.0)
 title('Error [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration error axtot [m/s²]','fontsize',12)
+saveas(gcf,".\written_data\6atot_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 % Yaw and Yaw rate 
 figure('name', 'Yaw')
@@ -288,7 +293,7 @@ title('\psi [deg]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('yaw angle \psi [deg]','fontsize',12)
-legend('Reference yaw angle','Calculated yaw angle','Location','northeast')
+% legend('R\_yaw','C\_yaw','Location','northeast')
 subplot(2,2,3)
 plot(t_mpc,abs(psi_ref_mpc-psi_mpc)*180/pi,'b','LineWidth',1.0)
 title('Error [deg]','fontsize',12,'fontweight','bold')
@@ -303,13 +308,14 @@ title('d\psi [deg/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('yaw velocity d\psi [deg/s]','fontsize',12)
-legend('Reference yaw velocity','Calculated yaw velocity','Location','northeast')
+% legend('R\_yaw vel','C\_yaw vel','Location','northeast')
 subplot(2,2,4)
 plot(t_mpc,abs(psi_dot_ref_mpc-psi_dot_mpc)*180/pi,'b','LineWidth',1.0)
 title('Error [deg/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('yaw velocity error d\psi [deg/s]','fontsize',12)
+saveas(gcf,".\written_data\7psi_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 % Inputs
 % delta & throttle
@@ -328,9 +334,10 @@ title('Throttle & Brake [-]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('throttle & brake [-]','fontsize',12)
+saveas(gcf,".\written_data\8inputs_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 % Calculate the jerks
-psi_ddot_mpc = deriv2(psi_mpc,dt);
+psi_ddot_mpc = derivative(psi_dot_mpc,dt);
 jy_t = deriv2(vy_mpc,dt);
 jy_n =  zeros(1,length(t_mpc));
 for i =1:1:length(t_mpc)
@@ -359,6 +366,14 @@ title('jerk y [m/s^3]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('jerk\_tot\_y [m/s^3]','fontsize',12)
+saveas(gcf,".\written_data\9jerks_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
+
+figure(1);
+saveas(gcf,".\written_data\10states_loop_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
+figure(2)
+saveas(gcf,".\written_data\11path_loop_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
+figure(3)
+saveas(gcf,".\written_data\12inputs_loop_N"+string(N)+"_TMP"+string(Ts_MP)+"_Tf"+string(Tf)+".png")
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Output of motion planning
