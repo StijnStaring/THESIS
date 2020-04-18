@@ -111,7 +111,7 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
 
     opti = casadi.Opti()
     X = opti.variable(nx, N + 1)
-    T = opti.variable()  # Time [s] 
+    T = opti.variable()  # Time [s]
 
     # Aliases for states
     x = X[0, :]
@@ -135,9 +135,10 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     opti.subject_to(opti.bounded(-20*pi/180,delta,20*pi/180)) # Limit on steeringwheelangle (150°)
     opti.subject_to(opti.bounded(-width_road / 2, y, width_road * 3 / 2))  # Stay on road
     opti.subject_to(x[0, 1:] >= 0)  # vehicle has to drive forward
+    ##############################################
     opti.subject_to(T > 3)  # every lane change is taking at least 3 seconds
     opti.subject_to(opti.bounded(-1, vy, 1))
-
+    ##############################################
     # Initial constraints
     # states: x, y, vx, vy, psi, psi_dot
     opti.subject_to(X[:, 0] == vertcat(x_start, y_start, vx_start, vy_start, psi_start, psi_dot_start))
@@ -239,9 +240,10 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
     opti.subject_to(jy_tot[-1] == 0)  # fully end of lane change --> no lateral acceleration in the next sample
     opti.subject_to(aty_list[0] == 0)  # start from the beginning of the lane change
     opti.subject_to(jy_tot[0] == 0)  # start from the beginning of the lane change
+    ##############################################
     for i in plt.arange(0,len(ay_tot),1):
         opti.subject_to(opti.bounded(-2, ay_tot[i], 2))
-
+    ##############################################
 
     # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 
