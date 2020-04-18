@@ -111,7 +111,7 @@ def optim_weights_ideal(theta,width_road,vx_start,data_cl,iteration,N,plotting,a
 
     opti = casadi.Opti()
     X = opti.variable(nx, N + 1)
-    T = opti.variable()  # Time [s]
+    T = opti.variable()  # Time [s] 
 
     # Aliases for states
     x = X[0, :]
