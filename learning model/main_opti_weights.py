@@ -111,10 +111,7 @@ while any(converged != 1):
         print('\n')
         grad_curr_list.append(grad_curr)
         axf.plot([f_calc_rel[k][0], f_calc_rel[k][1], f_calc_rel[k][2], f_calc_rel[k][3], f_calc_rel[k][4]], '-', marker='o', markersize=6)
-
         axfn.plot([f_calc[0], f_calc[1], f_calc[2], f_calc[3], f_calc[4]], '-', marker='o', markersize=6)
-
-
 
     print("----------------------------------------------")
     print(str(rec) + "// ", f_calc_rel)
