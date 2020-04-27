@@ -3,6 +3,22 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     Theta_iter is a string
     """
     import pylab as plt
+    # left = 0.125  # the left side of the subplots of the figure
+    # right = 0.9  # the right side of the subplots of the figure
+    # bottom = 0.1  # the bottom of the subplots of the figure
+    # top = 0.9  # the top of the subplots of the figure
+    # wspace = 0.2  # the amount of width reserved for space between subplots,
+    # # expressed as a fraction of the average axis width
+    # hspace = 0.2  # the amount of height reserved for space between subplots,
+    # # expressed as a fraction of the average axis height
+    # plt.subplots_adjust(left=0, bottom=None, right=None, top=None, wspace=0.4, hspace= None)
+    plt.rc('axes', linewidth=2)
+    plt.rc('legend',fontsize=16) # using a size in points
+    # plt.rcParams["legend.loc"] = 'best'
+    fontsize = 14
+    font = 16
+    plt.tight_layout()
+
 
     # Plot 1: normalized calculated features
     length = len(his_f_calc_rel)
@@ -17,35 +33,70 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Normalized calculated feature 1 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Convergence of features 1', fontsize=14)
+    plt.title('Convergence of features 1', fontsize=font, fontweight = 'bold')
+
+    for tick in acf1.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acf1.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 2)
     acf2 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Normalized calculated feature 2 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Convergence of features 2', fontsize=14)
+    plt.title('Convergence of features 2', fontsize=font, fontweight = 'bold')
+
+    for tick in acf2.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acf2.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 3)
     acf3 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Normalized calculated feature 3 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Convergence of features 3', fontsize=14)
+    plt.title('Convergence of features 3', fontsize=font, fontweight = 'bold')
+
+    for tick in acf3.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acf3.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 4)
     acf4 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Normalized calculated feature 4 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Convergence of features 4', fontsize=14)
+    plt.xlabel('Convergence of features 4', fontsize=font, fontweight = 'bold')
+
+    for tick in acf4.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acf4.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 5)
     acf5 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Normalized calculated feature 5 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Convergence of features 5', fontsize=14)
+    plt.xlabel('Convergence of features 5', fontsize=font, fontweight = 'bold')
+
+    for tick in acf5.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acf5.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     # plt.subplot(2, 4, 6)
     # ac6 = plt.gca()
@@ -78,35 +129,70 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("grad feature 1 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('grad of features 1', fontsize=14)
+    plt.title('grad of features 1', fontsize=font, fontweight = 'bold')
+
+    for tick in acgc1.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acgc1.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 2)
     acgc2 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("gradfeature 2 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('grad of features 2', fontsize=14)
+    plt.title('grad of features 2', fontsize=font, fontweight = 'bold')
+
+    for tick in acgc2.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acgc2.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 3)
     acgc3 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("grad feature 3 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('grad of features 3', fontsize=14)
+    plt.title('grad of features 3', fontsize=font, fontweight = 'bold')
+
+    for tick in acgc3.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acgc3.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 4)
     acgc4 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("grad feature 4 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('grad of features 4', fontsize=14)
+    plt.xlabel('grad of features 4', fontsize=font, fontweight = 'bold')
+
+    for tick in acgc4.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acgc4.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 5)
     acgc5 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("grad feature 5 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('grad of features 5', fontsize=14)
+    plt.xlabel('grad of features 5', fontsize=font, fontweight = 'bold')
+
+    for tick in acgc5.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acgc5.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     # plt.subplot(2, 4, 6)
     # ac6 = plt.gca()
@@ -139,38 +225,74 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
 
     plt.subplot(2, 3, 1)
     acw1 = plt.gca()
+    # acw1 = plt.subplots(figsize=())
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Weight of feature 1',fontsize=14)
+    plt.title('Weight of feature 1',fontsize=font, fontweight = 'bold')
+
+    for tick in acw1.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acw1.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 2)
     acw2 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Weight of feature 2', fontsize=14)
+    plt.title('Weight of feature 2', fontsize=font, fontweight = 'bold')
+
+    for tick in acw2.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acw2.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 3)
     acw3 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Weight of feature 3', fontsize=14)
+    plt.title('Weight of feature 3', fontsize=font, fontweight = 'bold')
+
+    for tick in acw3.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acw3.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 4)
     acw4 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Weight of feature 4', fontsize=14)
+    plt.xlabel('Weight of feature 4', fontsize=font, fontweight = 'bold')
+
+    for tick in acw4.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acw4.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 5)
     acw5 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Weight of feature 5', fontsize=14)
+    plt.xlabel('Weight of feature 5', fontsize=font, fontweight = 'bold')
+
+    for tick in acw5.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acw5.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     iterations_w = plt.arange(1, len(his_weights) + 1, 1)
     iterations_w = iterations_w[:, plt.newaxis]
@@ -189,35 +311,70 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("delta weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Update of theta 1', fontsize=14)
+    plt.title('Update of theta 1', fontsize=font, fontweight = 'bold')
+
+    for tick in acu1.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acu1.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 2)
     acu2 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("delta weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Update of theta 2', fontsize=14)
+    plt.title('Update of theta 2', fontsize=font, fontweight = 'bold')
+
+    for tick in acu2.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acu2.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 3)
     acu3 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("delta weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Update of theta 3', fontsize=14)
+    plt.title('Update of theta 3', fontsize=font, fontweight = 'bold')
+
+    for tick in acu3.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acu3.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 4)
     acu4 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("delta weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Update of theta 4', fontsize=14)
+    plt.xlabel('Update of theta 4', fontsize=font, fontweight = 'bold')
+
+    for tick in acu4.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acu4.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 5)
     acu5 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("delta weight value [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Update of theta 5', fontsize=14)
+    plt.xlabel('Update of theta 5', fontsize=font, fontweight = 'bold')
+
+    for tick in acu5.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acu5.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     if len(his_weights) != 1:
         for i in plt.arange(1, len(his_weights), 1):
@@ -237,35 +394,70 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Multi grad feature 1 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Multi grad of features 1', fontsize=14)
+    plt.title('Multi grad of features 1', fontsize=font, fontweight = 'bold')
+
+    for tick in acm1.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acm1.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 2)
     acm2 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Multi gradfeature 2 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Multi grad of features 2', fontsize=14)
+    plt.title('Multi grad of features 2', fontsize=font, fontweight = 'bold')
+
+    for tick in acm2.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acm2.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 3)
     acm3 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Multi grad feature 3 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('Multi grad of features 3', fontsize=14)
+    plt.title('Multi grad of features 3', fontsize=font, fontweight = 'bold')
+
+    for tick in acm3.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acm3.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 4)
     acm4 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Multi grad feature 4 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Multi grad of features 4', fontsize=14)
+    plt.xlabel('Multi grad of features 4', fontsize=font, fontweight = 'bold')
+
+    for tick in acm4.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acm4.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 5)
     acm5 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Multi grad feature 5 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Multi grad of features 5', fontsize=14)
+    plt.xlabel('Multi grad of features 5', fontsize=font, fontweight = 'bold')
+
+    for tick in acm5.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acm5.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     # plt.subplot(2, 4, 6)
     # ac6 = plt.gca()
@@ -298,35 +490,70 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("diff theta 1 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('diff theta 1', fontsize=14)
+    plt.title('diff theta 1', fontsize=font, fontweight = 'bold')
+
+    for tick in acdw1.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acdw1.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 2)
     acdw2 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("diff theta 2 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('diff theta 2', fontsize=14)
+    plt.title('diff theta 2', fontsize=font, fontweight = 'bold')
+
+    for tick in acdw2.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acdw2.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 3)
     acdw3 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("diff theta 3 [-]", fontsize=14)
     plt.grid(True)
-    plt.title('diff theta 3', fontsize=14)
+    plt.title('diff theta 3', fontsize=font, fontweight = 'bold')
+
+    for tick in acdw3.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acdw3.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 4)
     acdw4 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("diff theta 4 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('diff theta 4', fontsize=14)
+    plt.xlabel('diff theta 4', fontsize=font, fontweight = 'bold')
+
+    for tick in acdw4.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acdw4.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     plt.subplot(2, 3, 5)
     acdw5 = plt.gca()
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("diff theta 5 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('diff theta 5', fontsize=14)
+    plt.xlabel('diff theta 5', fontsize=font, fontweight = 'bold')
+
+    for tick in acdw5.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in acdw5.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
     # plt.subplot(2, 4, 6)
     # ac6 = plt.gca()

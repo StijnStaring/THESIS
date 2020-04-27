@@ -7,9 +7,11 @@ Github ==> ideal test folder
 # import seaborn as sns
 import pylab as plt
 # import sys
+import csv
 from comparing_features import comparing_features
 from post_processing_plots import post_processing_plots
 from RPROP import RPROP
+from figure_style_saving import figure_style_saving
 from import_data2 import import_data2
 from optim_weights_ideal import optim_weights_ideal
 import glob
@@ -66,7 +68,7 @@ theta_tracker = []
 theta_tracker.append(theta)
 his_weights.append([str(rec) + "//", theta])
 # theta_chosen = plt.array([5.49749001e+02, 1.89525204e+00, 5.31749963e-01, 2.14306117e+01, 1.16706616e-01])
-theta_chosen = plt.array([4,5,6,1,2])
+theta_chosen = plt.array([4,5,6,1,2]) # This is the theta used to generate the data
 theta_chosen = theta_chosen[:,plt.newaxis]
 data_list = []
 file_list = glob.glob("used_data/*.csv")
@@ -78,9 +80,9 @@ for file in file_list:
     [axf, acw, axfn, axcom1a, axcom1b, axcom2, axcom3a, axcom3b, axcom4a, axcom4b, axcom5a, axcom5b, axcom6a, axcom6b,axcom7a, axcom7b, axcom8a, axcom8b, axcom9] = comparing_features(data_cl,file)
     # plotting
     axf.plot([1, 1, 1, 1, 1], '-', marker='*', markersize=6, label = file[16:-4])
-    axf.legend()
+    # axf.legend()
     axfn.plot([f_data[0], f_data[1], f_data[2], f_data[3], f_data[4]], '-', marker='*', markersize=6,label = file[16:-4])
-    axfn.legend()
+    # axfn.legend()
     ###########
 
 # Calculate the averaged
@@ -96,8 +98,8 @@ dict_sol_list = []
 converged = 0
 grad_prev = plt.zeros([amount_features,1])
 
-# while rec <= 2:
-while converged != 1 and rec <= 300:
+while rec <= 1:
+# while converged != 1 and rec <= 300:
     converged = 0
     print('Iteration: ', rec)
     print('This is the difference of theta: ', theta_chosen - theta)
@@ -257,8 +259,8 @@ for i in plt.arange(0,len(file_list),1):
     ay_tot_sol = data_s['ay_tot_s']
     aty_sol = data_s['aty_s']
     any_sol = data_s['any_s']
-    jx_sol = data_s['jx_s']
-    jy_sol = data_s['jy_s']
+    jx_tot_sol = data_s['jx_s']
+    jy_tot_sol = data_s['jy_s']
     psi_ddot_sol = data_s['psi_ddot_s']
 
     time_vector = plt.linspace(0, T_sol, len(x_sol))
@@ -269,8 +271,8 @@ for i in plt.arange(0,len(file_list),1):
     axcom3b.plot(time_vector, vy_sol, '.-', linewidth=3.0, label="LS-"+file[16:-4])
     axcom4a.plot(time_vector, ax_tot_sol, '.-', linewidth=3.0, label="LS-"+file[16:-4])
     axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0, label="LS-"+file[16:-4])
-    axcom5a.plot(time_vector, jx_sol, '.-', linewidth=3.0, label="LS-"+file[16:-4])
-    axcom5b.plot(time_vector, jy_sol, '.-', linewidth=3.0, label="LS-"+file[16:-4])
+    axcom5a.plot(time_vector, jx_tot_sol, '.-', linewidth=3.0, label="LS-"+file[16:-4])
+    axcom5b.plot(time_vector, jy_tot_sol, '.-', linewidth=3.0, label="LS-"+file[16:-4])
     axcom6a.plot(time_vector, psi_sol * 180 / plt.pi, '.-', linewidth=3.0, label="LS-"+file[16:-4])
     axcom6b.plot(time_vector, psi_dot_sol * 180 / plt.pi, '.-', linewidth=3.0, label="LS-"+file[16:-4])
     axcom7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0, label="LS-"+file[16:-4])
@@ -305,11 +307,21 @@ for i in plt.arange(0,len(file_list),1):
 
 print('This is the theta_tracker: ',theta_tracker)
 post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
+#########################################
+# Saving figures and creating csv file
+#########################################
+# figure_style_saving()
+path = "results\Av_FT_It"+str(rec)+"D"+str(len(file_list))+".csv"
+file = open(path,'w',newline= "")
+writer = csv.writer(file)
+writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
 
-# Save figures and CSV file - still to be implemented (use solutions array for csv file)
-#call figure again and then save it
-# fname = "results/test.png"
-# plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w',orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches=None, pad_inches=0.1,metadata=None)
-
+for i in range(N+1):
+    if i == N: # last control point has no physical meaning
+        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
+    else:
+        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+file.close()
+#####################
 plt.show()
 #####################
