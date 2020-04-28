@@ -161,35 +161,6 @@ while rec <= 1:
 
     his_multi_grads.append([str(rec) + "//", case[:,plt.newaxis]])
 
-    # for j in plt.arange(0, amount_features):
-    #     flag = 1
-    #     for i in plt.arange(1, len(file_list), 1):
-    #         if grad_curr_list[0][j] * grad_curr_list[i][j] < 0 and flag == 1:
-    #             conflict_flags[j] = 1
-    #             flag = 0
-    #             if case[j] == 1:
-    #                 print('Conflict concerning case 1!')
-    #                 sys.exit(-1)
-    #             print('\n')
-    #             print('-----------------------------------')
-    #             print('Direction conflict: F' + str(j))
-    #             print('-----------------------------------')
-    #         elif grad_curr_list[0][j] * grad_curr_list[i][j] > 0 and flag == 1:
-    #             conflict_flags[j] = 0  # conflict is resolved
-    #         elif grad_curr_list[0][j] * grad_curr_list[i][j] == 0:
-    #             print('Error - grad_curr cannot be equal to zero')
-    #             sys.exit(-1)
-
-    # Check if can still improve something?
-    # if any(conflict_flags ==0):
-    #     print('Still improvement possible in a certain direction for all datasets')
-    #     for j in plt.arange(0,len(conflict_flags),1):
-    #         if conflict_flags[j] == 0:
-    #             print("Improvement possible in feature: ", j)
-    # else:
-    #     print('Cannot improve solution further')
-    #     break
-
     if converged != 1:
         length = amount_features
         [del_theta_prev, exception, theta, update] = RPROP(grad_curr,n_neg,case,length,update,theta,del_theta_prev,conflict_flags,1)
