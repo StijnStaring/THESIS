@@ -49,8 +49,9 @@ N = 500
 
 x_start = 0
 y_start = 0
-vx_start = 27.78
-vx_delta = 2.77
+vx_start = 10.0
+vx_delta = 5.56
+vx_delta = 1.0
 a_guess = 2
 T_guess = vx_delta/a_guess
 vy_start = 0
@@ -134,12 +135,13 @@ for vx_start in vx_start_a:
         #    Discrete system x_next = F(x,u)
         # -----------------------------------
         dt = MX.sym('dt')
+
         k1 = f(states, controls)
         k2 = f(states + dt/2 * k1, controls)
         k3 = f(states + dt/2 * k2, controls)
         k4 = f(states + dt * k3, controls)
         states_next = states+dt/6*(k1 +2*k2 +2*k3 +k4)
-        F = Function('F', [states, controls, dt], [states_next],['states','controls','dt'],['states_next'])
+        F = Function('F', [states, controls,dt], [states_next],['states','controls','dt'],['states_next'])
 
         ##
         # -----------------------------------------------
@@ -148,7 +150,7 @@ for vx_start in vx_start_a:
 
         opti = casadi.Opti()
         X = opti.variable(nx,N+1)
-        T =  opti.variable() # Time [s]
+        T = opti.variable()
 
         # Aliases for states
         x    = X[0,:]
@@ -169,7 +171,7 @@ for vx_start in vx_start_a:
 
         # Path constraints
         opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
-        # opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
+        opti.subject_to(opti.bounded(-10*pi/180,delta,10*pi/180))
         opti.subject_to(opti.bounded(-width_road/2,y,width_road*1/2)) # Stay on road
         opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
 
@@ -182,16 +184,16 @@ for vx_start in vx_start_a:
         # (This will cause a very small deceleration but makes sure ay is starting from zero)
 
         # Terminal constraints
-        # opti.subject_to(y[-1] == width_road) # should move 3 m lateral
-        # opti.subject_to(vy[-1] == 0) # lane change is completed
-        # opti.subject_to(psi[-1] == 0) # assuming straight road
-        # opti.subject_to(psi_dot[-1] == 0)
+        opti.subject_to(y[-1] == width_road) # should move 3 m lateral
+        opti.subject_to(vy[-1] == 0) # lane change is completed
+        opti.subject_to(psi[-1] == 0) # assuming straight road
+        opti.subject_to(psi_dot[-1] == 0)
         v_des = vx_start + vx_delta
-        opti.subject_to(vx[0,-1] == v_des)
-        # opti.subject_to(T>= 1)
+        opti.subject_to(vx[-1] == v_des)
+        opti.subject_to(T>= 0.2)
 
 
-        #  Set guesses
+        # Set guesses
         opti.set_initial(x,x_guess)
         opti.set_initial(y,y_guess)
         opti.set_initial(vx,vx_guess)
@@ -200,142 +202,145 @@ for vx_start in vx_start_a:
         opti.set_initial(psi_dot,psi_dot_guess)
         opti.set_initial(throttle,throttle_guess)
         opti.set_initial(delta,delta_guess)
-        opti.set_initial(T, T_guess)
+        # opti.set_initial(T, T_guess)
 
         ##
         # -----------------------------------------------
         #    objective
         # -----------------------------------------------
         # Objective: The total accelerations in the local axis are considered!
-        time_list = []
-        for i in range(N+1):
-            time_list.append(i*T/N)
-        time_vector = plt.array(time_list)
-
-        # normal lateral accelleration
-        anx_list = []
-        for k in range(N+1):
-            anx_list.append(-vy[k]*psi_dot[k])
-
-        any_list = []
-        for k in range(N+1):
-            any_list.append(vx[k]*psi_dot[k])
-
-        # tangential lateral accelleration
-        aty_list = []
-        for i in plt.arange(0, len(time_list), 1):
-            if i == 0:
-                aty_list.append((vy[i + 1]-vy[i])/(T/N))
-            elif i == len(time_list)-1:
-                aty_list.append((vy[i]-vy[i-1])/(T/N))
-            else:
-                aty_list.append((vy[i + 1] - vy[i - 1]) / (2 * (T/N)))
-
-        # tangential longitudinal accelleration
-        atx_list = []
-        for i in plt.arange(0, len(time_list), 1):
-            if i == 0:
-                atx_list.append((vx[i + 1]-vx[i])/(T/N))
-            elif i == len(time_list)-1:
-                atx_list.append((vx[i]-vx[i-1])/(T/N))
-            else:
-                atx_list.append((vx[i + 1] - vx[i - 1]) / (2 * (T/N)))
-
-        ax_tot = plt.array(atx_list) + plt.array(anx_list)
-        ay_tot = plt.array(aty_list) + plt.array(any_list)
-
-        # yaw_acceleration
-        psi_ddot_list = []
-        for i in plt.arange(0, len(time_list), 1):
-            if i == 0:
-                psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i]) / (T / N))
-            elif i == len(time_list) - 1:
-                psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
-            else:
-                psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i - 1]) / (2 * (T / N)))
-
-        # calculation lateral jerk -> jerk is calculated from the total acceleration!
-        # Implementation of second order scheme
-        jy_list_t = []
-        for i in plt.arange(0, len(time_list), 1):
-            if i == 0:
-                jy_list_t.append((aty_list[i + 1]-aty_list[i])/(T/N))
-            elif i == len(time_list)-1:
-                jy_list_t.append((aty_list[i]-aty_list[i-1])/(T/N))
-            else:
-                # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
-                jy_list_t.append((vy[i + 1] -2*vy[i] +vy[i - 1]) / ((T / N)**2))
-
-        jy_list_n = []
-        for k in range(N+1):
-            jy_list_n.append(psi_dot[k]*atx_list[k] + vx[k]*psi_ddot_list[k])
-        jy_tot = plt.array(jy_list_t) + plt.array(jy_list_n)
-
-        vx_des_list = []
-        for k in range(N+1):
-            vx_des_list.append(vx[k]-v_des)
-
-        y_des_list = []
-        y_des = 0
-        for k in range(N+1):
-            y_des_list.append(y[k]-y_des)
-
-        # Extra constraints on acceleration and jerk:
-        # opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
-        # opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
-        opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
-        opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
-        opti.subject_to(ax_tot[0] == 0)  # start from the beginning of the lane change
-        for i in plt.arange(1,len(ax_tot),1):
-            opti.subject_to(ax_tot[i]<=10)
-            opti.subject_to(ax_tot[i] >= -10)
-        tolerance = 10
+        # time_list = []
+        # for i in range(N+1):
+        #     time_list.append(i*T/N)
+        # time_vector = plt.array(time_list)
+        # #
+        # # normal lateral accelleration
+        # anx_list = []
+        # for k in range(N+1):
+        #     anx_list.append(-vy[k]*psi_dot[k])
+        #
+        # any_list = []
+        # for k in range(N+1):
+        #     any_list.append(vx[k]*psi_dot[k])
+        #
+        # # tangential lateral accelleration
+        # aty_list = []
+        # for i in plt.arange(0, len(time_list), 1):
+        #     if i == 0:
+        #         aty_list.append((vy[i + 1]-vy[i])/(T/N))
+        #     elif i == len(time_list)-1:
+        #         aty_list.append((vy[i]-vy[i-1])/(T/N))
+        #     else:
+        #         aty_list.append((vy[i + 1] - vy[i - 1]) / (2 * (T/N)))
+        #
+        # # tangential longitudinal accelleration
+        # atx_list = []
+        # for i in plt.arange(0, len(time_list), 1):
+        #     if i == 0:
+        #         atx_list.append((vx[i + 1]-vx[i])/(T/N))
+        #     elif i == len(time_list)-1:
+        #         atx_list.append((vx[i]-vx[i-1])/(T/N))
+        #     else:
+        #         atx_list.append((vx[i + 1] - vx[i - 1]) / (2 * (T/N)))
+        #
+        # ax_tot = plt.array(atx_list) + plt.array(anx_list)
+        # # ay_tot = plt.array(aty_list) + plt.array(any_list)
+        #
+        # # yaw_acceleration
+        # psi_ddot_list = []
+        # for i in plt.arange(0, len(time_list), 1):
+        #     if i == 0:
+        #         psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i]) / (T / N))
+        #     elif i == len(time_list) - 1:
+        #         psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
+        #     else:
+        #         psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i - 1]) / (2 * (T / N)))
+        #
+        # # calculation lateral jerk -> jerk is calculated from the total acceleration!
+        # # Implementation of second order scheme
+        # jy_list_t = []
+        # for i in plt.arange(0, len(time_list), 1):
+        #     if i == 0:
+        #         jy_list_t.append((aty_list[i + 1]-aty_list[i])/(T/N))
+        #     elif i == len(time_list)-1:
+        #         jy_list_t.append((aty_list[i]-aty_list[i-1])/(T/N))
+        #     else:
+        #         # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
+        #         jy_list_t.append((vy[i + 1] -2*vy[i] +vy[i - 1]) / ((T / N)**2))
+        #
+        # jy_list_n = []
+        # for k in range(N+1):
+        #     jy_list_n.append(psi_dot[k]*atx_list[k] + vx[k]*psi_ddot_list[k])
+        # jy_tot = plt.array(jy_list_t) + plt.array(jy_list_n)
+        #
+        # vx_des_list = []
+        # for k in range(N+1):
+        #     vx_des_list.append(vx[k]-v_des)
+        #
+        # y_des_list = []
+        # y_des = 0
+        # for k in range(N+1):
+        #     y_des_list.append(y[k]-y_des)
+        #
+        # # Extra constraints on acceleration and jerk:
+        # # opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
+        # # opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
+        # opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
+        # opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
+        # opti.subject_to(ax_tot[0] == 0)  # start from the beginning of the lane change
+        # for i in plt.arange(1,len(ax_tot),1):
+        #     opti.subject_to(ax_tot[i]<=4)
+        #     opti.subject_to(ax_tot[i] >= -4)
+        tolerance = 2
+        v_min = vx_start - tolerance
         v_max = v_des + tolerance
-        opti.subject_to(opti.bounded(-v_max,vx,v_max))
-        opti.subject_to(T>= 0.5)
+        opti.subject_to(opti.bounded(v_min,vx,v_max))
+
+        # opti.subject_to(T>= 0.5)
 
         # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
 
-        # f0: longitudinal acceleration
-        integrand = ax_tot** 2
-        f0_cal = 0
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f0_cal = f0_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-
-        # f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-
-        # f1: lateral acceleration
-        integrand = ay_tot** 2
-        f1_cal = 0
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f1_cal = f1_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-        # f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-        # print('f1: ',f1_cal)
-
-        # f2: lateral jerk
-        integrand = jy_tot** 2
-        f2_cal = 0
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-        # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-
-        # f3: desired velocity
-        integrand = plt.array(vx_des_list)** 2
-        f3_cal = 0
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f3_cal = f3_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-        # f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-
-        # f4: desired lane change
-        integrand = plt.array(y_des_list)** 2
-        f4_cal = 0
-        for i in plt.arange(0, len(integrand) - 1, 1):
-            f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+        # # f0: longitudinal acceleration
+        # integrand = ax_tot** 2
+        # f0_cal = 0
+        # for i in plt.arange(0, len(integrand) - 1, 1):
+        #     f0_cal = f0_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+        #
+        # # f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+        #
+        # # f1: lateral acceleration
+        # integrand = ay_tot** 2
+        # f1_cal = 0
+        # for i in plt.arange(0, len(integrand) - 1, 1):
+        #     f1_cal = f1_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+        # # f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+        # # print('f1: ',f1_cal)
+        #
+        # # f2: lateral jerk
+        # integrand = jy_tot** 2
+        # f2_cal = 0
+        # for i in plt.arange(0, len(integrand) - 1, 1):
+        #     f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+        # # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+        #
+        # # f3: desired velocity
+        # integrand = plt.array(vx_des_list)** 2
+        # f3_cal = 0
+        # for i in plt.arange(0, len(integrand) - 1, 1):
+        #     f3_cal = f3_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+        # # f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+        #
+        # # f4: desired lane change
+        # integrand = plt.array(y_des_list)** 2
+        # f4_cal = 0
+        # for i in plt.arange(0, len(integrand) - 1, 1):
+        #     f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
         # f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
 
         # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-        opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
+        # opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
+        opti.minimize(sumsqr(throttle))
         # opti.minimize(theta[0]/norm0*f0_cal+theta[3]/norm3*f3_cal)
 
         print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4]))
@@ -467,22 +472,22 @@ for vx_start in vx_start_a:
         #    Storing of data in csv-file
         # ----------------------------------
 
-        path = "writing_acceleration_data\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
-        file = open(path,'w',newline= "")
-        writer = csv.writer(file)
-        writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
-
-        for i in range(N+1):
-            if i == N: # last control point has no physical meaning
-                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
-            else:
-                writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
-
-        file.close()
-        print('dt of the optimization is: ', dt_sol)
-        print('')
-        print('Simulation completed!')
-        print('\n')
+        # path = "writing_acceleration_data\ DATA2_V" + str(speed) + "_L"+str(width)+".csv"
+        # file = open(path,'w',newline= "")
+        # writer = csv.writer(file)
+        # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
+        #
+        # for i in range(N+1):
+        #     if i == N: # last control point has no physical meaning
+        #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
+        #     else:
+        #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+        #
+        # file.close()
+        # print('dt of the optimization is: ', dt_sol)
+        # print('')
+        # print('Simulation completed!')
+        # print('\n')
 
 
 # ----------------------------------

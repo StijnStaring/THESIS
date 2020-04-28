@@ -1,9 +1,9 @@
-def import_ideal_data():
+def import_ideal_acceleration_data():
     import glob
     import pylab as plt
     import pandas as pd
 
-    file = glob.glob("reading_dataset/*.csv")
+    file = glob.glob("reading_acceleration_data/*.csv")
     print("The name of the file: ", file)
 
     data = pd.read_csv(file[0])

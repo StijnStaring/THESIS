@@ -3,7 +3,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     Theta_iter is a string
     """
     import pylab as plt
-
+    plt.axis('equal')
 
     # X(t)/Y(t)
     plt.figure("Path vs Time: iter " + theta_iter,figsize=(10, 4))
