@@ -173,10 +173,10 @@ for vx_start in vx_start_a:
 
         # Gap-closing shooting constraints
         for k in range(N):
-            opti.subject_to(X[:, k + 1] == F(X[:, k], U[k],T/N))
+            opti.subject_to(X[:, k + 1] == F(X[:, k], U[:,k],T/N))
 
         # Path constraints
-        opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
+        opti.subject_to(opti.bounded(-0.01,throttle,0.01)) # local axis [m/s^2]
         # opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
         opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road
         opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
@@ -193,6 +193,7 @@ for vx_start in vx_start_a:
         opti.subject_to(vy[-1] == 0) # lane change is completed
         opti.subject_to(psi[-1] == 0) # assuming straight road
         opti.subject_to(psi_dot[-1] == 0)
+        opti.subject_to(opti.bounded(-pi/180,delta,pi/180))
 
 
         #  Set guesses

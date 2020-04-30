@@ -65,15 +65,36 @@ psi_dot_start = 0
 # width_road = des_matrix[0,0]
 
 # Resampling and guesses !! Resampling not good for not periodic signal!!
+N_old = len(data_cl['x_cl']) - 1
 time_guess = data_cl['time_cl'][-1,0]
 x_guess = signal.resample(data_cl['x_cl'],N+1).T
+# x_guess = signal.resample_poly(data_cl['x_cl'],N,N_old,padtype='line').T
 y_guess = signal.resample(data_cl['y_cl'],N+1).T
+# y_guess = signal.resample_poly(data_cl['y_cl'],N,N_old,padtype='maximum').T
 vx_guess = signal.resample(data_cl['vx_cl'],N+1).T
+# vx_guess = signal.resample_poly(data_cl['vx_cl'],N,N_old,padtype = 'line').T
 vy_guess = signal.resample(data_cl['vy_cl'],N+1).T
 psi_guess = signal.resample(data_cl['psi_cl'],N+1).T
 psi_dot_guess = signal.resample(data_cl['psi_dot_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
 delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siemens --> SWA not 40 degrees
+
+###############
+# Plot guesses
+###############
+# plt.figure('x')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(x_guess))
+# plt.figure('y')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(y_guess))
+# plt.figure('vx')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(vx_guess))
+# plt.figure('vy')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(vy_guess))
+# plt.figure('psi')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(psi_guess))
+# plt.figure('psi_dot')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(psi_dot_guess))
+
 
 # x_guess = data_cl['x_cl'].T
 # y_guess = data_cl['y_cl'].T

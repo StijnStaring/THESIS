@@ -1,5 +1,5 @@
 %% Initialization
-
+% Kijk naar het andere voertuigmodel!!  Gsteer als werkt met Amesim!!
 clear vars
 close all 
 clc
