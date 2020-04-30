@@ -1,4 +1,4 @@
-def import_ideal_data():
+def import_ideal_data_correction():
     import glob
     import pylab as plt
     import pandas as pd
@@ -26,8 +26,10 @@ def import_ideal_data():
     data_cl['jy_cl'] = plt.array([data.jy]).T
     data_cl['psi_cl'] = plt.array([data.psi]).T
     data_cl['psi_dot_cl'] = plt.array([data.psi_dot]).T
-    data_cl['throttle_cl'] = plt.array([data.throttle]).T
-    data_cl['delta_cl'] = plt.array([data.delta]).T
+    data_cl['throttle_cl'] = plt.array([data.throttle]).T[0:-1,0]
+    data_cl['throttle_cl'] = data_cl['throttle_cl'][:,plt.newaxis]
+    data_cl['delta_cl'] = plt.array([data.delta]).T[0:-1,0]
+    data_cl['delta_cl'] = data_cl['delta_cl'][:,plt.newaxis]
     data_cl['aty_cl'] = plt.array([data.aty]).T
     data_cl['any_cl'] = data_cl['psi_dot_cl'] * data_cl['vx_cl']
     data_cl['dt_cl'] = data_cl['time_cl'][1, 0] - data_cl['time_cl'][0, 0]
