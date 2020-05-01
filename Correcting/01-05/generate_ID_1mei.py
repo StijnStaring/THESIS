@@ -13,7 +13,7 @@ import csv
 import pylab as plt
 from scipy import signal
 # from import_data import import_data
-from import_ideal_data import import_ideal_data
+from import_ID_1mei import import_ID_1mei
 from define_plots import define_plots
 from derivative import derivative
 # from generate_delta_guess import generate_delta_guess
@@ -22,8 +22,8 @@ from casadi import *
 # [_,_,_,_,_,init_matrix,des_matrix,dict_list,files] = import_data(0)
 # width_road = 3.46990715
 # vx_start = 23.10159175
-time_guess = 4.01
-data_cl = import_ideal_data()
+# time_guess = 4.01
+data_cl = import_ID_1mei()
 
 # theta = plt.array([4,5,6,1,2]) en met data guess 1 berekende norm waarden en data guess 1 zelf. (example lane change)
 norm0 = 0.007276047781441449
@@ -61,23 +61,36 @@ psi_start = 0
 psi_dot_start = 0
 # width_road = des_matrix[0,0]
 
-# Resampling and guesses
-x_guess = signal.resample(data_cl['x_cl'],N+1).T
-y_guess = signal.resample(data_cl['y_cl'],N+1).T
-vx_guess = signal.resample(data_cl['vx_cl'],N+1).T
+# Resampling and guesses !! Resampling not good for not periodic signal!!
+N_old = len(data_cl['x_cl']) - 1
+time_guess = data_cl['time_cl'][-1,0]
+# x_guess = signal.resample(data_cl['x_cl'],N+1).T
+x_guess = signal.resample_poly(data_cl['x_cl'],N,N_old,padtype='line').T
+# y_guess = signal.resample(data_cl['y_cl'],N+1).T
+y_guess = signal.resample_poly(data_cl['y_cl'],N,N_old,padtype='maximum').T
+# vx_guess = signal.resample(data_cl['vx_cl'],N+1).T
+vx_guess = signal.resample_poly(data_cl['vx_cl'],N,N_old,padtype = 'line').T
 vy_guess = signal.resample(data_cl['vy_cl'],N+1).T
 psi_guess = signal.resample(data_cl['psi_cl'],N+1).T
 psi_dot_guess = signal.resample(data_cl['psi_dot_cl'],N+1).T
 throttle_guess = signal.resample(data_cl['throttle_cl'],N).T
 delta_guess = signal.resample(data_cl['delta_cl'],N).T # Error made in data Siemens --> SWA not 40 degrees
-# time_guess = des_matrix[0,2]
-# delta_guess = generate_delta_guess(time_guess,N)[plt.newaxis,:]
-# plt.figure()
-# plt.plot(plt.linspace(0,time_guess,delta_guess.shape[1]),plt.squeeze(delta_guess)*180/plt.pi)
-# plt.xlabel("Time [s]", fontsize=14)
-# plt.ylabel("delta [degrees]", fontsize=14)
-# plt.title('delta local', fontsize=14)
-# plt.grid(True)
+# ###############
+# Plot guesses
+###############
+# print('This is the length of x_guess: ',len(x_guess))
+# plt.figure('x')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(x_guess))
+# plt.figure('y')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(y_guess))
+# plt.figure('vx')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(vx_guess))
+# plt.figure('vy')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(vy_guess))
+# plt.figure('psi')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(psi_guess))
+# plt.figure('psi_dot')
+# plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(psi_dot_guess))
 
 # ----------------------------------
 #    for loop over optimization
@@ -171,10 +184,14 @@ for vx_start in vx_start_a:
 
         # Gap-closing shooting constraints
         for k in range(N):
-            opti.subject_to(X[:, k + 1] == F(X[:, k], U[k],T/N))
+            opti.subject_to(X[:, k + 1] == F(X[:, k], U[:,k],T/N))
+
+        # last_rhs = f(X[:,N],vertcat(0,0))
+        # opti.subject_to(last_rhs[5,0] == 0)
+
 
         # Path constraints
-        # opti.subject_to(opti.bounded(-0.01,throttle,0.01)) # local axis [m/s^2]
+        opti.subject_to(opti.bounded(-0.01,throttle,0.01)) # local axis [m/s^2]
         # opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
         opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road
         opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
@@ -191,8 +208,7 @@ for vx_start in vx_start_a:
         opti.subject_to(vy[-1] == 0) # lane change is completed
         opti.subject_to(psi[-1] == 0) # assuming straight road
         opti.subject_to(psi_dot[-1] == 0)
-        # opti.subject_to(opti.bounded(-2*pi/180,delta,2*pi/180))
-
+        opti.subject_to(opti.bounded(-20*pi/180,delta,20*pi/180))
 
         #  Set guesses
         opti.set_initial(x,x_guess)
@@ -284,9 +300,9 @@ for vx_start in vx_start_a:
 
         # Extra constraints on acceleration and jerk:
         opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
-        opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
+        # opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
         opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
-        opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
+        # opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
 
 
         # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
@@ -322,7 +338,7 @@ for vx_start in vx_start_a:
         # f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
         # f4: desired lane change
-        integrand = plt.array(y_des_list)** 2
+        integrand = plt.array(y_des_list)**2
         f4_cal = 0
         for i in plt.arange(0, len(integrand) - 1, 1):
             f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)

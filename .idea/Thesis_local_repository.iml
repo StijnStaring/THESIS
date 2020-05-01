@@ -9,6 +9,8 @@
       <sourceFolder url="file://$MODULE_DIR$/Generating data_tracking" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/different_maneuver" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Correcting" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Correcting/30-04" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Correcting/01-05" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
