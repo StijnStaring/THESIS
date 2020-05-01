@@ -52,7 +52,7 @@ pi = 3.14159265359
 theta = plt.array([4,5,6,1,2,1])
 # theta = plt.array([1,1,1,1,10,1])
 # Parameters of the optimization
-nx = 6 # amount of states
+nx = 8 # amount of states
 nc = 2 # amount of controls
 N = 500
 
@@ -132,31 +132,52 @@ for file in file_list:
 
     #Controls
     throttle = MX.sym('throttle')
+    throttle_dot = MX.sym('throttle_dot') # maak connectie met gap closing constraints
     delta = MX.sym('delta') # this is the angle of the front tire --> Gsteer factor needed if want steeringwheelangle
+    delta_dot = MX.sym('delta_dot') # maak connectie tussen afgeleiden!!
 
     x_dot_glob = vx*cos(psi)-vy*sin(psi)
     y_dot_glob = vx*sin(psi)+vy*cos(psi)
     slipangle_f = plt.arctan2(vy+psi_dot*a,vx) - delta
     slipangle_r = plt.arctan2(vy-psi_dot*b,vx)
     Fxf = throttle*Tmax/(2*rw)
+    c = Tmax/(2*rw)
     Fxr = Fxf
     Fyf = -2*Kyf* slipangle_f
     Fyr = -2*Kyr* slipangle_r
     F_d = Cr0 + Cr2*vx*vx
-    ddx = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M +vy*psi_dot # not total acceleration
-    ddy = (sin(delta)*Fxf+cos(delta)*Fyf+Fyr)/M -vx*psi_dot # not total acceleration
-    ddpsi = (sin(delta)*Fxf*a+cos(delta)*Fyf*a-b*Fyr)/Izz
+    atx = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M +vy*psi_dot # not total acceleration
+    aty = (sin(delta)*Fxf+cos(delta)*Fyf+Fyr)/M -vx*psi_dot # not total acceleration
+    psi_ddot = (sin(delta)*Fxf*a+cos(delta)*Fyf*a-b*Fyr)/Izz
+
+    ax_total = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M
+
+    ay_total = (sin(delta) * Fxf + cos(delta) * Fyf + Fyr) / M
+
+    jx_total = (-sin(delta)*throttle*c+cos(delta)*throttle_dot*c+cos(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)+sin(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-cos(delta)*2*Kyf*delta-sin(delta)*2*Kyf*delta_dot+throttle_dot*c-Cr2*2*vx)/M
+
+    jy_total = (cos(delta)*throttle*c+sin(delta)*throttle_dot*c+sin(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)-cos(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-sin(delta)*2*Kyf*delta+cos(delta)*2*Kyf*delta_dot-2*Kyr*(vx*aty-vx*psi_ddot*b-atx*vy+atx*psi_dot*b)/(vx**2+vy**2-2*vy*psi_dot*b+psi_dot**2*b**2))/M
+
+    ax_total_int = ax_total ** 2
+    ay_total_int = ay_total**2
+    jx_total_int = jx_total ** 2
+    jy_total_int = jy_total ** 2
 
     # ----------------------------------
     #    continuous system dot(x)=f(x,u)
     # ----------------------------------
-     # states: x, y, vx, vy, psi, psi_dot
-     # controls: T, delta_dot
-    rhs = vertcat(x_dot_glob, y_dot_glob, ddx, ddy, psi_dot, ddpsi)
-    states = vertcat(x, y, vx, vy, psi, psi_dot)
-    controls = vertcat(throttle, delta)
-    f = Function('f', [states,controls], [rhs],['states','controls'],['rhs'])
+     # states: x, y, vx, vy, psi, psi_dot, throttle, delta
+     # controls: throttle_dot, delta_dot
+    rhs = vertcat(x_dot_glob, y_dot_glob, atx, aty, psi_dot, psi_ddot,throttle_dot,delta_dot)
+    states = vertcat(x, y, vx, vy, psi, psi_dot, throttle, delta)
+    controls = vertcat(throttle_dot, delta_dot)
+    f = Function('f', [states,controls], [ax_total_int],['states','controls'],['rhs'])
 
+    # Other functions:
+    # AXT_int = Function('AXT_int', [states, controls], [ax_total_int], ['states', 'controls'], ['ax_total_int'])
+    # AYT_int = Function('AYT_int', [states, controls], [ay_total_int], ['states', 'controls'], ['ay_total_int'])
+    # JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
+    # JYT_int = Function('JYT_int', [states, controls], [jy_total_int], ['states', 'controls'], ['jy_total_int'])
     ##
     # -----------------------------------
     #    Discrete system x_next = F(x,u)
@@ -185,11 +206,13 @@ for file in file_list:
     vy = X[3,:]
     psi = X[4,:]
     psi_dot = X[5,:]
+    throttle = X[6,:]
+    delta = X[7,:]
 
     # Decision variables for control vector
     U =  opti.variable(nc,N)
-    throttle = U[0,:]
-    delta = U[1,:]
+    throttle_dot = U[0,:]
+    delta_dot = U[1,:]
 
     # Gap-closing shooting constraints
     for k in range(N):
@@ -207,7 +230,9 @@ for file in file_list:
 
     # Initial constraints
     # states: x, y, vx, vy, psi, psi_dot
-    opti.subject_to(X[:,0]== vertcat(x_start,y_start,vx_start,vy_start,psi_start,psi_dot_start))
+    opti.subject_to(X[0:5,0]== vertcat(x_start,y_start,vx_start,vy_start,psi_start,psi_dot_start))
+    opti.subject_to(X[6, 0] == (Cr0+Cr2*vx**2)/(2*c)) # no longitudinal acc when drag force taken into account
+    opti.subject_to(X[7,0] == 0)
     # Controls set on zero in first interval --> want to start from steady state.
     # opti.subject_to(delta[0] == 0)
     # opti.subject_to(throttle[0] == 0)
@@ -217,6 +242,7 @@ for file in file_list:
     opti.subject_to(vy[-1] == 0) # lane change is completed
     opti.subject_to(psi[-1] == 0) # assuming straight road
     opti.subject_to(psi_dot[-1] == 0)
+    opti.subject_to(delta[-1] == 0)
     limit = 150/16.96 # max steerwheelanlge / constant factor to front wheel (paper Son)
     opti.subject_to(opti.bounded(-limit*pi/180,delta,limit*pi/180))
 
@@ -252,37 +278,47 @@ for file in file_list:
 
     # tangential lateral accelleration
     aty_list = []
-    for i in plt.arange(0, len(time_list), 1):
-        if i == 0:
-            aty_list.append((vy[i + 1]-vy[i])/(T/N))
-            # aty_list.append(0) # manually removed as opti variable in order to avoid large psi_ddot an jy peaks at the start
-        elif i == len(time_list)-1:
-            aty_list.append((vy[i]-vy[i-1])/(T/N))
-        else:
-            aty_list.append((vy[i + 1] - vy[i - 1]) / (2 * (T/N)))
+    atx_list = []
+    psi_ddot_list = []
+    for i in plt.arange(0, N, 1):
+        atx_list.append(f(X[:,i],U[:,i])[2,0])
+        aty_list.append(f(X[:,i],U[:,i])[3,0])
+        psi_ddot_list.append(f(X[:, i], U[:, i])[5, 0])
+    for i in plt.arange(N,N+1,1):
+        aty_list.append((vy[i] - vy[i - 1]) / (T / N))
+        atx_list.append((vx[i] - vx[i - 1]) / (T / N))
+        psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
+    # for i in plt.arange(0, len(time_list), 1):
+    #     if i == 0:
+    #         aty_list.append((vy[i + 1]-vy[i])/(T/N))
+    #         # aty_list.append(0) # manually removed as opti variable in order to avoid large psi_ddot an jy peaks at the start
+    #     elif i == len(time_list)-1:
+    #         aty_list.append((vy[i]-vy[i-1])/(T/N))
+    #     else:
+    #         aty_list.append((vy[i + 1] - vy[i - 1]) / (2 * (T/N)))
 
     # tangential longitudinal accelleration
-    atx_list = []
-    for i in plt.arange(0, len(time_list), 1):
-        if i == 0:
-            atx_list.append((vx[i + 1]-vx[i])/(T/N))
-        elif i == len(time_list)-1:
-            atx_list.append((vx[i]-vx[i-1])/(T/N))
-        else:
-            atx_list.append((vx[i + 1] - vx[i - 1]) / (2 * (T/N)))
+    # atx_list = []
+    # for i in plt.arange(0, len(time_list), 1):
+    #     if i == 0:
+    #         atx_list.append((vx[i + 1]-vx[i])/(T/N))
+    #     elif i == len(time_list)-1:
+    #         atx_list.append((vx[i]-vx[i-1])/(T/N))
+    #     else:
+    #         atx_list.append((vx[i + 1] - vx[i - 1]) / (2 * (T/N)))
 
     ax_tot = plt.array(atx_list) + plt.array(anx_list)
     ay_tot = plt.array(aty_list) + plt.array(any_list)
 
     # yaw_acceleration
-    psi_ddot_list = []
-    for i in plt.arange(0, len(time_list), 1):
-        if i == 0:
-            psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i]) / (T / N))
-        elif i == len(time_list) - 1:
-            psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
-        else:
-            psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i - 1]) / (2 * (T / N)))
+
+    # for i in plt.arange(0, len(time_list), 1):
+    #     if i == 0:
+    #         psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i]) / (T / N))
+    #     elif i == len(time_list) - 1:
+    #         psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
+    #     else:
+    #         psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i - 1]) / (2 * (T / N)))
 
     # calculation longitudinal jerk --> jerk is calculated from the total acceleration!
     # Implementation of second order scheme
@@ -341,7 +377,6 @@ for file in file_list:
 
 
     # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-
     # f0: longitudinal acceleration
     integrand = ax_tot** 2
     f0_cal = 0
@@ -496,22 +531,22 @@ for file in file_list:
     #    Storing of data in csv-file
     # ----------------------------------
 
-    path = "writting_C\ DATAC2_V" + str(speed) + "_L"+str(width)+".csv"
-    file = open(path,'w',newline= "")
-    writer = csv.writer(file)
-    writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any","atx","anx"])
-
-    for i in range(N+1):
-        if i == N: # last control point has no physical meaning
-            writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i],atx_sol[i], anx_sol[i]])
-        else:
-            writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i],atx_sol[i], anx_sol[i]])
-
-    file.close()
-    print('dt of the optimization is: ', dt_sol)
-    print('')
-    print('Simulation completed!')
-    print('\n')
+    # path = "writting_C\ DATAC2_V" + str(speed) + "_L"+str(width)+".csv"
+    # file = open(path,'w',newline= "")
+    # writer = csv.writer(file)
+    # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any","atx","anx"])
+    #
+    # for i in range(N+1):
+    #     if i == N: # last control point has no physical meaning
+    #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i],atx_sol[i], anx_sol[i]])
+    #     else:
+    #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i],atx_sol[i], anx_sol[i]])
+    #
+    # file.close()
+    # print('dt of the optimization is: ', dt_sol)
+    # print('')
+    # print('Simulation completed!')
+    # print('\n')
 
 
 # ----------------------------------
