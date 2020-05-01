@@ -11,6 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Correcting" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Correcting/30-04" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Correcting/01-05" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Correcting/01-05/analytical acc" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

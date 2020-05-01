@@ -14,7 +14,7 @@ import csv
 import pylab as plt
 from scipy import signal
 # from import_data import import_data
-from import_ID_1mei import import_ID_1mei
+from import_ID_1mei_ana import import_ID_1mei
 from define_plots import define_plots
 from derivative import derivative
 # from generate_delta_guess import generate_delta_guess

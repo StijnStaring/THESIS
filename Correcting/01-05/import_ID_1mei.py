@@ -1,12 +1,12 @@
-def import_ID_1mei():
+def import_ID_1mei(file):
     import glob
     import pylab as plt
     import pandas as pd
 
-    file = glob.glob("reading_dataset/*.csv")
-    print("The name of the file: ", file)
+    # file = glob.glob("reading_dataset/*.csv")
+    # print("The name of the file: ", file)
 
-    data = pd.read_csv(file[0])
+    data = pd.read_csv(file)
 
     data_cl = dict()
 
@@ -31,6 +31,8 @@ def import_ID_1mei():
     data_cl['aty_cl'] = plt.array([data.aty]).T
     data_cl['any_cl'] = data_cl['psi_dot_cl'] * data_cl['vx_cl']
     data_cl['dt_cl'] = data_cl['time_cl'][1, 0] - data_cl['time_cl'][0, 0]
+    data_cl['width'] = plt.array([data.y]).T[-1,0]
+    data_cl['vx_start'] = plt.array([data.vx]).T[0,0]
 
     # # Calculation of features
     # # f0: longitudinal acceleration

@@ -281,7 +281,7 @@ post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_curren
 #########################################
 # Saving figures and creating csv file
 #########################################
-# figure_style_saving()
+figure_style_saving()
 path = "results\Av_FT_It"+str(rec)+"D"+str(len(file_list))+".csv"
 file = open(path,'w',newline= "")
 writer = csv.writer(file)
