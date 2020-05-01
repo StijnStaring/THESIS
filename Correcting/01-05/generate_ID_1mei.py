@@ -31,6 +31,7 @@ norm1 = 2.6381715506137424
 norm2 = 11.283498669013454
 norm3 = 0.046662223759442054
 norm4 = 17.13698903738383
+norm5 = 0.007276047781441449
 
 # data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
@@ -47,6 +48,8 @@ rw = 0.292
 Tmax = 584
 pi = 3.14159265359
 
+theta = plt.array([4,5,6,1,2,1])
+# theta = plt.array([1,1,1,1,10,1])
 # Parameters of the optimization
 nx = 6 # amount of states
 nc = 2 # amount of controls
@@ -111,7 +114,7 @@ for vx_start in vx_start_a:
         # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
         # theta = plt.array([4,5,6,1,2]) # deze wegingsfactoren dienen achterhaald te worden. (in ax en ay zit ook de normal acceleration)
         # theta = plt.array([4,5,6,1,2])
-        theta = plt.array([4,5,6,1,2])
+
 
         # Equations of the vehicle model
         x = MX.sym('x') # in global axis
@@ -191,7 +194,7 @@ for vx_start in vx_start_a:
 
 
         # Path constraints
-        opti.subject_to(opti.bounded(-0.5,throttle,0.5)) # local axis [m/s^2]
+        opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
         # opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
         opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road
         opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
@@ -208,7 +211,7 @@ for vx_start in vx_start_a:
         opti.subject_to(vy[-1] == 0) # lane change is completed
         opti.subject_to(psi[-1] == 0) # assuming straight road
         opti.subject_to(psi_dot[-1] == 0)
-        opti.subject_to(opti.bounded(-20*pi/180,delta,20*pi/180))
+        opti.subject_to(opti.bounded(-150*pi/180,delta,150*pi/180))
 
         #  Set guesses
         opti.set_initial(x,x_guess)
@@ -274,6 +277,25 @@ for vx_start in vx_start_a:
             else:
                 psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i - 1]) / (2 * (T / N)))
 
+        # calculation longitudinal jerk --> jerk is calculated from the total acceleration!
+        # Implementation of second order scheme
+        # Longitudinal jerk
+        jxt_list = []
+        for i in plt.arange(0, len(time_list), 1):
+            if i == 0:
+                jxt_list.append((atx_list[i + 1] - atx_list[i]) / (T / N))
+            elif i == len(time_list) - 1:
+                jxt_list.append((atx_list[i] - atx_list[i - 1]) / (T / N))
+            else:
+                # jx_list.append((ax_tot[i + 1] - ax_tot[i - 1]) / (2 * dt_sol))
+                jxt_list.append((vx[i + 1] - 2 * vx[i] + vx[i - 1]) / ((T / N) ** 2))
+
+        jxn_list = []
+        for k in range(N + 1):
+            jxn_list.append(-psi_dot[k] * aty_list[k] - vy[k] * psi_ddot_list[k])
+
+        jx_tot = plt.array(jxt_list) + plt.array(jxn_list)
+
         # calculation lateral jerk -> jerk is calculated from the total acceleration!
         # Implementation of second order scheme
         jy_list_t = []
@@ -300,8 +322,8 @@ for vx_start in vx_start_a:
             y_des_list.append(y[k]-width_road)
 
         # Extra constraints on acceleration and jerk:
-        opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
-        opti.subject_to(T<10)
+        # opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
+        opti.subject_to(T<50)
         # opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
         # opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
         # opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
@@ -350,12 +372,20 @@ for vx_start in vx_start_a:
             f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
         # f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
+        # f5: lateral jerk
+        integrand = jx_tot ** 2
+        f5_cal = 0
+        for i in plt.arange(0, len(integrand) - 1, 1):
+            f5_cal = f5_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
+        # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+
+
 
         # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-        opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
+        opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
         # opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
 
-        print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4]))
+        print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
         print('Relative weights: ', theta)
 
         # Implementation of the solver
@@ -448,10 +478,12 @@ for vx_start in vx_start_a:
         print(sol.value(f1_cal))
         print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
         print(sol.value(f2_cal))
-        print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-        print(sol.value(f3_cal))
         print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
+        print(sol.value(f3_cal))
+        print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
         print(sol.value(f4_cal))
+        print('integrand = plt.squeeze(data_cl[jx_cl] ** 2)')
+        print(sol.value(f5_cal))
 
         # ----------------------------------
         #    Storing of data in csv-file

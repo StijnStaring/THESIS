@@ -4,6 +4,8 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     """
     import pylab as plt
 
+
+
     # X(t)/Y(t)
     plt.figure("Path vs Time: iter " + theta_iter,figsize=(10, 4))
     plt.subplot(1, 2, 1)
@@ -12,6 +14,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Horizontal distance [m]", fontsize=14)
     plt.grid(True)
     plt.title('x(t) global',fontsize=14)
+    plt.tight_layout()
 
     plt.subplot(1, 2, 2)
     ax1b = plt.gca()
@@ -19,6 +22,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Vertical distance [m]", fontsize=14)
     plt.title('y(t) global',fontsize=14)
     plt.grid(True)
+    plt.tight_layout()
 
     # path
     plt.figure("Path: iter "+ theta_iter)
@@ -27,6 +31,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("y [m]",fontsize=14)
     plt.title('Path global [m] ',fontsize=14)
     plt.grid(True)
+    plt.tight_layout()
 
     # Vx(t)/Vy(t)
 
@@ -37,6 +42,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Horizontal velocity [m/s]", fontsize=14)
     plt.grid(True)
     plt.title('Vx(t) local',fontsize=14)
+    plt.tight_layout()
 
     plt.subplot(1, 2, 2)
     ax3b = plt.gca()
@@ -44,6 +50,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Vertical velocity [m/s]", fontsize=14)
     plt.title('Vy(t) local',fontsize=14)
     plt.grid(True)
+    plt.tight_layout()
 
 
     # Ax(t)/Ay(t)
@@ -54,6 +61,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Horizontal acceleration [m/s^2]", fontsize=14)
     plt.grid(True)
     plt.title('Ax(t) local total',fontsize=14)
+    plt.tight_layout()
 
     plt.subplot(1, 2, 2)
     ax4b = plt.gca()
@@ -61,6 +69,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Vertical acceleration [m/s^2]", fontsize=14)
     plt.title('Ay(t) local total',fontsize=14)
     plt.grid(True)
+    plt.tight_layout()
 
     # Jx(t)/Jy(t)
 
@@ -71,6 +80,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Horizontal jerk [m/s^3]", fontsize=14)
     plt.grid(True)
     plt.title('jx(t) local total',fontsize=14)
+    plt.tight_layout()
 
     plt.subplot(1, 2, 2)
     ax5b = plt.gca()
@@ -78,6 +88,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Vertical jerk [m/s^3]", fontsize=14)
     plt.title('jy(t) local total',fontsize=14)
     plt.grid(True)
+    plt.tight_layout()
 
     # yaw(t)/yaw/s(t)
 
@@ -88,6 +99,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Yaw angle [degrees]", fontsize=14)
     plt.grid(True)
     plt.title('Yaw angle ',fontsize=14)
+    plt.tight_layout()
 
     plt.subplot(1, 2, 2)
     ax6b = plt.gca()
@@ -95,6 +107,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Yaw angle/s [degrees/s]", fontsize=14)
     plt.title('Yaw angle/s ',fontsize=14)
     plt.grid(True)
+    plt.tight_layout()
 
     # Inputs
     plt.figure("throttle: iter " + theta_iter, figsize=(10, 4))
@@ -104,6 +117,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("throttle [-]", fontsize=14)
     plt.grid(True)
     plt.title('throttle ', fontsize=14)
+    plt.tight_layout()
 
     plt.subplot(1, 2, 2)
     ax7b = plt.gca()
@@ -111,6 +125,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("delta [degrees]", fontsize=14)
     plt.title('delta local', fontsize=14)
     plt.grid(True)
+    plt.tight_layout()
 
     # Different parts of the local lateral acceleration
     plt.figure("Ayt: iter " + theta_iter, figsize=(10, 4))
@@ -120,6 +135,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Ayt [m/s^2]", fontsize=14)
     plt.grid(True)
     plt.title('Ayt ', fontsize=14)
+    plt.tight_layout()
 
     plt.subplot(1, 2, 2)
     ax8b = plt.gca()
@@ -127,6 +143,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Ayn [m/s^2]", fontsize=14)
     plt.grid(True)
     plt.title('Ayn', fontsize=14)
+    plt.tight_layout()
 
     # yaw acceleration
 
@@ -136,6 +153,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.ylabel("Yaw acceleration [degrees/s^2]", fontsize=14)
     plt.grid(True)
     plt.title('Yaw acceleration ',fontsize=14)
+    plt.tight_layout()
 
     time_vector = plt.linspace(0,T_sol,len(x_sol))
 
