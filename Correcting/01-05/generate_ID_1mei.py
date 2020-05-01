@@ -244,7 +244,8 @@ for vx_start in vx_start_a:
         aty_list = []
         for i in plt.arange(0, len(time_list), 1):
             if i == 0:
-                aty_list.append((vy[i + 1]-vy[i])/(T/N))
+                # aty_list.append((vy[i + 1]-vy[i])/(T/N))
+                aty_list.append(0)
             elif i == len(time_list)-1:
                 aty_list.append((vy[i]-vy[i-1])/(T/N))
             else:
@@ -301,8 +302,12 @@ for vx_start in vx_start_a:
         # Extra constraints on acceleration and jerk:
         opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
         # opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
-        opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
+        # opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
         # opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
+
+        # for i in plt.arange(0,N+1,1):
+        #     opti.subject_to(jy_list_t[i] <= 5)
+        #     opti.subject_to(jy_list_t[i] >= -5)
 
 
         # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
