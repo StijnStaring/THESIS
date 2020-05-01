@@ -191,7 +191,7 @@ for vx_start in vx_start_a:
 
 
         # Path constraints
-        opti.subject_to(opti.bounded(-0.01,throttle,0.01)) # local axis [m/s^2]
+        opti.subject_to(opti.bounded(-0.5,throttle,0.5)) # local axis [m/s^2]
         # opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
         opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road
         opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
@@ -245,7 +245,7 @@ for vx_start in vx_start_a:
         for i in plt.arange(0, len(time_list), 1):
             if i == 0:
                 # aty_list.append((vy[i + 1]-vy[i])/(T/N))
-                aty_list.append(0)
+                aty_list.append(0) # manually removed as opti variable in order to avoid large psi_ddot an jy peaks at the start
             elif i == len(time_list)-1:
                 aty_list.append((vy[i]-vy[i-1])/(T/N))
             else:
@@ -301,6 +301,7 @@ for vx_start in vx_start_a:
 
         # Extra constraints on acceleration and jerk:
         opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
+        opti.subject_to(T<10)
         # opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
         # opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
         # opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
