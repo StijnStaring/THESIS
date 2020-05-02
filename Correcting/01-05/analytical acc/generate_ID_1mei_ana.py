@@ -86,27 +86,27 @@ for file in file_list:
     # ###############
     # Plot guesses
     ###############
-    print('This is the size of x_guess: ',x_guess.shape)
-    plt.figure('x')
-    plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(x_guess))
-    plt.figure('y')
-    plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(y_guess))
-    plt.figure('vx')
-    plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(vx_guess))
-    plt.figure('vy')
-    plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(vy_guess))
-    plt.figure('psi')
-    plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(psi_guess))
-    plt.figure('psi_dot')
-    plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(psi_dot_guess))
-    plt.figure('throttle')
-    plt.plot(plt.linspace(0, time_guess, N + 1), plt.squeeze(throttle_guess))
-    plt.figure('delta')
-    plt.plot(plt.linspace(0, time_guess, N + 1), plt.squeeze(delta_guess))
-    plt.figure('throttle_dot')
-    plt.plot(plt.linspace(0, time_guess, N ), plt.squeeze(throttle_dot_guess))
-    plt.figure('delta_dot')
-    plt.plot(plt.linspace(0, time_guess, N), plt.squeeze(delta_dot_guess))
+    # print('This is the size of x_guess: ',x_guess.shape)
+    # plt.figure('x')
+    # plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(x_guess))
+    # plt.figure('y')
+    # plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(y_guess))
+    # plt.figure('vx')
+    # plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(vx_guess))
+    # plt.figure('vy')
+    # plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(vy_guess))
+    # plt.figure('psi')
+    # plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(psi_guess))
+    # plt.figure('psi_dot')
+    # plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(psi_dot_guess))
+    # plt.figure('throttle')
+    # plt.plot(plt.linspace(0, time_guess, N + 1), plt.squeeze(throttle_guess))
+    # plt.figure('delta')
+    # plt.plot(plt.linspace(0, time_guess, N + 1), plt.squeeze(delta_guess))
+    # plt.figure('throttle_dot')
+    # plt.plot(plt.linspace(0, time_guess, N ), plt.squeeze(throttle_dot_guess))
+    # plt.figure('delta_dot')
+    # plt.plot(plt.linspace(0, time_guess, N), plt.squeeze(delta_dot_guess))
 
     print("")
     print("vx_start: ",vx_start," and width_road: ",width_road)
@@ -126,8 +126,8 @@ for file in file_list:
     delta_dot = SX.sym('delta_dot')
 
     # Other
-    vx_des = SX.sym('vx_des')
-    y_change = SX.sym('y_change')
+    vx_des = vx_start
+    y_change = width_road
 
     x_dot_glob = vx*cos(psi)-vy*sin(psi)
     y_dot_glob = vx*sin(psi)+vy*cos(psi)
@@ -245,6 +245,7 @@ for file in file_list:
 
     opti = casadi.Opti()
     X = opti.variable(nx,N+1)
+    U = opti.variable(nc, N)
     T =  opti.variable() # Time [s]
     feature0_current = opti.parameter()
     feature1_current = opti.parameter()
@@ -258,6 +259,10 @@ for file in file_list:
     opti.set_value(feature3_current, 0)
     opti.set_value(feature4_current, 0)
     opti.set_value(feature5_current,0)
+    # vx_des = opti.parameter()
+    # opti.set_value(vx_des,vx_start)
+    # y_change = opti.parameter()
+    # opti.set_value(y_change, width_road)
 
     # Aliases for states
     x  = X[0,:]
@@ -270,7 +275,6 @@ for file in file_list:
     delta = X[7,:]
 
     # Decision variables for control vector
-    U =  opti.variable(nc,N)
     throttle_dot = U[0,:]
     delta_dot = U[1,:]
 
@@ -319,120 +323,7 @@ for file in file_list:
     # -----------------------------------------------
     #    objective
     # -----------------------------------------------
-    # Objective: The total accelerations in the local axis are considered!
-    # time_list = []
-    # for i in range(N+1):
-    #     time_list.append(i*T/N)
-    # time_vector = plt.array(time_list)
-    #
-    # # normal lateral accelleration
-    # anx_list = []
-    # for k in range(N+1):
-    #     anx_list.append(-vy[k]*psi_dot[k])
-    #
-    # any_list = []
-    # for k in range(N+1):
-    #     any_list.append(vx[k]*psi_dot[k])
-    #
-    # # tangential lateral accelleration
-    # aty_list = []
-    # atx_list = []
-    # psi_ddot_list = []
-    # for i in plt.arange(0, N, 1):
-    #     atx_list.append(f(X[:,i],U[:,i])[2,0])
-    #     aty_list.append(f(X[:,i],U[:,i])[3,0])
-    #     psi_ddot_list.append(f(X[:, i], U[:, i])[5, 0])
-    # for i in plt.arange(N,N+1,1):
-    #     aty_list.append((vy[i] - vy[i - 1]) / (T / N))
-    #     atx_list.append((vx[i] - vx[i - 1]) / (T / N))
-    #     psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
-    # for i in plt.arange(0, len(time_list), 1):
-    #     if i == 0:
-    #         aty_list.append((vy[i + 1]-vy[i])/(T/N))
-    #         # aty_list.append(0) # manually removed as opti variable in order to avoid large psi_ddot an jy peaks at the start
-    #     elif i == len(time_list)-1:
-    #         aty_list.append((vy[i]-vy[i-1])/(T/N))
-    #     else:
-    #         aty_list.append((vy[i + 1] - vy[i - 1]) / (2 * (T/N)))
-
-    # tangential longitudinal accelleration
-    # atx_list = []
-    # for i in plt.arange(0, len(time_list), 1):
-    #     if i == 0:
-    #         atx_list.append((vx[i + 1]-vx[i])/(T/N))
-    #     elif i == len(time_list)-1:
-    #         atx_list.append((vx[i]-vx[i-1])/(T/N))
-    #     else:
-    #         atx_list.append((vx[i + 1] - vx[i - 1]) / (2 * (T/N)))
-
-    # ax_tot = plt.array(atx_list) + plt.array(anx_list)
-    # ay_tot = plt.array(aty_list) + plt.array(any_list)
-
-    # yaw_acceleration
-
-    # for i in plt.arange(0, len(time_list), 1):
-    #     if i == 0:
-    #         psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i]) / (T / N))
-    #     elif i == len(time_list) - 1:
-    #         psi_ddot_list.append((psi_dot[i] - psi_dot[i - 1]) / (T / N))
-    #     else:
-    #         psi_ddot_list.append((psi_dot[i + 1] - psi_dot[i - 1]) / (2 * (T / N)))
-
-    # calculation longitudinal jerk --> jerk is calculated from the total acceleration!
-    # Implementation of second order scheme
-    # Longitudinal jerk
-    # jxt_list = []
-    # for i in plt.arange(0, len(time_list), 1):
-    #     if i == 0:
-    #         jxt_list.append((atx_list[i + 1] - atx_list[i]) / (T / N))
-    #     elif i == len(time_list) - 1:
-    #         jxt_list.append((atx_list[i] - atx_list[i - 1]) / (T / N))
-    #     else:
-    #         # jx_list.append((ax_tot[i + 1] - ax_tot[i - 1]) / (2 * dt_sol))
-    #         jxt_list.append((vx[i + 1] - 2 * vx[i] + vx[i - 1]) / ((T / N) ** 2))
-    #
-    # jxn_list = []
-    # for k in range(N + 1):
-    #     jxn_list.append(-psi_dot[k] * aty_list[k] - vy[k] * psi_ddot_list[k])
-    #
-    # jx_tot = plt.array(jxt_list) + plt.array(jxn_list)
-    #
-    # # calculation lateral jerk -> jerk is calculated from the total acceleration!
-    # # Implementation of second order scheme
-    # jy_list_t = []
-    # for i in plt.arange(0, len(time_list), 1):
-    #     if i == 0:
-    #         jy_list_t.append((aty_list[i + 1]-aty_list[i])/(T/N))
-    #     elif i == len(time_list)-1:
-    #         jy_list_t.append((aty_list[i]-aty_list[i-1])/(T/N))
-    #     else:
-    #         # jy_list.append((ay_tot[i + 1] - ay_tot[i - 1]) / (2 * (T/N)))
-    #         jy_list_t.append((vy[i + 1] -2*vy[i] +vy[i - 1]) / ((T / N)**2))
-    #
-    # jy_list_n = []
-    # for k in range(N+1):
-    #     jy_list_n.append(psi_dot[k]*atx_list[k] + vx[k]*psi_ddot_list[k])
-    # jy_tot = plt.array(jy_list_t) + plt.array(jy_list_n)
-    #
-    # vx_des_list = []
-    # for k in range(N+1):
-    #     vx_des_list.append(vx[k]-vx_start)
-    #
-    # y_des_list = []
-    # for k in range(N+1):
-    #     y_des_list.append(y[k]-width_road)
-
-    # Extra constraints on acceleration and jerk:
-    # opti.subject_to(aty_list[-1] == 0) # to avoid shooting through
     opti.subject_to(T<50)
-    # opti.subject_to(jy_tot[-1] == 0) # fully end of lane change --> no lateral acceleration in the next sample
-    # opti.subject_to(aty_list[0] == 0) # start from the beginning of the lane change
-    # opti.subject_to(jy_tot[0] == 0) # start from the beginning of the lane change
-
-    # for i in plt.arange(0,N+1,1):
-    #     opti.subject_to(jy_list_t[i] <= 5)
-    #     opti.subject_to(jy_list_t[i] >= -5)
-
 
     # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jxtot**2+t3*jytot**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
     for i in plt.arange(0,N,1):
@@ -443,50 +334,6 @@ for file in file_list:
         feature4_current =  VXD_F(X[:, i], U[:, i], feature4_current, T / N)
         feature5_current =  YD_F(X[:, i], U[:, i], feature5_current, T / N)
 
-
-    # # f0: longitudinal acceleration
-    # integrand = ax_tot** 2
-    # f0_cal = 0
-    # for i in plt.arange(0, len(integrand) - 1, 1):
-    #     f0_cal = f0_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-    #
-    # # f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-    #
-    # # f1: lateral acceleration
-    # integrand = ay_tot** 2
-    # f1_cal = 0
-    # for i in plt.arange(0, len(integrand) - 1, 1):
-    #     f1_cal = f1_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-    # # f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-    # # print('f1: ',f1_cal)
-    #
-    # # f2: lateral jerk
-    # integrand = jy_tot** 2
-    # f2_cal = 0
-    # for i in plt.arange(0, len(integrand) - 1, 1):
-    #     f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-    # # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-    #
-    # # f3: desired velocity
-    # integrand = plt.array(vx_des_list)** 2
-    # f3_cal = 0
-    # for i in plt.arange(0, len(integrand) - 1, 1):
-    #     f3_cal = f3_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-    # # f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-    #
-    # # f4: desired lane change
-    # integrand = plt.array(y_des_list)**2
-    # f4_cal = 0
-    # for i in plt.arange(0, len(integrand) - 1, 1):
-    #     f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-    # # f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-    #
-    # # f5: lateral jerk
-    # integrand = jx_tot ** 2
-    # f5_cal = 0
-    # for i in plt.arange(0, len(integrand) - 1, 1):
-    #     f5_cal = f5_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
-    # # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
     opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
