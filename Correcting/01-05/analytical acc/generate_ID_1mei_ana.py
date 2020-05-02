@@ -14,7 +14,7 @@ import glob
 import pylab as plt
 from scipy import signal
 from import_ID_1mei_ana import import_ID_1mei
-from define_plots import define_plots
+from define_plots_1mei import define_plots
 
 from casadi import *
 
@@ -142,6 +142,7 @@ for file in file_list:
     atx = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M +vy*psi_dot # not total acceleration
     aty = (sin(delta)*Fxf+cos(delta)*Fyf+Fyr)/M -vx*psi_dot # not total acceleration
     an_y = vx*psi_dot
+    anx = -vy*psi_dot
     psi_ddot = (sin(delta)*Fxf*a+cos(delta)*Fyf*a-b*Fyr)/Izz
 
     ax_total = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M
@@ -170,6 +171,8 @@ for file in file_list:
     f = Function('f', [states,controls], [rhs],['states','controls'],['rhs'])
 
     # Other functions:
+    stock = Function('stock', [states, controls], [ax_total,ay_total,jx_total,jy_total,psi_ddot,atx,anx,aty,an_y], ['states', 'controls'], ['ax_total','ay_total','jx_total','jy_total','psi_ddot','atx','anx','aty','an_y'])
+
     AXT_int = Function('AXT_int', [states, controls], [ax_total_int], ['states', 'controls'], ['ax_total_int'])
     AYT_int = Function('AYT_int', [states, controls], [ay_total_int], ['states', 'controls'], ['ay_total_int'])
     JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
@@ -336,8 +339,8 @@ for file in file_list:
 
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-    opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
-    # opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
+    # opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
+    opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
 
     print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
     print('Relative weights: ', theta)
@@ -363,19 +366,36 @@ for file in file_list:
     delta_dot_sol = sol.value(delta_dot)
     T_sol = sol.value(T)
     dt_sol = T_sol/N
-    ax_tot_sol = sol.value(ax_total)
-    ay_tot_sol = sol.value(ay_total)
-    jx_tot_sol = sol.value(jx_total)
-    jy_tot_sol = sol.value(jy_total)
-    psi_ddot_sol = sol.value(psi_ddot)
-    aty_sol = sol.value(aty)
-    any_sol = sol.value(an_y)
+    ax_tot_sol = plt.zeros(N)
+    ay_tot_sol = plt.zeros(N)
+    jx_tot_sol = plt.zeros(N)
+    jy_tot_sol = plt.zeros(N)
+    psi_ddot_sol = plt.zeros(N)
+    aty_sol = plt.zeros(N)
+    any_sol = plt.zeros(N)
+    atx_sol = plt.zeros(N)
+    anx_sol = plt.zeros(N)
+
+    for i in plt.arange(0,N,1):
+        res = stock(sol.value(X[:,i]),sol.value(U[:,i]))
+        ax_tot_sol[i] = res[0]
+        ay_tot_sol[i] = res[1]
+        jx_tot_sol[i] = res[2]
+        jy_tot_sol[i] = res[3]
+        psi_ddot_sol[i] = res[4]
+        atx_sol[i] = res[5]
+        anx_sol[i] = res[6]
+        aty_sol[i] = res[7]
+        any_sol[i] = res[8]
+
 
     width = plt.around(width_road, 2)
     speed = plt.around(vx_start, 2)
-    define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width)
+    define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,atx_sol,anx_sol,speed,width)
 
-    print("\n")
+    print("")
+    print("dt is equal to: ", dt_sol)
+    print("")
     print('Integrated feature values: ')
     print('------------------------------')
     print('integrand = plt.squeeze(data_cl[ax_cl]**2)')

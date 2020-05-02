@@ -1,10 +1,8 @@
-def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,speed,width):
+def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,T_sol,aty_sol,any_sol,atx_sol,anx_sol,speed,width):
     """"
     Theta_iter is a string
     """
     import pylab as plt
-
-
 
     # X(t)/Y(t)
     plt.figure("Path vs Time: iter " + theta_iter,figsize=(10, 4))
@@ -155,6 +153,25 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     plt.title('Yaw acceleration ',fontsize=14)
     plt.tight_layout()
 
+    # Different parts of the local longitudinal acceleration
+    plt.figure("Axt: iter " + theta_iter, figsize=(10, 4))
+    plt.subplot(1, 2, 1)
+    ax10a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Axt [m/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Axt ', fontsize=14)
+    plt.tight_layout()
+
+    plt.subplot(1, 2, 2)
+    ax10b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=14)
+    plt.ylabel("Axn [m/s^2]", fontsize=14)
+    plt.grid(True)
+    plt.title('Axn', fontsize=14)
+    plt.tight_layout()
+
+
     time_vector = plt.linspace(0,T_sol,len(x_sol))
 
     # states
@@ -163,17 +180,19 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax2.plot(x_sol, y_sol, '.-',  linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
     ax3a.plot(time_vector, vx_sol, '.-',  linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
     ax3b.plot(time_vector, vy_sol, '.-',  linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax4a.plot(time_vector, ax_sol, '.-',  linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax4b.plot(time_vector, ay_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax5a.plot(time_vector, jx_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax5b.plot(time_vector, jy_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax4a.plot(time_vector[0:-1], ax_sol, '.-',  linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax4b.plot(time_vector[0:-1], ay_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax5a.plot(time_vector[0:-1], jx_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax5b.plot(time_vector[0:-1], jy_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
     ax6a.plot(time_vector, psi_sol*180/plt.pi, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
     ax6b.plot(time_vector, psi_dot_sol*180/plt.pi, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax7a.plot(time_vector[0:-1], throttle_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax7b.plot(time_vector[0:-1], delta_sol*180/plt.pi, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax8a.plot(time_vector, aty_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax8b.plot(time_vector, any_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
-    ax9.plot(time_vector, psi_ddot_sol*180/plt.pi, '.-', linewidth=3.0, label="SP: " + str(speed) + " W: " + str(width))
+    ax7a.plot(time_vector, throttle_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax7b.plot(time_vector, delta_sol*180/plt.pi, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax8a.plot(time_vector[0:-1], aty_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax8b.plot(time_vector[0:-1], any_sol, '.-', linewidth=3.0, label= "SP: " +str(speed)+" W: " + str(width))
+    ax9.plot(time_vector[0:-1], psi_ddot_sol*180/plt.pi, '.-', linewidth=3.0, label="SP: " + str(speed) + " W: " + str(width))
+    ax10a.plot(time_vector[0:-1], atx_sol, '.-', linewidth=3.0, label="SP: " + str(speed) + " W: " + str(width))
+    ax10b.plot(time_vector[0:-1], anx_sol, '.-', linewidth=3.0, label="SP: " + str(speed) + " W: " + str(width))
 
     ax1a.legend()
     ax1b.legend()
@@ -190,6 +209,8 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax8a.legend()
     ax8b.legend()
     ax9.legend()
+    ax10a.legend()
+    ax10b.legend()
 
 
     print("\n")
