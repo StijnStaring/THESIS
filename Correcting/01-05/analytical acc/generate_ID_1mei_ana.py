@@ -97,6 +97,8 @@ for file in file_list:
     psi_dot_guess = signal.resample(data_cl['psi_dot_cl'], N + 1).T
     throttle_guess = signal.resample(data_cl['throttle_cl'], N).T
     delta_guess = signal.resample(data_cl['delta_cl'], N).T  # Error made in data Siemens --> SWA not 40 degrees
+    throttle_dot_guess =
+    delta_dot_guess =
     # ###############
     # Plot guesses
     ###############
@@ -171,13 +173,13 @@ for file in file_list:
     rhs = vertcat(x_dot_glob, y_dot_glob, atx, aty, psi_dot, psi_ddot,throttle_dot,delta_dot)
     states = vertcat(x, y, vx, vy, psi, psi_dot, throttle, delta)
     controls = vertcat(throttle_dot, delta_dot)
-    f = Function('f', [states,controls], [ax_total_int],['states','controls'],['rhs'])
+    f = Function('f', [states,controls], [rhs],['states','controls'],['rhs'])
 
     # Other functions:
-    # AXT_int = Function('AXT_int', [states, controls], [ax_total_int], ['states', 'controls'], ['ax_total_int'])
-    # AYT_int = Function('AYT_int', [states, controls], [ay_total_int], ['states', 'controls'], ['ay_total_int'])
-    # JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
-    # JYT_int = Function('JYT_int', [states, controls], [jy_total_int], ['states', 'controls'], ['jy_total_int'])
+    AXT_int = Function('AXT_int', [states, controls], [ax_total_int], ['states', 'controls'], ['ax_total_int'])
+    AYT_int = Function('AYT_int', [states, controls], [ay_total_int], ['states', 'controls'], ['ay_total_int'])
+    JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
+    JYT_int = Function('JYT_int', [states, controls], [jy_total_int], ['states', 'controls'], ['jy_total_int'])
     ##
     # -----------------------------------
     #    Discrete system x_next = F(x,u)
@@ -189,6 +191,37 @@ for file in file_list:
     k4 = f(states + dt * k3, controls)
     states_next = states+dt/6*(k1 +2*k2 +2*k3 +k4)
     F = Function('F', [states, controls, dt], [states_next],['states','controls','dt'],['states_next'])
+    # -----------------------------------
+    # -----------------------------------
+    feature1_current = MX.sym('feature1_current')
+    k1 = AXT_int(states, controls)
+    k2 = AXT_int(states + dt / 2 * k1, controls)
+    k3 = AXT_int(states + dt / 2 * k2, controls)
+    k4 = AXT_int(states + dt * k3, controls)
+    feature1_next = feature1_current + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+    AXT_F = Function('AXT_F', [states, controls, feature1_current, dt], [feature1_next], ['states', 'controls', 'dt'], ['feature1_next'])
+    # -----------------------------------
+    k1 = f(states, controls)
+    k2 = f(states + dt / 2 * k1, controls)
+    k3 = f(states + dt / 2 * k2, controls)
+    k4 = f(states + dt * k3, controls)
+    states_next = states + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+    F = Function('F', [states, controls, dt], [states_next], ['states', 'controls', 'dt'], ['states_next'])
+    # -----------------------------------
+    k1 = f(states, controls)
+    k2 = f(states + dt / 2 * k1, controls)
+    k3 = f(states + dt / 2 * k2, controls)
+    k4 = f(states + dt * k3, controls)
+    states_next = states + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+    F = Function('F', [states, controls, dt], [states_next], ['states', 'controls', 'dt'], ['states_next'])
+    # -----------------------------------
+    k1 = f(states, controls)
+    k2 = f(states + dt / 2 * k1, controls)
+    k3 = f(states + dt / 2 * k2, controls)
+    k4 = f(states + dt * k3, controls)
+    states_next = states + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+    F = Function('F', [states, controls, dt], [states_next], ['states', 'controls', 'dt'], ['states_next'])
+    # -----------------------------------
 
     ##
     # -----------------------------------------------
@@ -242,7 +275,7 @@ for file in file_list:
     opti.subject_to(vy[-1] == 0) # lane change is completed
     opti.subject_to(psi[-1] == 0) # assuming straight road
     opti.subject_to(psi_dot[-1] == 0)
-    opti.subject_to(delta[-1] == 0)
+    # opti.subject_to(delta[-1] == 0)
     limit = 150/16.96 # max steerwheelanlge / constant factor to front wheel (paper Son)
     opti.subject_to(opti.bounded(-limit*pi/180,delta,limit*pi/180))
 
