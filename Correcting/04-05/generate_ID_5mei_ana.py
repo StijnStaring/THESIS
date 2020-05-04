@@ -1,15 +1,17 @@
 """
 This script is generating data using the same vehicle model as in the learning algorithm and uses the comfortcostfunction
 as objective when pathplanning.
-Feedforward control of the vehicle. One optimization is solved over the whole control horizon.
+Feedforward control of the vehicle --> One optimization is solved over the whole control horizon.
 Linear tyre model -> valid if slipangle < 5 degrees and lat_acc < 4 m/s^2
 Producing different lane changes: different longitudinal start velocities and lateral distances to be convered
 :return: csv-datafiles
 """
 import glob
 # import csv
+import scipy
 import pylab as plt
 from scipy import signal
+from scipy import integrate
 from import_ID_5mei_ana import import_ID_5mei
 from define_plots_5mei_ana import define_plots
 from casadi import *
@@ -302,7 +304,8 @@ for file in file_list:
     # opti.subject_to(jy_start == 0)
     opti.subject_to(X[6, 0] == (Cr0+Cr2*vx_start**2)/(2*c)) # no longitudinal acc when drag force taken into account
     opti.subject_to(X[7,0] == 0) # driving straigth
-    opti.subject_to(T < 50)  # This constraint should be unbinding, but is needed to decrease the feasible space for the solver
+    T_limit = 10
+    opti.subject_to(T < T_limit)  # This constraint should be unbinding, but is needed to decrease the feasible space for the solver
 
     # Terminal constraints
     opti.subject_to(y[-1] == width_road) # should move 3,47 m
@@ -330,6 +333,9 @@ for file in file_list:
     # -----------------------------------------------
     #    objective
     # -----------------------------------------------
+    time_list = []
+    for i in range(N + 1):
+        time_list.append(i * T / N)
     # longitudinal jerk
     jx_list = []
     for i in plt.arange(0, N+1, 1):
@@ -366,15 +372,13 @@ for file in file_list:
     integrand = jx_tot ** 2
     feature2_current = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
-        feature2_current = feature2_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
-        # feature2_current = scipy.integrate.simps(integrand,plt.array(time_list))
+        feature2_current = feature2_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N) # Crank - Nicolson scheme
 
     # f3: lateral jerk
     integrand = jy_tot ** 2
     feature3_current = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
-        feature3_current = feature3_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
-        # f3_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+        feature3_current = feature3_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N) # Crank - Nicolson scheme
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
     opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
@@ -404,15 +408,15 @@ for file in file_list:
     delta_dot_sol = sol.value(delta_dot)
     T_sol = sol.value(T)
     dt_sol = T_sol/N
-    ax_tot_sol = plt.zeros(N)
-    ay_tot_sol = plt.zeros(N)
-    jx_tot_sol = plt.zeros(N)
-    jy_tot_sol = plt.zeros(N)
-    psi_ddot_sol = plt.zeros(N)
-    aty_sol = plt.zeros(N)
-    any_sol = plt.zeros(N)
-    atx_sol = plt.zeros(N)
-    anx_sol = plt.zeros(N)
+    ax_tot_sol = plt.zeros(N+1)
+    ay_tot_sol = plt.zeros(N+1)
+    jx_tot_sol = plt.zeros(N+1)
+    jy_tot_sol = plt.zeros(N+1)
+    psi_ddot_sol = plt.zeros(N+1)
+    aty_sol = plt.zeros(N+1)
+    any_sol = plt.zeros(N+1)
+    atx_sol = plt.zeros(N+1)
+    anx_sol = plt.zeros(N+1)
 
     for i in plt.arange(0,N+1,1):
         res = stock(sol.value(X[:,i]))
@@ -430,25 +434,25 @@ for file in file_list:
 
     # longitudinal jerk
     jx_list = []
-    for i in plt.arange(0, N, 1):
+    for i in plt.arange(0, N+1, 1):
         if i == 0:
-            jx_list.append((AX_TOT(sol.value(X[:, i + 1]), sol.value(U[:, i + 1])) - AX_TOT(sol.value(X[:, i]), sol.value(U[:, i]))) / (sol.value(T) / N))
-        elif i == N-1:
-            jx_list.append((AX_TOT(sol.value(X[:, i]), sol.value(U[:, i])) - AX_TOT(sol.value(X[:, i - 1]), sol.value(U[:, i - 1]))) / (sol.value(T) / N))
+            jx_list.append((AX_TOT(sol.value(X[:, i + 1])) - AX_TOT(sol.value(X[:, i]))) / (sol.value(T) / N))
+        elif i == N:
+            jx_list.append((AX_TOT(sol.value(X[:, i])) - AX_TOT(sol.value(X[:, i - 1]))) / (sol.value(T) / N))
         else:
-            jx_list.append((AX_TOT(sol.value(X[:, i + 1]), sol.value(U[:, i + 1])) - AX_TOT(sol.value(X[:, i - 1]), sol.value(U[:, i - 1]))) / (2 * (sol.value(T) / N)))
+            jx_list.append((AX_TOT(sol.value(X[:, i + 1])) - AX_TOT(sol.value(X[:, i - 1]))) / (2 * (sol.value(T) / N)))
 
     jx_tot_sol = plt.array(jx_list)
 
     # lateral jerk
     jy_list = []
-    for i in plt.arange(0, N, 1):
+    for i in plt.arange(0, N+1, 1):
         if i == 0:
-            jy_list.append((AY_TOT(sol.value(X[:,i+1]),sol.value(U[:,i+1])) - AY_TOT(sol.value(X[:,i]),sol.value(U[:,i]))) / (sol.value(T) / N))
-        elif i == N-1:
-            jy_list.append((AY_TOT(sol.value(X[:,i]),sol.value(U[:,i])) - AY_TOT(sol.value(X[:,i-1]),sol.value(U[:,i-1]))) / (sol.value(T) / N))
+            jy_list.append((AY_TOT(sol.value(X[:,i+1])) - AY_TOT(sol.value(X[:,i]))) / (sol.value(T) / N))
+        elif i == N:
+            jy_list.append((AY_TOT(sol.value(X[:,i])) - AY_TOT(sol.value(X[:,i-1]))) / (sol.value(T) / N))
         else:
-            jy_list.append((AY_TOT(sol.value(X[:,i+1]),sol.value(U[:,i+1])) - AY_TOT(sol.value(X[:,i-1]),sol.value(U[:,i-1]))) / (2 * (sol.value(T) / N)))
+            jy_list.append((AY_TOT(sol.value(X[:,i+1])) - AY_TOT(sol.value(X[:,i-1]))) / (2 * (sol.value(T) / N)))
 
     jy_tot_sol = plt.array(jy_list)
 
@@ -473,6 +477,14 @@ for file in file_list:
     print(sol.value(feature4_current))
     print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
     print(sol.value(feature5_current))
+
+    print("")
+    if (T_limit - dt_sol) <= T_sol:
+        print("-------------------------------------")
+        print("Warning: Time constraint is binding!")
+        print("-------------------------------------")
+    print('Simulation completed!')
+
 
     # ----------------------------------
     #    Storing of data in a csv-file
@@ -499,5 +511,4 @@ for file in file_list:
 # ----------------------------------
 #    Show
 # ----------------------------------
-
 plt.show()
