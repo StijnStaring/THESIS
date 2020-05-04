@@ -145,17 +145,16 @@ for file in file_list:
     psi_ddot = (sin(delta)*Fxf*a+cos(delta)*Fyf*a-b*Fyr)/Izz
 
     ax_total = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M
-
     ay_total = (sin(delta) * Fxf + cos(delta) * Fyf + Fyr) / M
-    #j_total = derivative(ax_total(t),t) --> see photos of my notes
-    # jx_total = (-sin(delta)*throttle*c+cos(delta)*throttle_dot*c+cos(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)+sin(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-cos(delta)*2*Kyf*delta-sin(delta)*2*Kyf*delta_dot+throttle_dot*c-Cr2*2*vx)/M
 
-    # jy_total = (cos(delta)*throttle*c+sin(delta)*throttle_dot*c+sin(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)-cos(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-sin(delta)*2*Kyf*delta+cos(delta)*2*Kyf*delta_dot-2*Kyr*(vx*aty-vx*psi_ddot*b-atx*vy+atx*psi_dot*b)/(vx**2+vy**2-2*vy*psi_dot*b+psi_dot**2*b**2))/M
+    # j_total = derivative(ax_total(t),t) --> see photos of my notes (c)
+    jx_total = (c*throttle_dot - 2*Cr2*vx*atx + 2*Kyf*sin(delta)*(((a*psi_ddot + aty)/vx - ((vy + a*psi_dot)*atx)/vx**2)/((vy + a*psi_dot)**2/vx**2 + 1) - delta_dot) + c*cos(delta)*throttle_dot - 2*Kyf*cos(delta)*(delta- plt.arctan2((vy + a*psi_dot),vx))*delta_dot - c*sin(delta)*throttle*delta_dot)/M
+    jy_total = ((2*Kyr*((b*psi_ddot - aty)/vx + ((vy - b*psi_dot)*atx)/vx**2))/((vy - b*psi_dot)**2/vx**2 + 1) - 2*Kyf*cos(delta)*(((a*psi_ddot + aty)/vx - ((vy + a*psi_dot)*atx)/vx**2)/((vy + a*psi_dot)**2/vx**2 + 1) - delta_dot) + c*sin(delta)*throttle_dot - 2*Kyf*sin(delta)*(delta - plt.arctan2((vy + a*psi_dot),vx))*delta_dot + c*cos(delta)*throttle*delta_dot)/M
 
     ax_total_int = ax_total ** 2
     ay_total_int = ay_total**2
-    # jx_total_int = jx_total ** 2
-    # jy_total_int = jy_total ** 2
+    jx_total_int = jx_total ** 2
+    jy_total_int = jy_total ** 2
     vx_diff_int = vx ** 2 - 2 * vx * vx_des + vx_des ** 2 # (vx- vx_des)**2 --> vx_des is the start vx at beginning lane change
     y_diff_int = y ** 2 - 2 * y * y_change + y_change ** 2 # (y-y_des)**2 --> y_des is 3.47, distance to be travelled to change lane
 
@@ -179,8 +178,8 @@ for file in file_list:
     # In fact not all the states and controls are needed to calculate the output of the function --> but I think, giving to much inputs doesn't matter.
     AXT_int = Function('AXT_int', [states], [ax_total_int], ['states'], ['ax_total_int'])
     AYT_int = Function('AYT_int', [states], [ay_total_int], ['states'], ['ay_total_int'])
-    # JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
-    # JYT_int = Function('JYT_int', [states, controls], [jy_total_int], ['states', 'controls'], ['jy_total_int'])
+    JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
+    JYT_int = Function('JYT_int', [states, controls], [jy_total_int], ['states', 'controls'], ['jy_total_int'])
     VXD_int = Function('VXD_int', [states], [vx_diff_int], ['states'], ['vx_diff_int'])
     YD_int = Function('YD_int', [states], [y_diff_int], ['states'], ['y_diff_int'])
 
@@ -195,59 +194,12 @@ for file in file_list:
     k4 = f(states + dt * k3, controls)
     states_next = states+dt/6*(k1 +2*k2 +2*k3 +k4)
     F = Function('F', [states, controls, dt], [states_next],['states','controls','dt'],['states_next'])
+
     # -----------------------------------
     # Objective of path planning = th0/n0*int(ax**2,dt)+th1/n1*int(ay**2,dt)+th2/n2*int(jx**2,dt)+th3/n3*int(jy**2,dt)+th4/n4*int(vx_diff**2,dt)+th5/n5*int(y_diff**2,dt)
     # integration needed over the entire time horizon
     # th_ = theta/weigth, n_ = norm factor
     # -----------------------------------
-    # names 'a' used and not 'k' in order not to change function F
-    feature0_current = SX.sym('feature0_current')
-    a1 = AXT_int(states)
-    a2 = AXT_int(states + dt / 2 * a1)
-    a3 = AXT_int(states + dt / 2 * a2)
-    a4 = AXT_int(states + dt * a3)
-    feature0_next = feature0_current + dt / 6 * (a1 + 2 * a2 + 2 * a3 + a4)
-    AXT_F = Function('AXT_F', [states, feature0_current, dt], [feature0_next], ['states', 'feature0_current', 'dt'], ['feature0_next'])
-    # -----------------------------------
-    feature1_current = SX.sym('feature1_current')
-    b1 = AYT_int(states)
-    b2 = AYT_int(states + dt / 2 * b1)
-    b3 = AYT_int(states + dt / 2 * b2)
-    b4 = AYT_int(states + dt * b3)
-    feature1_next = feature1_current + dt / 6 * (b1 + 2 * b2 + 2 * b3 + b4)
-    AYT_F = Function('AYT_F', [states, feature1_current, dt], [feature1_next], ['states', 'feature1_current', 'dt'], ['feature1_next'])
-    # -----------------------------------
-    # feature2_current = SX.sym('feature2_current')
-    # c1 = JXT_int(states, controls)
-    # c2 = JXT_int(states + dt / 2 * c1, controls)
-    # c3 = JXT_int(states + dt / 2 * c2, controls)
-    # c4 = JXT_int(states + dt * c3, controls)
-    # feature2_next = feature2_current + dt / 6 * (c1 + 2 * c2 + 2 * c3 + c4)
-    # JXT_F = Function('JXT_F', [states, controls, feature2_current, dt], [feature2_next],['states', 'controls', 'feature2_current', 'dt'], ['feature2_next'])
-    # # -----------------------------------
-    # feature3_current = SX.sym('feature3_current')
-    # d1 = JYT_int(states, controls)
-    # d2 = JYT_int(states + dt / 2 * d1, controls)
-    # d3 = JYT_int(states + dt / 2 * d2, controls)
-    # d4 = JYT_int(states + dt * d3, controls)
-    # feature3_next = feature3_current + dt / 6 * (d1 + 2 * d2 + 2 * d3 + d4)
-    # JYT_F = Function('JYT_F', [states, controls, feature3_current, dt], [feature3_next],['states', 'controls', 'feature3_current', 'dt'], ['feature3_next'])
-    # -----------------------------------
-    feature4_current = SX.sym('feature4_current')
-    e1 = VXD_int(states)
-    e2 = VXD_int(states + dt / 2 * e1)
-    e3 = VXD_int(states + dt / 2 * e2)
-    e4 = VXD_int(states + dt * e3)
-    feature4_next = feature4_current + dt / 6 * (e1 + 2 * e2 + 2 * e3 + e4)
-    VXD_F = Function('VXD_F', [states, feature4_current, dt], [feature4_next],['states', 'feature4_current', 'dt'], ['feature4_next'])
-    # -----------------------------------
-    feature5_current = SX.sym('feature5_current')
-    f1 = YD_int(states)
-    f2 = YD_int(states + dt / 2 * f1)
-    f3 = YD_int(states + dt / 2 * f2)
-    f4 = YD_int(states + dt * f3)
-    feature5_next = feature5_current + dt / 6 * (f1 + 2 * f2 + 2 * f3 + f4)
-    YD_F = Function('YD_F', [states, feature5_current, dt], [feature5_next],['states', 'feature5_current', 'dt'], ['feature5_next'])
 
     ##
     # -----------------------------------------------
@@ -258,18 +210,6 @@ for file in file_list:
     X = opti.variable(nx,N+1)
     U = opti.variable(nc, N)
     T =  opti.variable() # Time [s]
-    feature0_current = opti.parameter() # set the start value of the integration of the different features
-    feature1_current = opti.parameter()
-    # feature2_current = opti.parameter()
-    # feature3_current = opti.parameter()
-    feature4_current = opti.parameter()
-    feature5_current = opti.parameter()
-    opti.set_value(feature0_current,0)
-    opti.set_value(feature1_current, 0)
-    # opti.set_value(feature2_current, 0)
-    # opti.set_value(feature3_current, 0)
-    opti.set_value(feature4_current, 0)
-    opti.set_value(feature5_current,0)
 
     # Aliases for states
     x  = X[0,:]
@@ -333,56 +273,47 @@ for file in file_list:
     # -----------------------------------------------
     #    objective
     # -----------------------------------------------
-    time_list = []
-    for i in range(N + 1):
-        time_list.append(i * T / N)
-    # longitudinal jerk
-    jx_list = []
-    for i in plt.arange(0, N+1, 1):
-        if i == 0:
-            jx_list.append((AX_TOT(X[:, i + 1]) - AX_TOT(X[:, i])) / (T / N))
-        elif i == N:
-            jx_list.append((AX_TOT(X[:, i]) - AX_TOT(X[:, i - 1])) / (T / N))
-        else:
-            jx_list.append((AX_TOT(X[:, i + 1]) - AX_TOT(X[:, i - 1])) / (2 * (T / N)))
-
-    jx_tot = plt.array(jx_list)
-
-    # lateral jerk
-    jy_list = []
-    for i in plt.arange(0, N+1, 1):
-        if i == 0:
-            jy_list.append((AY_TOT(X[:,i+1]) - AY_TOT(X[:,i])) / (T / N))
-        elif i == N:
-            jy_list.append((AY_TOT(X[:,i]) - AY_TOT(X[:,i-1])) / (T / N))
-        else:
-            jy_list.append((AY_TOT(X[:,i+1]) - AY_TOT(X[:,i-1])) / (2 * (T / N)))
-
-    jy_tot = plt.array(jy_list)
 
     # Comfort cost function: t0/n0*axtot**2+t1/n1*aytot**2+t2/n2*jxtot**2+t3/n3*jytot**2+t4/n4*(vx-vdes)**2+t5/n5*(y-ydes)**2
-    for i in plt.arange(0,N,1):
-        feature0_current =  AXT_F(X[:,i],feature0_current,T/N)
-        feature1_current =  AYT_F(X[:, i], feature1_current, T / N)
-        # feature2_current =  JXT_F(X[:, i], U[:, i], feature2_current, T / N)
-        # feature3_current =  JYT_F(X[:, i], U[:, i], feature3_current, T / N)
-        feature4_current =  VXD_F(X[:, i], feature4_current, T / N)
-        feature5_current =  YD_F(X[:, i], feature5_current, T / N)
 
-    integrand = jx_tot ** 2
-    feature2_current = 0
-    for i in plt.arange(0, len(integrand) - 1, 1):
-        feature2_current = feature2_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N) # Crank - Nicolson scheme
+    # feature2_current = 0
+    # for i in plt.arange(0, len(integrand) - 1, 1):
+    #     feature2_current = feature2_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N) # Crank - Nicolson scheme
+    #
+    # # f3: lateral jerk
+    # integrand = jy_tot ** 2
+    # feature3_current = 0
+    # for i in plt.arange(0, len(integrand) - 1, 1):
+    #     feature3_current = feature3_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N) # Crank - Nicolson scheme
+    jxtot_end = ((AX_TOT(X[:,N]) - AX_TOT(X[:,N-1]))/(T/N))**2
+    jytot_end = ((AY_TOT(X[:,N]) - AY_TOT(X[:,N-1]))/(T/N))**2
 
-    # f3: lateral jerk
-    integrand = jy_tot ** 2
-    feature3_current = 0
-    for i in plt.arange(0, len(integrand) - 1, 1):
-        feature3_current = feature3_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N) # Crank - Nicolson scheme
+    f0_cal = 0
+    f1_cal = 0
+    f2_cal = 0
+    f3_cal = 0
+    f4_cal = 0
+    f5_cal = 0
+    for i in plt.arange(0, N, 1):
+        if i == N-1:
+            f0_cal = f0_cal + 0.5 * (AXT_int(X[:, i]) + AXT_int(X[i + 1])) * (T / N)
+            f1_cal = f1_cal + 0.5 * (AYT_int(X[:, i]) + AYT_int(X[i + 1])) * (T / N)
+            f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i], U[:, i]) +  jxtot_end)* (T / N)
+            f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i], U[:, i]) + jytot_end)* (T / N)
+            f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[i + 1])) * (T / N)
+            f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[i + 1])) * (T / N)
+        else:
+            f0_cal = f0_cal + 0.5 * (AXT_int(X[:,i]) + AXT_int(X[i + 1]))* (T / N)
+            f1_cal = f1_cal + 0.5 * (AYT_int(X[:,i]) + AYT_int(X[i + 1]))*(T / N)
+            f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i],U[:,i]) + JXT_int(X[i + 1],U[:,i+1])) * (T / N)
+            f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i],U[:,i]) + JYT_int(X[i + 1],U[:,i+1])) * (T / N)
+            f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[i + 1])) * (T / N)
+            f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[i + 1]))* (T / N)
+
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-    opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
-    # opti.minimize(theta[0] / norm0 * feature0_current + theta[1] / norm1 * feature1_current + theta[4] / norm4 * feature4_current +theta[5] / norm5 * feature5_current)
+    opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
+    # opti.minimize(theta[0] / norm0 * f0_cal + theta[1] / norm1 * f1_cal + theta[4] / norm4 * f4_cal +theta[5] / norm5 * f5_cal)
 
     print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
     print('Relative weights: ', theta)
@@ -428,35 +359,9 @@ for file in file_list:
         aty_sol[i] = res[5]
         any_sol[i] = res[6]
 
-    ####################
-    # Retrieving jerk
-    ####################
 
-    # longitudinal jerk
-    jx_list = []
-    for i in plt.arange(0, N+1, 1):
-        if i == 0:
-            jx_list.append((AX_TOT(sol.value(X[:, i + 1])) - AX_TOT(sol.value(X[:, i]))) / (sol.value(T) / N))
-        elif i == N:
-            jx_list.append((AX_TOT(sol.value(X[:, i])) - AX_TOT(sol.value(X[:, i - 1]))) / (sol.value(T) / N))
-        else:
-            jx_list.append((AX_TOT(sol.value(X[:, i + 1])) - AX_TOT(sol.value(X[:, i - 1]))) / (2 * (sol.value(T) / N)))
 
-    jx_tot_sol = plt.array(jx_list)
-
-    # lateral jerk
-    jy_list = []
-    for i in plt.arange(0, N+1, 1):
-        if i == 0:
-            jy_list.append((AY_TOT(sol.value(X[:,i+1])) - AY_TOT(sol.value(X[:,i]))) / (sol.value(T) / N))
-        elif i == N:
-            jy_list.append((AY_TOT(sol.value(X[:,i])) - AY_TOT(sol.value(X[:,i-1]))) / (sol.value(T) / N))
-        else:
-            jy_list.append((AY_TOT(sol.value(X[:,i+1])) - AY_TOT(sol.value(X[:,i-1]))) / (2 * (sol.value(T) / N)))
-
-    jy_tot_sol = plt.array(jy_list)
-
-    width = plt.around(width_road, 2) 
+    width = plt.around(width_road, 2)
     speed = plt.around(vx_start, 2)
     define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,throttle_dot_sol,delta_dot_sol,T_sol,aty_sol,any_sol,atx_sol,anx_sol,speed,width)
 
@@ -466,17 +371,17 @@ for file in file_list:
     print('Integrated feature values: ')
     print('------------------------------')
     print('integrand = plt.squeeze(data_cl[ax_cl]**2)')
-    print(sol.value(feature0_current))
+    print(sol.value(f0_cal))
     print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
-    print(sol.value(feature1_current))
+    print(sol.value(f1_cal))
     print('integrand = plt.squeeze(data_cl[jx_cl] ** 2)')
-    print(sol.value(feature2_current))
+    print(sol.value(f2_cal))
     print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
-    print(sol.value(feature3_current))
+    print(sol.value(f3_cal))
     print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
-    print(sol.value(feature4_current))
+    print(sol.value(f4_cal))
     print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-    print(sol.value(feature5_current))
+    print(sol.value(f5_cal))
 
     print("")
     if (T_limit - dt_sol) <= T_sol:
@@ -512,3 +417,18 @@ for file in file_list:
 #    Show
 # ----------------------------------
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

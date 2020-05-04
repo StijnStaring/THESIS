@@ -145,10 +145,10 @@ for file in file_list:
     ax_total = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M
 
     ay_total = (sin(delta) * Fxf + cos(delta) * Fyf + Fyr) / M
-    #j_total = derivative(ax_total(t),t) --> see photos of my notes
-    jx_total = (-sin(delta)*throttle*c+cos(delta)*throttle_dot*c+cos(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)+sin(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-cos(delta)*2*Kyf*delta-sin(delta)*2*Kyf*delta_dot+throttle_dot*c-Cr2*2*vx)/M
 
-    jy_total = (cos(delta)*throttle*c+sin(delta)*throttle_dot*c+sin(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)-cos(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-sin(delta)*2*Kyf*delta+cos(delta)*2*Kyf*delta_dot-2*Kyr*(vx*aty-vx*psi_ddot*b-atx*vy+atx*psi_dot*b)/(vx**2+vy**2-2*vy*psi_dot*b+psi_dot**2*b**2))/M
+    # j_total = derivative(ax_total(t),t) --> see photos of my notes (corrected)
+    jx_total = (c * throttle_dot - 2 * Cr2 * vx * atx + 2 * Kyf * sin(delta) * (((a * psi_ddot + aty) / vx - ((vy + a * psi_dot) * atx) / vx ** 2) / ((vy + a * psi_dot) ** 2 / vx ** 2 + 1) - delta_dot) + c * cos(delta) * throttle_dot - 2 * Kyf * cos(delta) * (delta - plt.arctan2((vy + a * psi_dot) , vx)) * delta_dot - c * sin(delta) * throttle * delta_dot) / M
+    jy_total = ((2 * Kyr * ((b * psi_ddot - aty) / vx + ((vy - b * psi_dot) * atx) / vx ** 2)) / ((vy - b * psi_dot) ** 2 / vx ** 2 + 1) - 2 * Kyf * cos(delta) * (((a * psi_ddot + aty) / vx - ((vy + a * psi_dot) * atx) / vx ** 2) / ((vy + a * psi_dot) ** 2 / vx ** 2 + 1) - delta_dot) + c * sin(delta) * throttle_dot - 2 * Kyf * sin(delta) * (delta - plt.arctan2((vy + a * psi_dot) , vx)) * delta_dot + c * cos(delta) * throttle * delta_dot) / M
 
     ax_total_int = ax_total ** 2
     ay_total_int = ay_total**2
