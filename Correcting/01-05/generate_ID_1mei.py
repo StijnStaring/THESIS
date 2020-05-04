@@ -15,15 +15,10 @@ import pylab as plt
 from scipy import signal
 # from import_data import import_data
 from import_ID_1mei import import_ID_1mei
-from define_plots import define_plots
-from derivative import derivative
+from define_plots_1mei import define_plots
+from derivative_1mei import derivative
 # from generate_delta_guess import generate_delta_guess
 from casadi import *
-
-# [_,_,_,_,_,init_matrix,des_matrix,dict_list,files] = import_data(0)
-# width_road = 3.46990715
-# vx_start = 23.10159175
-# time_guess = 4.01
 
 
 # theta = plt.array([4,5,6,1,2]) en met data guess 1 berekende norm waarden en data guess 1 zelf. (example lane change)
@@ -122,10 +117,6 @@ for file in file_list:
     print("vx_start: ",vx_start," and width_road: ",width_road)
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-    # Normalization numbers are taken from the non-linear tracking algorithm --> take the inherentely difference in order of size into account.
-    # theta = plt.array([4,5,6,1,2]) # deze wegingsfactoren dienen achterhaald te worden. (in ax en ay zit ook de normal acceleration)
-    # theta = plt.array([4,5,6,1,2])
-
     # Equations of the vehicle model
     x = MX.sym('x') # in global axis
     y = MX.sym('y') # in global axis

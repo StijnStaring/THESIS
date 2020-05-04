@@ -1,8 +1,8 @@
-def import_ID_1mei(file):
+def import_ID_5mei(file):
     # Example lane change data --> in main file uncomment plots
 
     import pylab as plt
-    from derivative_1mei_ana import derivative
+    from derivative_5mei_ana import derivative
     import pandas as pd
 
     data = pd.read_csv(file)

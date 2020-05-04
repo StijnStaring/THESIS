@@ -10,8 +10,8 @@ import glob
 # import csv
 import pylab as plt
 from scipy import signal
-from import_ID_1mei_ana import import_ID_1mei
-from define_plots_1mei_ana import define_plots
+from import_ID_5mei_ana import import_ID_5mei
+from define_plots_5mei_ana import define_plots
 from casadi import *
 
 norm0 = 0.007276047781441449
@@ -54,7 +54,7 @@ file_list = glob.glob("reading_dataset/*.csv")
 for file in file_list:
     print('\n')
     print("The name of the file: ", file)
-    data_cl = import_ID_1mei(file) # imported the solution of nummeric (other approach)
+    data_cl = import_ID_5mei(file) # imported the solution of nummeric (other approach)
     width_road = data_cl['width']
     vx_start = data_cl['vx_start']
 
@@ -146,14 +146,14 @@ for file in file_list:
 
     ay_total = (sin(delta) * Fxf + cos(delta) * Fyf + Fyr) / M
     #j_total = derivative(ax_total(t),t) --> see photos of my notes
-    jx_total = (-sin(delta)*throttle*c+cos(delta)*throttle_dot*c+cos(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)+sin(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-cos(delta)*2*Kyf*delta-sin(delta)*2*Kyf*delta_dot+throttle_dot*c-Cr2*2*vx)/M
+    # jx_total = (-sin(delta)*throttle*c+cos(delta)*throttle_dot*c+cos(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)+sin(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-cos(delta)*2*Kyf*delta-sin(delta)*2*Kyf*delta_dot+throttle_dot*c-Cr2*2*vx)/M
 
-    jy_total = (cos(delta)*throttle*c+sin(delta)*throttle_dot*c+sin(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)-cos(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-sin(delta)*2*Kyf*delta+cos(delta)*2*Kyf*delta_dot-2*Kyr*(vx*aty-vx*psi_ddot*b-atx*vy+atx*psi_dot*b)/(vx**2+vy**2-2*vy*psi_dot*b+psi_dot**2*b**2))/M
+    # jy_total = (cos(delta)*throttle*c+sin(delta)*throttle_dot*c+sin(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)-cos(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-sin(delta)*2*Kyf*delta+cos(delta)*2*Kyf*delta_dot-2*Kyr*(vx*aty-vx*psi_ddot*b-atx*vy+atx*psi_dot*b)/(vx**2+vy**2-2*vy*psi_dot*b+psi_dot**2*b**2))/M
 
     ax_total_int = ax_total ** 2
     ay_total_int = ay_total**2
-    jx_total_int = jx_total ** 2
-    jy_total_int = jy_total ** 2
+    # jx_total_int = jx_total ** 2
+    # jy_total_int = jy_total ** 2
     vx_diff_int = vx ** 2 - 2 * vx * vx_des + vx_des ** 2 # (vx- vx_des)**2 --> vx_des is the start vx at beginning lane change
     y_diff_int = y ** 2 - 2 * y * y_change + y_change ** 2 # (y-y_des)**2 --> y_des is 3.47, distance to be travelled to change lane
 
@@ -168,13 +168,16 @@ for file in file_list:
     f = Function('f', [states,controls], [rhs],['states','controls'],['rhs'])
 
     # Other functions:
-    stock = Function('stock', [states, controls], [ax_total,ay_total,jx_total,jy_total,psi_ddot,atx,anx,aty,an_y], ['states', 'controls'], ['ax_total','ay_total','jx_total','jy_total','psi_ddot','atx','anx','aty','an_y'])
-
+    stock = Function('stock', [states, controls], [ax_total,ay_total,psi_ddot,atx,anx,aty,an_y], ['states', 'controls'], ['ax_total','ay_total','psi_ddot','atx','anx','aty','an_y'])
+    AX_TOT = Function('JX_TOT', [states, controls], [ax_total], ['states', 'controls'], ['jx_total'])
+    AY_TOT = Function('JY_TOT', [states, controls], [ay_total], ['states', 'controls'], ['jy_total'])
+    # JX_TOT = Function('JX_TOT', [states, controls], [jx_total], ['states', 'controls'], ['jx_total'])
+    # JY_TOT = Function('JY_TOT', [states, controls], [jy_total], ['states', 'controls'], ['jy_total'])
     # In fact not all the states and controls are needed to calculate the output of the function --> but I think, giving to much inputs doesn't matter.
     AXT_int = Function('AXT_int', [states, controls], [ax_total_int], ['states', 'controls'], ['ax_total_int'])
     AYT_int = Function('AYT_int', [states, controls], [ay_total_int], ['states', 'controls'], ['ay_total_int'])
-    JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
-    JYT_int = Function('JYT_int', [states, controls], [jy_total_int], ['states', 'controls'], ['jy_total_int'])
+    # JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
+    # JYT_int = Function('JYT_int', [states, controls], [jy_total_int], ['states', 'controls'], ['jy_total_int'])
     VXD_int = Function('VXD_int', [states, controls], [vx_diff_int], ['states', 'controls'], ['vx_diff_int'])
     YD_int = Function('YD_int', [states, controls], [y_diff_int], ['states', 'controls'], ['y_diff_int'])
 
@@ -211,21 +214,21 @@ for file in file_list:
     feature1_next = feature1_current + dt / 6 * (b1 + 2 * b2 + 2 * b3 + b4)
     AYT_F = Function('AYT_F', [states, controls, feature1_current, dt], [feature1_next], ['states', 'controls', 'feature1_current', 'dt'], ['feature1_next'])
     # -----------------------------------
-    feature2_current = SX.sym('feature2_current')
-    c1 = JXT_int(states, controls)
-    c2 = JXT_int(states + dt / 2 * c1, controls)
-    c3 = JXT_int(states + dt / 2 * c2, controls)
-    c4 = JXT_int(states + dt * c3, controls)
-    feature2_next = feature2_current + dt / 6 * (c1 + 2 * c2 + 2 * c3 + c4)
-    JXT_F = Function('JXT_F', [states, controls, feature2_current, dt], [feature2_next],['states', 'controls', 'feature2_current', 'dt'], ['feature2_next'])
-    # -----------------------------------
-    feature3_current = SX.sym('feature3_current')
-    d1 = JYT_int(states, controls)
-    d2 = JYT_int(states + dt / 2 * d1, controls)
-    d3 = JYT_int(states + dt / 2 * d2, controls)
-    d4 = JYT_int(states + dt * d3, controls)
-    feature3_next = feature3_current + dt / 6 * (d1 + 2 * d2 + 2 * d3 + d4)
-    JYT_F = Function('JYT_F', [states, controls, feature3_current, dt], [feature3_next],['states', 'controls', 'feature3_current', 'dt'], ['feature3_next'])
+    # feature2_current = SX.sym('feature2_current')
+    # c1 = JXT_int(states, controls)
+    # c2 = JXT_int(states + dt / 2 * c1, controls)
+    # c3 = JXT_int(states + dt / 2 * c2, controls)
+    # c4 = JXT_int(states + dt * c3, controls)
+    # feature2_next = feature2_current + dt / 6 * (c1 + 2 * c2 + 2 * c3 + c4)
+    # JXT_F = Function('JXT_F', [states, controls, feature2_current, dt], [feature2_next],['states', 'controls', 'feature2_current', 'dt'], ['feature2_next'])
+    # # -----------------------------------
+    # feature3_current = SX.sym('feature3_current')
+    # d1 = JYT_int(states, controls)
+    # d2 = JYT_int(states + dt / 2 * d1, controls)
+    # d3 = JYT_int(states + dt / 2 * d2, controls)
+    # d4 = JYT_int(states + dt * d3, controls)
+    # feature3_next = feature3_current + dt / 6 * (d1 + 2 * d2 + 2 * d3 + d4)
+    # JYT_F = Function('JYT_F', [states, controls, feature3_current, dt], [feature3_next],['states', 'controls', 'feature3_current', 'dt'], ['feature3_next'])
     # -----------------------------------
     feature4_current = SX.sym('feature4_current')
     e1 = VXD_int(states, controls)
@@ -254,14 +257,14 @@ for file in file_list:
     T =  opti.variable() # Time [s]
     feature0_current = opti.parameter() # set the start value of the integration of the different features
     feature1_current = opti.parameter()
-    feature2_current = opti.parameter()
-    feature3_current = opti.parameter()
+    # feature2_current = opti.parameter()
+    # feature3_current = opti.parameter()
     feature4_current = opti.parameter()
     feature5_current = opti.parameter()
     opti.set_value(feature0_current,0)
     opti.set_value(feature1_current, 0)
-    opti.set_value(feature2_current, 0)
-    opti.set_value(feature3_current, 0)
+    # opti.set_value(feature2_current, 0)
+    # opti.set_value(feature3_current, 0)
     opti.set_value(feature4_current, 0)
     opti.set_value(feature5_current,0)
 
@@ -273,7 +276,7 @@ for file in file_list:
     psi = X[4,:] #yaw
     psi_dot = X[5,:] #yaw rate
     throttle = X[6,:] # gas padel
-    delta = X[7,:] # angle of
+    delta = X[7,:] # angle of front wheel
 
     # Decision variables for control vector
     throttle_dot = U[0,:]
@@ -284,7 +287,7 @@ for file in file_list:
         opti.subject_to(X[:, k + 1] == F(X[:, k], U[:,k],T/N))
 
     # Path constraints
-    opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
+    opti.subject_to(opti.bounded(-1,throttle,1))
     # opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
     opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road--> start middle of right lane of a two lane road
     opti.subject_to(x[0,1:] >= 0 ) # vehicle has to drive forward
@@ -292,8 +295,13 @@ for file in file_list:
     # Initial constraints
     # states: x, y, vx, vy, psi, psi_dot, throttle, delta
     opti.subject_to(X[0:6,0]== vertcat(x_start,y_start,vx_start,vy_start,psi_start,psi_dot_start))
+    # jx_start = JX_TOT(X[:,0],U[:,0])
+    # jy_start = JY_TOT(X[:, 0], U[:, 0])
+    # opti.subject_to(jx_start == 0)
+    # opti.subject_to(jy_start == 0)
     opti.subject_to(X[6, 0] == (Cr0+Cr2*vx_start**2)/(2*c)) # no longitudinal acc when drag force taken into account
     opti.subject_to(X[7,0] == 0) # driving straigth
+    opti.subject_to(T < 50)  # This constraint should be unbinding, but is needed to decrease the feasible space for the solver
 
     # Terminal constraints
     opti.subject_to(y[-1] == width_road) # should move 3,47 m
@@ -321,20 +329,73 @@ for file in file_list:
     # -----------------------------------------------
     #    objective
     # -----------------------------------------------
-    opti.subject_to(T<50) # This constraint should be unbinding, but is needed to decrease the feasible space for the solver
+    # longitudinal jerk
+    jx_list = []
+    for i in plt.arange(0, N, 1):
+        if i == 0:
+            jx_list.append((AX_TOT(X[:, i + 1], U[:, i + 1]) - AX_TOT(X[:, i], U[:, i])) / (T / N))
+        elif i == N-1:
+            jx_list.append((AX_TOT(X[:, i], U[:, i]) - AX_TOT(X[:, i - 1], U[:, i - 1])) / (T / N))
+        else:
+            jx_list.append((AX_TOT(X[:, i + 1], U[:, i + 1]) - AX_TOT(X[:, i - 1], U[:, i - 1])) / (2 * (T / N)))
+
+    jx_tot = plt.array(jx_list)
+
+    # lateral jerk
+    jy_list = []
+    for i in plt.arange(0, N, 1):
+        if i == 0:
+            jy_list.append((AY_TOT(X[:,i+1],U[:,i+1]) - AY_TOT(X[:,i],U[:,i])) / (T / N))
+        elif i == N-1:
+            jy_list.append((AY_TOT(X[:,i],U[:,i]) - AY_TOT(X[:,i-1],U[:,i-1])) / (T / N))
+        else:
+            jy_list.append((AY_TOT(X[:,i+1],U[:,i+1]) - AY_TOT(X[:,i-1],U[:,i-1])) / (2 * (T / N)))
+
+    jy_tot = plt.array(jy_list)
 
     # Comfort cost function: t0/n0*axtot**2+t1/n1*aytot**2+t2/n2*jxtot**2+t3/n3*jytot**2+t4/n4*(vx-vdes)**2+t5/n5*(y-ydes)**2
     for i in plt.arange(0,N,1):
         feature0_current =  AXT_F(X[:,i],U[:,i],feature0_current,T/N)
         feature1_current =  AYT_F(X[:, i], U[:, i], feature1_current, T / N)
-        feature2_current =  JXT_F(X[:, i], U[:, i], feature2_current, T / N)
-        feature3_current =  JYT_F(X[:, i], U[:, i], feature3_current, T / N)
+        # feature2_current =  JXT_F(X[:, i], U[:, i], feature2_current, T / N)
+        # feature3_current =  JYT_F(X[:, i], U[:, i], feature3_current, T / N)
         feature4_current =  VXD_F(X[:, i], U[:, i], feature4_current, T / N)
         feature5_current =  YD_F(X[:, i], U[:, i], feature5_current, T / N)
 
+    integrand = jx_tot ** 2
+    f2_cal = 0
+    for i in plt.arange(0, len(integrand) - 1, 1):
+        f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
+    feature2_current = f2_cal
+
+
+
+    c1 = JXT_int(states, controls)
+    c2 = JXT_int(states + dt / 2 * c1, controls)
+    c3 = JXT_int(states + dt / 2 * c2, controls)
+    c4 = JXT_int(states + dt * c3, controls)
+    feature2_next = feature2_current + dt / 6 * (c1 + 2 * c2 + 2 * c3 + c4)
+
+
+
+
+
+
+
+
+
+
+
+    # f3: lateral jerk
+    integrand = jy_tot ** 2
+    f3_cal = 0
+    for i in plt.arange(0, len(integrand) - 1, 1):
+        f3_cal = f3_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
+    feature3_current = f3_cal
+
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-    opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current + sumsqr(throttle_dot)+sumsqr(delta_dot))
+    opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
     # opti.minimize(theta[0] / norm0 * feature0_current + theta[1] / norm1 * feature1_current + theta[4] / norm4 * feature4_current +theta[5] / norm5 * feature5_current)
 
     print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
@@ -375,13 +436,39 @@ for file in file_list:
         res = stock(sol.value(X[:,i]),sol.value(U[:,i]))
         ax_tot_sol[i] = res[0]
         ay_tot_sol[i] = res[1]
-        jx_tot_sol[i] = res[2]
-        jy_tot_sol[i] = res[3]
-        psi_ddot_sol[i] = res[4]
-        atx_sol[i] = res[5]
-        anx_sol[i] = res[6]
-        aty_sol[i] = res[7]
-        any_sol[i] = res[8]
+        psi_ddot_sol[i] = res[2]
+        atx_sol[i] = res[3]
+        anx_sol[i] = res[4]
+        aty_sol[i] = res[5]
+        any_sol[i] = res[6]
+
+    ####################
+    # Retrieving jerk
+    ####################
+
+    # longitudinal jerk
+    jx_list = []
+    for i in plt.arange(0, N, 1):
+        if i == 0:
+            jx_list.append((AX_TOT(sol.value(X[:, i + 1]), sol.value(U[:, i + 1])) - AX_TOT(sol.value(X[:, i]), sol.value(U[:, i]))) / (sol.value(T) / N))
+        elif i == N-1:
+            jx_list.append((AX_TOT(sol.value(X[:, i]), sol.value(U[:, i])) - AX_TOT(sol.value(X[:, i - 1]), sol.value(U[:, i - 1]))) / (sol.value(T) / N))
+        else:
+            jx_list.append((AX_TOT(sol.value(X[:, i + 1]), sol.value(U[:, i + 1])) - AX_TOT(sol.value(X[:, i - 1]), sol.value(U[:, i - 1]))) / (2 * (sol.value(T) / N)))
+
+    jx_tot_sol = plt.array(jx_list)
+
+    # lateral jerk
+    jy_list = []
+    for i in plt.arange(0, N, 1):
+        if i == 0:
+            jy_list.append((AY_TOT(sol.value(X[:,i+1]),sol.value(U[:,i+1])) - AY_TOT(sol.value(X[:,i]),sol.value(U[:,i]))) / (sol.value(T) / N))
+        elif i == N-1:
+            jy_list.append((AY_TOT(sol.value(X[:,i]),sol.value(U[:,i])) - AY_TOT(sol.value(X[:,i-1]),sol.value(U[:,i-1]))) / (sol.value(T) / N))
+        else:
+            jy_list.append((AY_TOT(sol.value(X[:,i+1]),sol.value(U[:,i+1])) - AY_TOT(sol.value(X[:,i-1]),sol.value(U[:,i-1]))) / (2 * (sol.value(T) / N)))
+
+    jy_tot_sol = plt.array(jy_list)
 
 
     width = plt.around(width_road, 2)
