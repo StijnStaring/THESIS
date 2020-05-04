@@ -1,22 +1,14 @@
 def import_ID_1mei(file):
+    # Example lane change data --> in main file uncomment plots
+
     import pylab as plt
     from derivative_1mei import derivative
     import pandas as pd
 
-    # file = glob.glob("reading_dataset/*.csv")
-    # print("The name of the file: ", file)
-
     data = pd.read_csv(file)
-
     data_cl = dict()
 
-    # path = "rading_data\ diff_weights_guess"
-    # file = open(path, newline='')
-    # reader = csv.reader(file)
-    # header = next(reader)
-    # data = []
-
-    # "time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta","aty","any"
+    # "time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","throttle","delta","aty","any","atx","anx"
     data_cl['time_cl'] = plt.array([data.time])
     N = data_cl['time_cl'].shape[1] - 1
     data_cl['x_cl'] = plt.array([data.x])
@@ -24,13 +16,13 @@ def import_ID_1mei(file):
     data_cl['vx_cl'] = plt.array([data.vx])
     data_cl['vy_cl'] = plt.array([data.vy])
     data_cl['ax_cl'] = plt.array([data.ax]) #total acc
-    data_cl['jy_cl'] = plt.array([data.jy])
-    data_cl['psi_cl'] = plt.array([data.psi])
+    data_cl['jy_cl'] = plt.array([data.jy]) #total jerk
+    data_cl['psi_cl'] = plt.array([data.psi]) # in rad
     data_cl['psi_dot_cl'] = plt.array([data.psi_dot])
     data_cl['throttle_cl'] = plt.array([data.throttle])[None,0,0:N]
     data_cl['delta_cl'] = plt.array([data.delta])[None,0,0:N]
     data_cl['aty_cl'] = plt.array([data.aty])
-    data_cl['any_cl'] = data_cl['psi_dot_cl'] * data_cl['vx_cl']
+    data_cl['any_cl'] = data_cl['psi_dot_cl'] * data_cl['vx_cl'] # because of problem with name when importing
     data_cl['dt_cl'] = data_cl['time_cl'][0,1] - data_cl['time_cl'][0, 0]
     data_cl['width'] = data_cl['y_cl'][0,-1]
     data_cl['vx_start'] = data_cl['vx_cl'][0,0]
@@ -38,6 +30,8 @@ def import_ID_1mei(file):
     data_cl['throttle_dot_cl'] = data_cl['throttle_dot_cl'][plt.newaxis,:]
     data_cl['delta_dot_cl'] = derivative(data_cl['delta_cl'],data_cl['dt_cl'])
     data_cl['delta_dot_cl'] = data_cl['delta_dot_cl'][plt.newaxis,:]
+
+
     # # Calculation of features
     # # f0: longitudinal acceleration
     # integrand = data_cl['ax_cl'] ** 2

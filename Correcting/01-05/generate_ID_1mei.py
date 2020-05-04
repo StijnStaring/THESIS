@@ -29,10 +29,10 @@ from casadi import *
 # theta = plt.array([4,5,6,1,2]) en met data guess 1 berekende norm waarden en data guess 1 zelf. (example lane change)
 norm0 = 0.007276047781441449
 norm1 = 2.6381715506137424
-norm2 = 11.283498669013454
-norm3 = 0.046662223759442054
-norm4 = 17.13698903738383
-norm5 = 0.007276047781441449
+norm2 = 0.007276047781441449
+norm3 = 11.283498669013454
+norm4 = 0.046662223759442054
+norm5 = 17.13698903738383
 
 # data_cl = dict_list[0]
 # Parameters of the non-linear bicycle model used to generate the data.
@@ -49,7 +49,7 @@ rw = 0.292
 Tmax = 584
 pi = 3.14159265359
 
-theta = plt.array([4,5,6,1,2,1])
+theta = plt.array([4,5,1,6,1,2])
 # theta = plt.array([1,1,1,1,10,1])
 # Parameters of the optimization
 nx = 6 # amount of states
@@ -83,20 +83,24 @@ for file in file_list:
     width_road = data_cl['width']
     vx_start = data_cl['vx_start']
 
-    # Resampling and guesses !! Resampling not good for not periodic signal!!
-    N_old = len(data_cl['x_cl']) - 1
-    time_guess = data_cl['time_cl'][-1, 0]
-    # x_guess = signal.resample(data_cl['x_cl'],N+1).T
-    x_guess = signal.resample_poly(data_cl['x_cl'], N, N_old, padtype='line').T
-    # y_guess = signal.resample(data_cl['y_cl'],N+1).T
-    y_guess = signal.resample_poly(data_cl['y_cl'], N, N_old, padtype='maximum').T
-    # vx_guess = signal.resample(data_cl['vx_cl'],N+1).T
-    vx_guess = signal.resample_poly(data_cl['vx_cl'], N, N_old, padtype='line').T
-    vy_guess = signal.resample(data_cl['vy_cl'], N + 1).T
-    psi_guess = signal.resample(data_cl['psi_cl'], N + 1).T
-    psi_dot_guess = signal.resample(data_cl['psi_dot_cl'], N + 1).T
-    throttle_guess = signal.resample(data_cl['throttle_cl'], N).T
-    delta_guess = signal.resample(data_cl['delta_cl'], N).T  # Error made in data Siemens --> SWA not 40 degrees
+    # Resampling not needed with this data file
+    # N_old = len(data_cl['x_cl']) - 1
+    time_guess = data_cl['time_cl'][0, -1]
+    # x_guess = signal.resample_poly(data_cl['x_cl'], N, N_old, ,axis= 1,padtype='line')
+    x_guess = data_cl['x_cl']
+    # y_guess = signal.resample_poly(data_cl['y_cl'], N, N_old, ,axis= 1, padtype='maximum')
+    y_guess = data_cl['y_cl']
+    # vx_guess = signal.resample_poly(data_cl['vx_cl'], N, N_old,axis= 1 padtype='line')
+    vx_guess = data_cl['vx_cl']
+    # vy_guess = signal.resample(data_cl['vy_cl'], N + 1,axis= 1)
+    vy_guess = data_cl['vy_cl']
+    # psi_guess = signal.resample(data_cl['psi_cl'], N + 1,axis= 1)
+    psi_guess = data_cl['psi_cl']
+    # psi_dot_guess = signal.resample(data_cl['psi_dot_cl'], N + 1,axis= 1)
+    psi_dot_guess = data_cl['psi_dot_cl']
+    throttle_guess = data_cl['throttle_cl']  # throttle and delta use to be inputs
+    delta_guess = data_cl['delta_cl']
+
     # ###############
     # Plot guesses
     ###############
@@ -340,15 +344,13 @@ for file in file_list:
     #     opti.subject_to(jy_list_t[i] >= -5)
 
 
-    # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
+    # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jytot**2+t3*(vx-vdes)**2+t4*(y-ydes)**2 + t5*jxtot**2
 
     # f0: longitudinal acceleration
     integrand = ax_tot** 2
     f0_cal = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
         f0_cal = f0_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-
-    # f0_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
     # f1: lateral acceleration
     integrand = ay_tot** 2
@@ -358,39 +360,36 @@ for file in file_list:
     # f1_cal = scipy.integrate.simps(integrand,plt.array(time_list))
     # print('f1: ',f1_cal)
 
-    # f2: lateral jerk
-    integrand = jy_tot** 2
+    # f2: longitudinal jerk
+    integrand = jx_tot ** 2
     f2_cal = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
-        f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+        f2_cal = f2_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
     # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
-    # f3: desired velocity
-    integrand = plt.array(vx_des_list)** 2
+    # f3: lateral jerk
+    integrand = jy_tot** 2
     f3_cal = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
         f3_cal = f3_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-    # f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+    # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
-    # f4: desired lane change
-    integrand = plt.array(y_des_list)**2
+    # f4: desired velocity
+    integrand = plt.array(vx_des_list)** 2
     f4_cal = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
         f4_cal = f4_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
-    # f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
+    # f4_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
-    # f5: lateral jerk
-    integrand = jx_tot ** 2
+    # f5: desired lane change
+    integrand = plt.array(y_des_list)**2
     f5_cal = 0
     for i in plt.arange(0, len(integrand) - 1, 1):
-        f5_cal = f5_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N)
-    # f2_cal = scipy.integrate.simps(integrand,plt.array(time_list))
-
-
+        f5_cal = f5_cal + 0.5 * (integrand[i] + integrand[i + 1]) * (T/N)
+    # f5_cal = scipy.integrate.simps(integrand,plt.array(time_list))
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
     opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
-    # opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal)
 
     print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
     print('Relative weights: ', theta)
@@ -483,35 +482,35 @@ for file in file_list:
     print(sol.value(f0_cal))
     print('integrand = plt.squeeze(data_cl[ay_cl] ** 2)')
     print(sol.value(f1_cal))
-    print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
-    print(sol.value(f2_cal))
-    print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
-    print(sol.value(f3_cal))
-    print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
-    print(sol.value(f4_cal))
     print('integrand = plt.squeeze(data_cl[jx_cl] ** 2)')
+    print(sol.value(f2_cal))
+    print('integrand = plt.squeeze(data_cl[jy_cl] ** 2)')
+    print(sol.value(f3_cal))
+    print('integrand = plt.squeeze((desired_speed - data_cl[vx_cl]) ** 2)')
+    print(sol.value(f4_cal))
+    print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
     print(sol.value(f5_cal))
 
     # ----------------------------------
     #    Storing of data in csv-file
     # ----------------------------------
 
-    path = "writting_C\ DATAC2_V" + str(speed) + "_L"+str(width)+".csv"
-    file = open(path,'w',newline= "")
-    writer = csv.writer(file)
-    writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any","atx","anx"])
-
-    for i in range(N+1):
-        if i == N: # last control point has no physical meaning
-            writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i],atx_sol[i], anx_sol[i]])
-        else:
-            writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i],atx_sol[i], anx_sol[i]])
-
-    file.close()
-    print('dt of the optimization is: ', dt_sol)
-    print('')
-    print('Simulation completed!')
-    print('\n')
+    # path = "writting_C\ DATAC2_V" + str(speed) + "_L"+str(width)+".csv"
+    # file = open(path,'w',newline= "")
+    # writer = csv.writer(file)
+    # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any","atx","anx"])
+    #
+    # for i in range(N+1):
+    #     if i == N: # last control point has no physical meaning
+    #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i],atx_sol[i], anx_sol[i]])
+    #     else:
+    #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i],atx_sol[i], anx_sol[i]])
+    #
+    # file.close()
+    # print('dt of the optimization is: ', dt_sol)
+    # print('')
+    # print('Simulation completed!')
+    # print('\n')
 
 
 # ----------------------------------

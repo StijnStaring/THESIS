@@ -1,12 +1,9 @@
 """
-This function is generating data using the same vehicle model as in the learning algorithm and uses the comfortcostfunction
+This script is generating data using the same vehicle model as in the learning algorithm and uses the comfortcostfunction
 as objective when pathplanning.
 Feedforward control of the vehicle. One optimization is solved over the whole control horizon.
 Linear tyre model -> valid if slipangle < 5 degrees and lat_acc < 4 m/s^2
-Producing different lane changes: different longitudinal start velocities and different time to finish the lane change
-A real driver is taking a limit of the time of the lane change into account
-time_range: free time range
-speed_range: [80-90] km/hour
+Producing different lane changes: different longitudinal start velocities and lateral distances to be convered
 :return: csv-datafiles
 """
 import glob
@@ -15,7 +12,6 @@ import pylab as plt
 from scipy import signal
 from import_ID_1mei_ana import import_ID_1mei
 from define_plots_1mei import define_plots
-
 from casadi import *
 
 norm0 = 0.007276047781441449
@@ -25,8 +21,8 @@ norm3 = 11.283498669013454
 norm4 = 0.046662223759442054
 norm5 = 17.13698903738383
 
-# Parameters of the non-linear bicycle model used to generate the data.
-# Remark !x and y are coordinates in global axis!
+# Parameters of the non-linear bicycle model used to generate the data. (from Siemens)
+# Remark: x and y are coordinates in global axis
 M = 1430
 Izz = 1300
 a = 1.056
@@ -43,7 +39,7 @@ pi = 3.14159265359
 theta = plt.array([4,5,1,6,1,2])
 nx = 8 # amount of states
 nc = 2 # amount of controls
-N = 500
+N = 500 # amount of control intervals
 
 x_start = 0
 y_start = 0
@@ -58,11 +54,11 @@ file_list = glob.glob("reading_dataset/*.csv")
 for file in file_list:
     print('\n')
     print("The name of the file: ", file)
-    data_cl = import_ID_1mei(file)
+    data_cl = import_ID_1mei(file) # imported the solution of nummeric (other approach)
     width_road = data_cl['width']
     vx_start = data_cl['vx_start']
 
-    # Resampling and guesses !! Resampling not good for not periodic signal!!
+    # Resampling mostly not needed with this data file
     # N_old = len(data_cl['x_cl']) - 1
     time_guess = data_cl['time_cl'][0,-1]
     # x_guess = signal.resample_poly(data_cl['x_cl'], N, N_old, ,axis= 1,padtype='line')
@@ -77,12 +73,13 @@ for file in file_list:
     psi_guess = data_cl['psi_cl']
     # psi_dot_guess = signal.resample(data_cl['psi_dot_cl'], N + 1,axis= 1)
     psi_dot_guess = data_cl['psi_dot_cl']
-    throttle_guess = signal.resample(data_cl['throttle_cl'], N+1,axis= 1)
+    throttle_guess = signal.resample(data_cl['throttle_cl'], N+1,axis= 1) # throttle and delta use to be inputs
     delta_guess = signal.resample(data_cl['delta_cl'], N+1,axis= 1)
     # throttle_dot_guess = signal.resample(data_cl['throttle_dot_cl'], N+1,axis= 1)
     throttle_dot_guess = data_cl['throttle_dot_cl']
     # delta_dot_guess = signal.resample(data_cl['delta_dot_cl'], N+1,axis= 1)
     delta_dot_guess = data_cl['delta_dot_cl']
+
     # ###############
     # Plot guesses
     ###############
@@ -139,16 +136,16 @@ for file in file_list:
     Fyf = -2*Kyf* slipangle_f
     Fyr = -2*Kyr* slipangle_r
     F_d = Cr0 + Cr2*vx*vx
-    atx = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M +vy*psi_dot # not total acceleration
-    aty = (sin(delta)*Fxf+cos(delta)*Fyf+Fyr)/M -vx*psi_dot # not total acceleration
-    an_y = vx*psi_dot
+    atx = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M +vy*psi_dot # tangential acceleration
+    aty = (sin(delta)*Fxf+cos(delta)*Fyf+Fyr)/M -vx*psi_dot
+    an_y = vx*psi_dot # normal acceleration
     anx = -vy*psi_dot
     psi_ddot = (sin(delta)*Fxf*a+cos(delta)*Fyf*a-b*Fyr)/Izz
 
     ax_total = (cos(delta)*Fxf-sin(delta)*Fyf+Fxr-F_d)/M
 
     ay_total = (sin(delta) * Fxf + cos(delta) * Fyf + Fyr) / M
-
+    #j_total = derivative(ax_total(t),t) --> see photos of my notes
     jx_total = (-sin(delta)*throttle*c+cos(delta)*throttle_dot*c+cos(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)+sin(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-cos(delta)*2*Kyf*delta-sin(delta)*2*Kyf*delta_dot+throttle_dot*c-Cr2*2*vx)/M
 
     jy_total = (cos(delta)*throttle*c+sin(delta)*throttle_dot*c+sin(delta)*2*Kyf*plt.arctan2(vy+psi_dot*a,vx)-cos(delta)*2*Kyf*(vx*aty+vx*psi_ddot*a-atx*vy-atx*psi_dot*a)/(vx**2+vy**2+2*vy*psi_dot*a+psi_dot**2*a**2)-sin(delta)*2*Kyf*delta+cos(delta)*2*Kyf*delta_dot-2*Kyr*(vx*aty-vx*psi_ddot*b-atx*vy+atx*psi_dot*b)/(vx**2+vy**2-2*vy*psi_dot*b+psi_dot**2*b**2))/M
@@ -157,8 +154,8 @@ for file in file_list:
     ay_total_int = ay_total**2
     jx_total_int = jx_total ** 2
     jy_total_int = jy_total ** 2
-    vx_diff_int = vx ** 2 - 2 * vx * vx_des + vx_des ** 2
-    y_diff_int = y ** 2 - 2 * y * y_change + y_change ** 2
+    vx_diff_int = vx ** 2 - 2 * vx * vx_des + vx_des ** 2 # (vx- vx_des)**2 --> vx_des is the start vx at beginning lane change
+    y_diff_int = y ** 2 - 2 * y * y_change + y_change ** 2 # (y-y_des)**2 --> y_des is 3.47, distance to be travelled to change lane
 
     # ----------------------------------
     #    continuous system dot(x)=f(x,u)
@@ -173,6 +170,7 @@ for file in file_list:
     # Other functions:
     stock = Function('stock', [states, controls], [ax_total,ay_total,jx_total,jy_total,psi_ddot,atx,anx,aty,an_y], ['states', 'controls'], ['ax_total','ay_total','jx_total','jy_total','psi_ddot','atx','anx','aty','an_y'])
 
+    # In fact not all the states and controls are needed to calculate the output of the function --> but I think, giving to much inputs doesn't matter.
     AXT_int = Function('AXT_int', [states, controls], [ax_total_int], ['states', 'controls'], ['ax_total_int'])
     AYT_int = Function('AYT_int', [states, controls], [ay_total_int], ['states', 'controls'], ['ay_total_int'])
     JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
@@ -192,7 +190,11 @@ for file in file_list:
     states_next = states+dt/6*(k1 +2*k2 +2*k3 +k4)
     F = Function('F', [states, controls, dt], [states_next],['states','controls','dt'],['states_next'])
     # -----------------------------------
+    # Objective of path planning = th0/n0*int(ax**2,dt)+th1/n1*int(ay**2,dt)+th2/n2*int(jx**2,dt)+th3/n3*int(jy**2,dt)+th4/n4*int(vx_diff**2,dt)+th5/n5*int(y_diff**2,dt)
+    # integration needed over the entire time horizon
+    # th_ = theta/weigth, n_ = norm factor
     # -----------------------------------
+    # names 'a' used and not 'k' in order not to change function F
     feature0_current = SX.sym('feature0_current')
     a1 = AXT_int(states, controls)
     a2 = AXT_int(states + dt / 2 * a1, controls)
@@ -250,7 +252,7 @@ for file in file_list:
     X = opti.variable(nx,N+1)
     U = opti.variable(nc, N)
     T =  opti.variable() # Time [s]
-    feature0_current = opti.parameter()
+    feature0_current = opti.parameter() # set the start value of the integration of the different features
     feature1_current = opti.parameter()
     feature2_current = opti.parameter()
     feature3_current = opti.parameter()
@@ -262,20 +264,16 @@ for file in file_list:
     opti.set_value(feature3_current, 0)
     opti.set_value(feature4_current, 0)
     opti.set_value(feature5_current,0)
-    # vx_des = opti.parameter()
-    # opti.set_value(vx_des,vx_start)
-    # y_change = opti.parameter()
-    # opti.set_value(y_change, width_road)
 
     # Aliases for states
     x  = X[0,:]
     y  = X[1,:]
     vx = X[2,:]
     vy = X[3,:]
-    psi = X[4,:]
-    psi_dot = X[5,:]
-    throttle = X[6,:]
-    delta = X[7,:]
+    psi = X[4,:] #yaw
+    psi_dot = X[5,:] #yaw rate
+    throttle = X[6,:] # gas padel
+    delta = X[7,:] # angle of
 
     # Decision variables for control vector
     throttle_dot = U[0,:]
@@ -288,25 +286,22 @@ for file in file_list:
     # Path constraints
     opti.subject_to(opti.bounded(-1,throttle,1)) # local axis [m/s^2]
     # opti.subject_to(opti.bounded(-2.618,delta,2.618)) # Limit on steeringwheelangle (150°)
-    opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road
-    opti.subject_to(x[0,1:]>=0) # vehicle has to drive forward
+    opti.subject_to(opti.bounded(-width_road/2,y,width_road*3/2)) # Stay on road--> start middle of right lane of a two lane road
+    opti.subject_to(x[0,1:] >= 0 ) # vehicle has to drive forward
 
     # Initial constraints
-    # states: x, y, vx, vy, psi, psi_dot
+    # states: x, y, vx, vy, psi, psi_dot, throttle, delta
     opti.subject_to(X[0:6,0]== vertcat(x_start,y_start,vx_start,vy_start,psi_start,psi_dot_start))
-    opti.subject_to(X[6, 0] == (Cr0+Cr2*vx**2)/(2*c)) # no longitudinal acc when drag force taken into account
-    opti.subject_to(X[7,0] == 0)
-    # Controls set on zero in first interval --> want to start from steady state.
-    # opti.subject_to(delta[0] == 0)
-    # opti.subject_to(throttle[0] == 0)
-    # (This will cause a very small deceleration but makes sure ay is starting from zero)
+    opti.subject_to(X[6, 0] == (Cr0+Cr2*vx_start**2)/(2*c)) # no longitudinal acc when drag force taken into account
+    opti.subject_to(X[7,0] == 0) # driving straigth
+
     # Terminal constraints
-    opti.subject_to(y[-1] == width_road) # should move 3,47 m lateral
+    opti.subject_to(y[-1] == width_road) # should move 3,47 m
     opti.subject_to(vy[-1] == 0) # lane change is completed
     opti.subject_to(psi[-1] == 0) # assuming straight road
-    opti.subject_to(psi_dot[-1] == 0)
-    # opti.subject_to(delta[-1] == 0)
-    limit = 150/16.96 # max steerwheelanlge / constant factor to front wheel (paper Son)
+    opti.subject_to(psi_dot[-1] == 0) # Fy is zero
+    Gsteer = 16.96
+    limit = 150/Gsteer # max steerwheelangle / constant factor to front wheel (paper Son)
     opti.subject_to(opti.bounded(-limit*pi/180,delta,limit*pi/180))
 
     #  Set guesses
@@ -326,9 +321,9 @@ for file in file_list:
     # -----------------------------------------------
     #    objective
     # -----------------------------------------------
-    opti.subject_to(T<50)
+    opti.subject_to(T<50) # This constraint should be unbinding, but is needed to decrease the feasible space for the solver
 
-    # Comfort cost function: t0*axtot**2+t1*aytot**2+t2*jxtot**2+t3*jytot**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
+    # Comfort cost function: t0/n0*axtot**2+t1/n1*aytot**2+t2/n2*jxtot**2+t3/n3*jytot**2+t4/n4*(vx-vdes)**2+t5/n5*(y-ydes)**2
     for i in plt.arange(0,N,1):
         feature0_current =  AXT_F(X[:,i],U[:,i],feature0_current,T/N)
         feature1_current =  AYT_F(X[:, i], U[:, i], feature1_current, T / N)
@@ -339,8 +334,8 @@ for file in file_list:
 
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-    # opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
-    opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current)
+    opti.minimize(theta[0]/norm0*feature0_current+theta[1]/norm1*feature1_current+theta[2]/norm2*feature2_current+theta[3]/norm3*feature3_current+theta[4]/norm4*feature4_current+theta[5]/norm5*feature5_current + sumsqr(throttle_dot)+sumsqr(delta_dot))
+    # opti.minimize(theta[0] / norm0 * feature0_current + theta[1] / norm1 * feature1_current + theta[4] / norm4 * feature4_current +theta[5] / norm5 * feature5_current)
 
     print('Absolute weights: ',theta/plt.array([norm0,norm1,norm2,norm3,norm4,norm5]))
     print('Relative weights: ', theta)
@@ -412,7 +407,7 @@ for file in file_list:
     print(sol.value(feature5_current))
 
     # ----------------------------------
-    #    Storing of data in csv-file
+    #    Storing of data in a csv-file
     # ----------------------------------
 
     # path = "writting_C\ DATAC2_V" + str(speed) + "_L"+str(width)+".csv"

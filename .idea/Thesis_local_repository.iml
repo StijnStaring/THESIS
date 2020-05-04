@@ -12,10 +12,14 @@
       <sourceFolder url="file://$MODULE_DIR$/Correcting/30-04" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Correcting/01-05" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Correcting/01-05/analytical acc" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Correcting/01-05/Sending" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Correcting/01-05/Sending/analytical" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Correcting/01-05/Sending/nummeric" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Python_guardian_angle" />
+    <orderEntry type="module" module-name="Optimization" />
   </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="pytest" />
