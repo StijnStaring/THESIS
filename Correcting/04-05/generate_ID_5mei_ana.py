@@ -456,7 +456,7 @@ for file in file_list:
 
     jy_tot_sol = plt.array(jy_list)
 
-    width = plt.around(width_road, 2)
+    width = plt.around(width_road, 2) 
     speed = plt.around(vx_start, 2)
     define_plots("1",x_sol,y_sol,vx_sol,vy_sol,ax_tot_sol,ay_tot_sol,jx_tot_sol,jy_tot_sol,psi_sol,psi_dot_sol,psi_ddot_sol,throttle_sol,delta_sol,throttle_dot_sol,delta_dot_sol,T_sol,aty_sol,any_sol,atx_sol,anx_sol,speed,width)
 
