@@ -166,7 +166,7 @@ for file in file_list:
     rhs = vertcat(x_dot_glob, y_dot_glob, atx, aty, psi_dot, psi_ddot,throttle_dot,delta_dot)
     states = vertcat(x, y, vx, vy, psi, psi_dot, throttle, delta)
     controls = vertcat(throttle_dot, delta_dot)
-    f = Function('f', [states,controls], [rhs],['states','controls'],['rhs']) 
+    f = Function('f', [states,controls], [rhs],['states','controls'],['rhs'])
 
     # Other functions:
     stock = Function('stock', [states], [ax_total,ay_total,psi_ddot,atx,anx,aty,an_y], ['states'], ['ax_total','ay_total','psi_ddot','atx','anx','aty','an_y'])
@@ -244,7 +244,7 @@ for file in file_list:
     # opti.subject_to(jy_start == 0)
     opti.subject_to(X[6, 0] == (Cr0+Cr2*vx_start**2)/(2*c)) # no longitudinal acc when drag force taken into account
     opti.subject_to(X[7,0] == 0) # driving straigth
-    T_limit = 10
+    T_limit = 50
     opti.subject_to(T < T_limit)  # This constraint should be unbinding, but is needed to decrease the feasible space for the solver
 
     # Terminal constraints
@@ -296,19 +296,19 @@ for file in file_list:
     f5_cal = 0
     for i in plt.arange(0, N, 1):
         if i == N-1:
-            f0_cal = f0_cal + 0.5 * (AXT_int(X[:, i]) + AXT_int(X[i + 1])) * (T / N)
-            f1_cal = f1_cal + 0.5 * (AYT_int(X[:, i]) + AYT_int(X[i + 1])) * (T / N)
+            f0_cal = f0_cal + 0.5 * (AXT_int(X[:, i]) + AXT_int(X[:,i + 1])) * (T / N)
+            f1_cal = f1_cal + 0.5 * (AYT_int(X[:, i]) + AYT_int(X[:,i + 1])) * (T / N)
             f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i], U[:, i]) +  jxtot_end)* (T / N)
             f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i], U[:, i]) + jytot_end)* (T / N)
-            f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[i + 1])) * (T / N)
-            f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[i + 1])) * (T / N)
+            f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[:,i + 1])) * (T / N)
+            f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[:,i + 1])) * (T / N)
         else:
-            f0_cal = f0_cal + 0.5 * (AXT_int(X[:,i]) + AXT_int(X[i + 1]))* (T / N)
-            f1_cal = f1_cal + 0.5 * (AYT_int(X[:,i]) + AYT_int(X[i + 1]))*(T / N)
-            f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i],U[:,i]) + JXT_int(X[i + 1],U[:,i+1])) * (T / N)
-            f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i],U[:,i]) + JYT_int(X[i + 1],U[:,i+1])) * (T / N)
-            f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[i + 1])) * (T / N)
-            f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[i + 1]))* (T / N)
+            f0_cal = f0_cal + 0.5 * (AXT_int(X[:,i]) + AXT_int(X[:,i + 1]))* (T / N)
+            f1_cal = f1_cal + 0.5 * (AYT_int(X[:,i]) + AYT_int(X[:,i + 1]))*(T / N)
+            f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i],U[:,i]) + JXT_int(X[:,i + 1],U[:,i+1])) * (T / N)
+            f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i],U[:,i]) + JYT_int(X[:,i + 1],U[:,i+1])) * (T / N)
+            f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[:,i + 1])) * (T / N)
+            f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[:,i + 1]))* (T / N)
 
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
@@ -417,3 +417,4 @@ for file in file_list:
 #    Show
 # ----------------------------------
 plt.show()
+
