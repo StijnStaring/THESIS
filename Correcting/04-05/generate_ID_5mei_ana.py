@@ -11,7 +11,8 @@ import glob
 import scipy
 import pylab as plt
 from scipy import signal
-from scipy import integrate
+
+# from scipy import integrate
 from import_ID_5mei_ana import import_ID_5mei
 from define_plots_5mei_ana import define_plots
 from casadi import *
@@ -61,13 +62,17 @@ for file in file_list:
     vx_start = data_cl['vx_start']
 
     # Resampling mostly not needed with this data file
-    # N_old = len(data_cl['x_cl']) - 1
+    # N_old = data_cl['x_cl'].shape[1] - 1
     time_guess = data_cl['time_cl'][0,-1]
-    # x_guess = signal.resample_poly(data_cl['x_cl'], N, N_old, ,axis= 1,padtype='line')
+    # x_guess = signal.resample_poly(data_cl['x_cl'], N, N_old,axis= 1,padtype='line')
+    # x_guess = x_guess[None,0,0:N+1]
     x_guess = data_cl['x_cl']
-    # y_guess = signal.resample_poly(data_cl['y_cl'], N, N_old, ,axis= 1, padtype='maximum')
+    # y_guess = signal.resample_poly(data_cl['y_cl'], N, N_old ,axis= 1, padtype='maximum')
+    # y_guess = y_guess[None, 0, 0:N + 1]
     y_guess = data_cl['y_cl']
-    # vx_guess = signal.resample_poly(data_cl['vx_cl'], N, N_old,axis= 1 padtype='line')
+    # vx_guess = signal.resample_poly(data_cl['vx_cl'], N, N_old,axis= 1 ,padtype='line')
+    # vx_guess = vx_guess[None, 0, 0:N + 1]
+    # vx_guess = signal.resample(data_cl['vx_cl'],N+1,axis= 1)
     vx_guess = data_cl['vx_cl']
     # vy_guess = signal.resample(data_cl['vy_cl'], N + 1,axis= 1)
     vy_guess = data_cl['vy_cl']
@@ -77,15 +82,15 @@ for file in file_list:
     psi_dot_guess = data_cl['psi_dot_cl']
     throttle_guess = signal.resample(data_cl['throttle_cl'], N+1,axis= 1) # throttle and delta use to be inputs
     delta_guess = signal.resample(data_cl['delta_cl'], N+1,axis= 1)
-    # throttle_dot_guess = signal.resample(data_cl['throttle_dot_cl'], N+1,axis= 1)
+    # throttle_dot_guess = signal.resample(data_cl['throttle_dot_cl'], N,axis= 1)
     throttle_dot_guess = data_cl['throttle_dot_cl']
-    # delta_dot_guess = signal.resample(data_cl['delta_dot_cl'], N+1,axis= 1)
+    # delta_dot_guess = signal.resample(data_cl['delta_dot_cl'], N,axis= 1)
     delta_dot_guess = data_cl['delta_dot_cl']
 
     # ###############
     # Plot guesses
     ###############
-    # print('This is the size of x_guess: ',x_guess.shape)
+    print('This is the size of x_guess: ',x_guess.shape)
     # plt.figure('x')
     # plt.plot(plt.linspace(0,time_guess,N+1),plt.squeeze(x_guess))
     # plt.figure('y')
@@ -170,6 +175,8 @@ for file in file_list:
 
     # Other functions:
     stock = Function('stock', [states], [ax_total,ay_total,psi_ddot,atx,anx,aty,an_y], ['states'], ['ax_total','ay_total','psi_ddot','atx','anx','aty','an_y'])
+    stock2 = Function('stock2', [states,controls], [jx_total,jy_total], ['states','controls'],['jx_total','jy_total'])
+
     AX_TOT = Function('AX_TOT', [states], [ax_total], ['states'], ['ax_total'])
     AY_TOT = Function('AY_TOT', [states], [ay_total], ['states'], ['ay_total'])
     # JX_TOT = Function('JX_TOT', [states, controls], [jx_total], ['states', 'controls'], ['jx_total'])
@@ -285,8 +292,8 @@ for file in file_list:
     # feature3_current = 0
     # for i in plt.arange(0, len(integrand) - 1, 1):
     #     feature3_current = feature3_current + 0.5 * (integrand[i] + integrand[i + 1]) * (T / N) # Crank - Nicolson scheme
-    jxtot_end = ((AX_TOT(X[:,N]) - AX_TOT(X[:,N-1]))/(T/N))**2
-    jytot_end = ((AY_TOT(X[:,N]) - AY_TOT(X[:,N-1]))/(T/N))**2
+    jxtot_int_end = ((AX_TOT(X[:,N]) - AX_TOT(X[:,N-1]))/(T/N))**2
+    jytot_int_end = ((AY_TOT(X[:,N]) - AY_TOT(X[:,N-1]))/(T/N))**2
 
     f0_cal = 0
     f1_cal = 0
@@ -298,8 +305,8 @@ for file in file_list:
         if i == N-1:
             f0_cal = f0_cal + 0.5 * (AXT_int(X[:, i]) + AXT_int(X[:,i + 1])) * (T / N)
             f1_cal = f1_cal + 0.5 * (AYT_int(X[:, i]) + AYT_int(X[:,i + 1])) * (T / N)
-            f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i], U[:, i]) +  jxtot_end)* (T / N)
-            f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i], U[:, i]) + jytot_end)* (T / N)
+            f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i], U[:, i]) +  jxtot_int_end)* (T / N)
+            f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i], U[:, i]) + jytot_int_end)* (T / N)
             f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[:,i + 1])) * (T / N)
             f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[:,i + 1])) * (T / N)
         else:
@@ -309,7 +316,6 @@ for file in file_list:
             f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i],U[:,i]) + JYT_int(X[:,i + 1],U[:,i+1])) * (T / N)
             f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[:,i + 1])) * (T / N)
             f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[:,i + 1]))* (T / N)
-
 
     # Comfort cost function: t0*ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
     opti.minimize(theta[0]/norm0*f0_cal+theta[1]/norm1*f1_cal+theta[2]/norm2*f2_cal+theta[3]/norm3*f3_cal+theta[4]/norm4*f4_cal+theta[5]/norm5*f5_cal)
@@ -358,8 +364,12 @@ for file in file_list:
         anx_sol[i] = res[4]
         aty_sol[i] = res[5]
         any_sol[i] = res[6]
-
-
+    for i in plt.arange(0,N,1):
+        res = stock2(sol.value(X[:,i]),sol.value(U[:,i]))
+        jx_tot_sol[i] = res[0]
+        jy_tot_sol[i] = res[1]
+    jx_tot_sol[N] = (ax_tot_sol[N] - ax_tot_sol[N-1])/(T_sol/N)
+    jy_tot_sol[N] = (ay_tot_sol[N] - ay_tot_sol[N-1])/(T_sol/N)
 
     width = plt.around(width_road, 2)
     speed = plt.around(vx_start, 2)

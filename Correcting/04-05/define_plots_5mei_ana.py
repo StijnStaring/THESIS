@@ -121,7 +121,7 @@ def define_plots(theta_iter,x_sol,y_sol,vx_sol,vy_sol,ax_sol,ay_sol,jx_sol,jy_so
     ax7b = plt.gca()
     plt.xlabel("Time [s]", fontsize=14)
     plt.ylabel("delta [degrees]", fontsize=14)
-    plt.title('delta local', fontsize=14)
+    plt.title('delta', fontsize=14)
     plt.grid(True)
     plt.tight_layout()
 
