@@ -166,7 +166,7 @@ for file in file_list:
     rhs = vertcat(x_dot_glob, y_dot_glob, atx, aty, psi_dot, psi_ddot,throttle_dot,delta_dot)
     states = vertcat(x, y, vx, vy, psi, psi_dot, throttle, delta)
     controls = vertcat(throttle_dot, delta_dot)
-    f = Function('f', [states,controls], [rhs],['states','controls'],['rhs'])
+    f = Function('f', [states,controls], [rhs],['states','controls'],['rhs']) 
 
     # Other functions:
     stock = Function('stock', [states], [ax_total,ay_total,psi_ddot,atx,anx,aty,an_y], ['states'], ['ax_total','ay_total','psi_ddot','atx','anx','aty','an_y'])
@@ -417,18 +417,3 @@ for file in file_list:
 #    Show
 # ----------------------------------
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
