@@ -7,7 +7,7 @@ Producing different lane changes: different longitudinal start velocities and la
 :return: csv-datafiles
 """
 import glob
-# import csv
+import csv
 import pylab as plt
 from scipy import signal
 
@@ -290,9 +290,7 @@ for N in N_list:
             # -----------------------------------------------
 
             # Comfort cost function: t0/n0*axtot**2+t1/n1*aytot**2+t2/n2*jxtot**2+t3/n3*jytot**2+t4/n4*(vx-vdes)**2+t5/n5*(y-ydes)**2
-            jxtot_int_end = ((ax_total[N] - ax_total[N-1])/(T/N))**2
-            jytot_int_end = ((ay_total[N] - ay_total[N-1])/(T/N))**2
-
+            # Jerk is evaluated at point of states and when just the new control is applied --> beginning of next interval.
             f0_cal = 0
             f1_cal = 0
             f2_cal = 0
@@ -303,8 +301,8 @@ for N in N_list:
                 if i == N-1:
                     f0_cal = f0_cal + 0.5 * (AXT_int(X[:, i]) + AXT_int(X[:,i + 1])) * (T / N)
                     f1_cal = f1_cal + 0.5 * (AYT_int(X[:, i]) + AYT_int(X[:,i + 1])) * (T / N)
-                    f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i], U[:, i]) +  jxtot_int_end)* (T / N)
-                    f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i], U[:, i]) + jytot_int_end)* (T / N)
+                    f2_cal = f2_cal + 0.5 * (JXT_int(X[:, i], U[:, i]) +  JXT_int(X[:, i+1], U[:, i]))* (T / N)
+                    f3_cal = f3_cal + 0.5 * (JYT_int(X[:, i], U[:, i]) + JYT_int(X[:, i+1], U[:, i]))* (T / N)
                     f4_cal = f4_cal + 0.5 * (VXD_int(X[:, i]) + VXD_int(X[:,i + 1])) * (T / N)
                     f5_cal = f5_cal + 0.5 * (YD_int(X[:, i]) + YD_int(X[:,i + 1])) * (T / N)
                 else:
@@ -404,22 +402,22 @@ for N in N_list:
             #    Storing of data in a csv-file
             # ----------------------------------
 
-            # path = "writting_C\ DATAC2_V" + str(speed) + "_L"+str(width)+".csv"
-            # file = open(path,'w',newline= "")
-            # writer = csv.writer(file)
-            # writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any","atx","anx"])
-            #
-            # for i in range(N+1):
-            #     if i == N: # last control point has no physical meaning
-            #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], a_ny_sol[i],atx_sol[i], anx_sol[i]])
-            #     else:
-            #         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],a_ny_sol[i],atx_sol[i], anx_sol[i]])
-            #
-            # file.close()
-            # print('dt of the optimization is: ', dt_sol)
-            # print('')
-            # print('Simulation completed!')
-            # print('\n')
+            path = "writting_C\ DATAC2_V" + str(speed) + "_L"+str(width)+".csv"
+            file = open(path,'w',newline= "")
+            writer = csv.writer(file)
+            writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","throttle_dot","delta_dot","aty","any","atx","anx"])
+            a_ny_sol = any_sol
+            for i in range(N+1):
+                if i == N: # last control point has no physical meaning
+                    writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], throttle_dot_sol[i-1],delta_dot_sol[i-1], aty_sol[i], a_ny_sol[i],atx_sol[i], anx_sol[i]])
+                else:
+                    writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i],throttle_dot_sol[i],delta_dot_sol[i], aty_sol[i],a_ny_sol[i],atx_sol[i], anx_sol[i]])
+
+            file.close()
+            print('dt of the optimization is: ', dt_sol)
+            print('')
+            print('Simulation completed!')
+            print('\n')
 
 
 # ----------------------------------
