@@ -9,6 +9,7 @@ def comparing_features(data_cl,file_name):
 
     # Define plot to compare normalized features
     plt.figure("Comparing Normalized Features")
+    plt.tight_layout()
     axf = plt.gca()
     plt.xlabel("Feature number", fontsize=font,fontweight='bold')
     plt.ylabel("Normalized Feature value", fontsize=font,fontweight='bold')
@@ -24,6 +25,7 @@ def comparing_features(data_cl,file_name):
 
     # Define plot to compare not normalized features
     plt.figure("Comparing Features")
+    plt.tight_layout()
     axfn = plt.gca()
     plt.xlabel("Feature number", fontsize=font,fontweight='bold')
     plt.ylabel("Feature value", fontsize=font,fontweight='bold')
@@ -39,6 +41,7 @@ def comparing_features(data_cl,file_name):
 
     # comparison of used weights
     plt.figure("Comparison weights", figsize=(10, 4))
+    plt.tight_layout()
     acw = plt.gca()
     plt.xlabel("Weight number", fontsize=font,fontweight='bold')
     plt.ylabel("Weight value", fontsize=font,fontweight='bold')
@@ -57,6 +60,7 @@ def comparing_features(data_cl,file_name):
 
     # X(t)/Y(t)
     plt.figure("Comparison X(t) and Y(t)", figsize=(10, 4))
+    plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom1a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
@@ -87,6 +91,7 @@ def comparing_features(data_cl,file_name):
 
     # Path
     plt.figure("Comparison paths", figsize=(10, 4))
+    plt.tight_layout()
     axcom2 = plt.gca()
     plt.xlabel("x [m]", fontsize=font,fontweight='bold')
     plt.ylabel("y [m]", fontsize=font,fontweight='bold')
@@ -104,6 +109,7 @@ def comparing_features(data_cl,file_name):
     # Vx(t)/Vy(t)
 
     plt.figure("Comparison velocities", figsize=(10, 4))
+    plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom3a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
@@ -134,6 +140,7 @@ def comparing_features(data_cl,file_name):
 
     # Ax(t)/Ay(t)
     plt.figure("Comparison accelerations", figsize=(10, 4))
+    plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom4a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
@@ -165,6 +172,7 @@ def comparing_features(data_cl,file_name):
     # Jx(t)/Jy(t)
 
     plt.figure("Comparison jerks", figsize=(10, 4))
+    plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom5a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
@@ -196,6 +204,7 @@ def comparing_features(data_cl,file_name):
     # yaw(t)/yaw/s(t)
 
     plt.figure("Yaw angle", figsize=(10, 4))
+    plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom6a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
@@ -226,6 +235,7 @@ def comparing_features(data_cl,file_name):
 
     # Inputs
     plt.figure("throttle", figsize=(10, 4))
+    plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom7a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
@@ -254,14 +264,15 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
 
-    # Different parts of the local lateral acceleration
-    plt.figure("Ayt", figsize=(10, 4))
+    # Different parts of the longitudinal lateral acceleration
+    plt.figure("Axt", figsize=(10, 4))
+    plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom8a = plt.gca()
-    plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Ayt [m/s^2]", fontsize=font,fontweight='bold')
+    plt.xlabel("Time [s]", fontsize=font, fontweight='bold')
+    plt.ylabel("Axt [m/s^2]", fontsize=font, fontweight='bold')
     plt.grid(True)
-    # plt.title('Ayt ', fontsize=font,fontweight='bold')
+    # plt.title('Axt ', fontsize=font,fontweight='bold')
 
     for tick in axcom8a.xaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
@@ -272,8 +283,8 @@ def comparing_features(data_cl,file_name):
 
     plt.subplot(1, 2, 2)
     axcom8b = plt.gca()
-    plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Ayn [m/s^2]", fontsize=font,fontweight='bold')
+    plt.xlabel("Time [s]", fontsize=font, fontweight='bold')
+    plt.ylabel("Axn [m/s^2]", fontsize=font, fontweight='bold')
     plt.grid(True)
     # plt.title('Ayn', fontsize=font,fontweight='bold')
 
@@ -284,56 +295,127 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
 
+    # Different parts of the local lateral acceleration
+    plt.figure("Axt", figsize=(10, 4))
+    plt.tight_layout()
+    plt.subplot(1, 2, 1)
+    axcom9a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
+    plt.ylabel("Axt [m/s^2]", fontsize=font,fontweight='bold')
+    plt.grid(True)
+    # plt.title('Ayt ', fontsize=font,fontweight='bold')
+
+    for tick in axcom9a.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in axcom9a.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+
+    plt.subplot(1, 2, 2)
+    axcom9b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
+    plt.ylabel("Ayn [m/s^2]", fontsize=font,fontweight='bold')
+    plt.grid(True)
+    # plt.title('Ayn', fontsize=font,fontweight='bold')
+
+    for tick in axcom9b.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in axcom9b.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+
     # yaw acceleration
 
     plt.figure("Yaw acceleration", figsize=(10, 4))
-    axcom9 = plt.gca()
+    plt.tight_layout()
+    axcom10 = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
     plt.ylabel("Yaw acceleration [degrees/s^2]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('Yaw acceleration ', fontsize=font,fontweight='bold')
 
-    for tick in axcom9.xaxis.get_major_ticks():
+    for tick in axcom10.xaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
-    for tick in axcom9.yaxis.get_major_ticks():
+    for tick in axcom10.yaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
 
+    # Inputs_dot
+    plt.figure("throttle_dot", figsize=(10, 4))
+    plt.tight_layout()
+    plt.subplot(1, 2, 1)
+    axcom11a = plt.gca()
+    plt.xlabel("Time [s]", fontsize=font, fontweight='bold')
+    plt.ylabel("throttle_dot [1/s]", fontsize=font, fontweight='bold')
+    plt.grid(True)
+    # plt.title('throttle ', fontsize=font,fontweight='bold')
+
+    for tick in axcom11a.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in axcom11a.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+
+    plt.subplot(1, 2, 2)
+    axcom11b = plt.gca()
+    plt.xlabel("Time [s]", fontsize=font, fontweight='bold')
+    plt.ylabel("delta_dot [degrees/s]", fontsize=font, fontweight='bold')
+    # plt.title('delta local', fontsize=font,fontweight='bold')
+    plt.grid(True)
+
+    for tick in axcom11b.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
+    for tick in axcom11b.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(fontsize)
+        tick.label1.set_fontweight('bold')
 
 
     # Plotting data in figures
-    axcom1a.plot(data_cl['time_cl'], data_cl['x_cl'], '-', label="X(t) "+file_name[16:-4], linewidth=3.0)
-    axcom1b.plot(data_cl['time_cl'], data_cl['y_cl'], '-', label="Y(t) "+file_name[16:-4], linewidth=3.0)
+    N = len(plt.squeeze(data_cl['x_cl'])) - 1
+    axcom1a.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['x_cl']), '-', label="X(t) "+file_name[15:-4], linewidth=3.0)
+    axcom1b.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['y_cl']), '-', label="Y(t) "+file_name[15:-4], linewidth=3.0)
 
-    axcom2.plot(data_cl['x_cl'], data_cl['y_cl'], '-', label="path "+file_name[16:-4], linewidth=3.0)
+    axcom2.plot(plt.squeeze(data_cl['x_cl']), plt.squeeze(data_cl['y_cl']), '-', label="path "+file_name[15:-4], linewidth=3.0)
 
     # The vx and vy velocities are as seen in the global axis (fixed).
-    axcom3a.plot(data_cl['time_cl'], data_cl['vx_cl'], '-', label="Vx(t) "+file_name[16:-4], linewidth=3.0)
-    axcom3b.plot(data_cl['time_cl'], data_cl['vy_cl'], '-', label="Vy(t) "+file_name[16:-4], linewidth=3.0)
+    axcom3a.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['vx_cl']), '-', label="Vx(t) "+file_name[15:-4], linewidth=3.0)
+    axcom3b.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['vy_cl']), '-', label="Vy(t) "+file_name[15:-4], linewidth=3.0)
 
     # The ax and ay accelerations are as seen in the global axis (fixed).
-    axcom4a.plot(data_cl['time_cl'], data_cl['ax_cl'], '-', label="Ax(t) "+file_name[16:-4], linewidth=3.0)
-    axcom4b.plot(data_cl['time_cl'], data_cl['ay_cl'], '-', label="Ay(t) "+file_name[16:-4], linewidth=3.0)
+    axcom4a.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['ax_cl']), '-', label="Ax(t) "+file_name[15:-4], linewidth=3.0)
+    axcom4b.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['ay_cl']), '-', label="Ay(t) "+file_name[15:-4], linewidth=3.0)
 
     # The jerk_x and jerk_y are as seen in the global axis (fixed).
-    axcom5a.plot(data_cl['time_cl'], data_cl['jx_cl'], '-', label="Jx(t) "+file_name[16:-4], linewidth=3.0)
-    axcom5b.plot(data_cl['time_cl'], data_cl['jy_cl'], '-', label="Jy(t) "+file_name[16:-4], linewidth=3.0)
+    axcom5a.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['jx_cl']), '-', label="Jx(t) "+file_name[15:-4], linewidth=3.0)
+    axcom5b.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['jy_cl']), '-', label="Jy(t) "+file_name[15:-4], linewidth=3.0)
 
     # yaw and yaw rate
-    axcom6a.plot(data_cl['time_cl'], data_cl['psi_cl']* 180 / plt.pi, '-', label="Psi(t) "+file_name[16:-4], linewidth=3.0)
-    axcom6b.plot(data_cl['time_cl'], data_cl['psi_dot_cl']* 180 / plt.pi, '-', label="Psi_dot(t) "+file_name[16:-4], linewidth=3.0)
+    axcom6a.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['psi_cl'])* 180 / plt.pi, '-', label="Psi(t) "+file_name[15:-4], linewidth=3.0)
+    axcom6b.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['psi_dot_cl'])* 180 / plt.pi, '-', label="Psi_dot(t) "+file_name[15:-4], linewidth=3.0)
 
     # throttle and delta and yaw rate
-    axcom7a.plot(data_cl['time_cl'], data_cl['throttle_cl'] , '-', label="Throttle(t) "+file_name[16:-4], linewidth=3.0)
-    axcom7b.plot(data_cl['time_cl'], data_cl['delta_cl'] * 180 / plt.pi, '-', label="Delta(t) "+file_name[16:-4],linewidth=3.0)
+    axcom7a.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['throttle_cl']) , '-', label="Throttle(t) "+file_name[15:-4], linewidth=3.0)
+    axcom7b.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['delta_cl']) * 180 / plt.pi, '-', label="Delta(t) "+file_name[15:-4],linewidth=3.0)
 
-    # throttle and delta and yaw rate
-    axcom8a.plot(data_cl['time_cl'], data_cl['aty_cl'], '-', label="Aty(t) "+file_name[16:-4], linewidth=3.0)
-    axcom8b.plot(data_cl['time_cl'], data_cl['any_cl'], '-', label="Any(t) "+file_name[16:-4], linewidth=3.0)
+    # axt and axn
+    axcom8a.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['atx_cl']), '-',label="Atx(t) " + file_name[15:-4], linewidth=3.0)
+    axcom8b.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['anx_cl']), '-',label="Anx(t) " + file_name[15:-4], linewidth=3.0)
+
+    # ayt and ayn
+    axcom9a.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['aty_cl']), '-', label="Aty(t) "+file_name[15:-4], linewidth=3.0)
+    axcom9b.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['any_cl']), '-', label="Any(t) "+file_name[15:-4], linewidth=3.0)
 
     # yaw rate aceleration
-    axcom9.plot(data_cl['time_cl'], data_cl['psi_ddot_cl']*180/plt.pi, '-', label="Psi_ddot(t) "+file_name[16:-4], linewidth=3.0)
+    axcom10.plot(plt.squeeze(data_cl['time_cl']), plt.squeeze(data_cl['psi_ddot_cl'])*180/plt.pi, '-', label="Psi_ddot(t) "+file_name[15:-4], linewidth=3.0)
+
+    # throttle_dot and delta_dot and yaw rate
+    axcom11a.plot(plt.squeeze(data_cl['time_cl'])[0:N], plt.squeeze(data_cl['throttle_dot_cl']) , '-', label="Throttle_dot(t) "+file_name[15:-4], linewidth=3.0)
+    axcom11b.plot(plt.squeeze(data_cl['time_cl'])[0:N], plt.squeeze(data_cl['delta_dot_cl']) * 180 / plt.pi, '-', label="Delta_dot(t) "+file_name[15:-4],linewidth=3.0)
 
     axcom1a.legend()
     axcom1b.legend()
@@ -350,7 +432,10 @@ def comparing_features(data_cl,file_name):
     axcom7b.legend()
     axcom8a.legend()
     axcom8b.legend()
-    axcom9.legend()
+    axcom9a.legend()
+    axcom9b.legend()
+    axcom10.legend()
+    axcom11a.legend()
+    axcom11b.legend()
 
-
-    return axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b, axcom9
+    return axf,acw, axfn, axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b, axcom9a, axcom9b, axcom10,axcom11a, axcom11b

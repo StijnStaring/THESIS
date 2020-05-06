@@ -192,6 +192,8 @@ for N in N_list:
             AYT_int = Function('AYT_int', [states], [ay_total_int], ['states'], ['ay_total_int'])
             JXT_int = Function('JXT_int', [states, controls], [jx_total_int], ['states', 'controls'], ['jx_total_int'])
             JYT_int = Function('JYT_int', [states, controls], [jy_total_int], ['states', 'controls'], ['jy_total_int'])
+            JXT = Function('JXT', [states, controls], [jx_total], ['states', 'controls'], ['jx_total'])
+            JYT = Function('JYT', [states, controls], [jy_total], ['states', 'controls'], ['jy_total'])
             VXD_int = Function('VXD_int', [states], [vx_diff_int], ['states'], ['vx_diff_int'])
             YD_int = Function('YD_int', [states], [y_diff_int], ['states'], ['y_diff_int'])
 
@@ -232,8 +234,8 @@ for N in N_list:
             psi_dot = X[5,:] #yaw rate
             throttle = X[6,:] # gas padel
             delta = X[7,:] # angle of front wheel
-            ax_total = X[8,:]
-            ay_total = X[9,:]
+            # ax_total = X[8,:]
+            # ay_total = X[9,:]
 
             # Decision variables for control vector
             throttle_dot = U[0,:]
@@ -365,8 +367,10 @@ for N in N_list:
                 res = stock2(sol.value(X[:,i]),sol.value(U[:,i]))
                 jx_tot_sol[i] = res[0]
                 jy_tot_sol[i] = res[1]
-            jx_tot_sol[N] = (ax_tot_sol[N] - ax_tot_sol[N-1])/(T_sol/N)
-            jy_tot_sol[N] = (ay_tot_sol[N] - ay_tot_sol[N-1])/(T_sol/N)
+            jx_tot_sol[N] = JXT(sol.value(X[:,N]),sol.value(U[:,N-1])) # uses previous control to approximate the jerk
+            jy_tot_sol[N] = JYT(sol.value(X[:,N]),sol.value(U[:,N-1]))
+            # jx_tot_sol[N] = (ax_tot_sol[N] - ax_tot_sol[N-1])/(T_sol/N)
+            # jy_tot_sol[N] = (ay_tot_sol[N] - ay_tot_sol[N-1])/(T_sol/N)
 
             width = plt.around(width_road, 2)
             speed = plt.around(vx_start, 2)
@@ -405,18 +409,15 @@ for N in N_list:
             path = "writting_C\ DCA2_V" + str(speed) + "_L"+str(width)+".csv"
             file = open(path,'w',newline= "")
             writer = csv.writer(file)
-            writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","throttle_dot","delta_dot","aty","any","atx","anx"])
-            a_ny_sol = any_sol
+            writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","throttle_dot","delta_dot","aty","a_ny","atx","anx"])
+
             for i in range(N+1):
                 if i == N: # last control point has no physical meaning
-                    writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], throttle_dot_sol[i-1],delta_dot_sol[i-1], aty_sol[i], a_ny_sol[i],atx_sol[i], anx_sol[i]])
+                    writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], throttle_dot_sol[i-1],delta_dot_sol[i-1], aty_sol[i], any_sol[i],atx_sol[i], anx_sol[i]])
                 else:
-                    writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i],throttle_dot_sol[i],delta_dot_sol[i], aty_sol[i],a_ny_sol[i],atx_sol[i], anx_sol[i]])
+                    writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i],throttle_dot_sol[i],delta_dot_sol[i], aty_sol[i],any_sol[i],atx_sol[i], anx_sol[i]])
 
             file.close()
-            print('dt of the optimization is: ', dt_sol)
-            print('')
-            print('Simulation completed!')
             print('\n')
 
 

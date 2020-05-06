@@ -1,6 +1,6 @@
 def derivative(a_list,dt):
     import pylab as plt
-
+    a_list = plt.squeeze(a_list)
     j_list = []
     for i in plt.arange(0, len(a_list), 1):
         if i == 0:

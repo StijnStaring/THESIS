@@ -2,29 +2,25 @@
 stijnstaring@hotmail.com
 
 The program automatically uses all the csv files stored in the 'used_data' folder.
-Github ==> ideal test folder
+Github stijn staring for more information
 """
-# import seaborn as sns
 import pylab as plt
-# import sys
-import csv
+# import csv
 from comparing_features import comparing_features
 from post_processing_plots import post_processing_plots
 from RPROP import RPROP
-from figure_style_saving import figure_style_saving
+# from figure_style_saving import figure_style_saving
 from import_data2 import import_data2
 from optim_weights_ideal import optim_weights_ideal
 import glob
-# import seaborn as sns
 
 # Remarks
 # ########
-# No normalization necessary with respect of gradient --> size doesn't matter in RPROP implementation.
+# No normalization necessary of gradient --> size doesn't matter in RPROP implementation.
 # Optimization objective is normalized in order to have dimensionless weights --> better start (+-equal size of optimization terms at start)
 
 # Defining weights
 ##################
-# sns.set_palette(sns.color_palette("hls", 15))
 his_diff_theta = []
 his_multi_grads = []
 his_grad_current = []
@@ -33,57 +29,43 @@ his_exception = []
 his_update = []
 his_del_theta_prev = []
 his_f_calc_rel = [] # procentual difference between the calculated features
-amount_features = 5
-conflict_flags = plt.zeros([amount_features,1])
+amount_features = 6
 rec = 1
-N = 500
-# N = 500 # amount of data points
-tol = 1e-4
-# width_road = 3.46990715
-# vx_start = 23.10159175
-# time_guess = 4.01
-
+N = 1000
+tol = 1e-3
+# Comfort cost function: ax**2+t1*ay**2+t2*jx**2+t3*jy**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
+theta = plt.array([[1.0],[1.0],[1.0],[1.0],[1.0],[1.0]])
 # RPROP variables
 del_0 = 0.1
-n_neg = 0.5
 exception = plt.zeros([amount_features,1])
 del_theta_prev = plt.zeros([amount_features,1])
-# grad_curr = plt.zeros([amount_features,1])
 update = del_0*plt.ones([amount_features,1])
-#################
-# Comfort cost function: ax**2+t1*ay**2+t2*jy**2+t3*(vx-vdes)**2+t4*(y-ydes)**2
-# theta = plt.array([[5.0],[5.0],[5.0],[5.0],[5.0]])
-theta = plt.array([[500.0],[500.0],[500.0],[500.0],[500.0]])
-# theta = plt.array([[3.7],[4.7],[5.7],[0.7],[1.7]])
-# theta = plt.array([[5.49749001e+02], [1.89525204e+00], [5.31749963e-01], [2.14306117e+01],[1.16706616e-01]])
-# theta = plt.array([[551], [1.93], [0.55], [23], [0.15]])
 
 # Plotting
 ######################
 plotting_calc = 0
 axcom1a =0; axcom1b=0; axcom2=0; axcom3a=0;axcom3b=0;axcom4a=0;axcom4b=0;axcom5a=0;axcom5b=0
 axcom6a=0;axcom6b=0;axcom7a=0;axcom7b=0;axcom8a=0;axcom8b=0;axcom9=0;axf=0;axfn=0;acw=0
+
+# Other
 ######################
 theta_tracker = []
 theta_tracker.append(theta)
 his_weights.append([str(rec) + "//", theta])
-# theta_chosen = plt.array([5.49749001e+02, 1.89525204e+00, 5.31749963e-01, 2.14306117e+01, 1.16706616e-01])
-theta_chosen = plt.array([4,5,6,1,2]) # This is the theta used to generate the data
+theta_chosen = plt.array([4,5,1,6,1,2]) # This is the theta used to generate the data
 theta_chosen = theta_chosen[:,plt.newaxis]
 data_list = []
 file_list = glob.glob("used_data/*.csv")
 for file in file_list:
-    print('\n')
+    print("")
     print("The name of the file: ", file)
-    [data_cl, f_data, width_road, vx_start] = import_data2(file, 1)
+    data_cl = import_data2(file, 1)
     data_list.append(data_cl)
-    [axf, acw, axfn, axcom1a, axcom1b, axcom2, axcom3a, axcom3b, axcom4a, axcom4b, axcom5a, axcom5b, axcom6a, axcom6b,axcom7a, axcom7b, axcom8a, axcom8b, axcom9] = comparing_features(data_cl,file)
+    [axf, acw, axfn, axcom1a, axcom1b, axcom2, axcom3a, axcom3b, axcom4a, axcom4b, axcom5a, axcom5b, axcom6a, axcom6b,axcom7a, axcom7b, axcom8a, axcom8b, axcom9a,axcom9b,axcom10,axcom11a,axcom11b] = comparing_features(data_cl,file)
     # plotting
-    axf.plot([1, 1, 1, 1, 1], '-', marker='*', markersize=6, label = file[16:-4])
-    # axf.legend()
-    axfn.plot([f_data[0], f_data[1], f_data[2], f_data[3], f_data[4]], '-', marker='*', markersize=6,label = file[16:-4])
-    # axfn.legend()
-    ###########
+    axf.plot([1, 1, 1, 1, 1, 1], '-', marker='*', markersize=6, label = file[16:-4])
+    axfn.plot([data_cl['features'][0], data_cl['features'][1], data_cl['features'][2], data_cl['features'][3], data_cl['features'][4], data_cl['features'][5]], '-', marker='*', markersize=6,label = file[15:-4])
+
 
 # Calculate the averaged
 av_features_data = plt.zeros([amount_features,1])
@@ -98,8 +80,8 @@ dict_sol_list = []
 converged = 0
 grad_prev = plt.zeros([amount_features,1])
 
-while rec <= 1:
-# while converged != 1 and rec <= 300:
+# while rec <= 1:
+while converged != 1 and rec <= 300:
     converged = 0
     print('Iteration: ', rec)
     print('This is the difference of theta: ', theta_chosen - theta)
@@ -108,7 +90,7 @@ while rec <= 1:
     for k in range(len(file_list)):
         file = file_list[k]
         curr_data = data_list[k]
-        [data_s, f_calc] = optim_weights_ideal(theta,curr_data["width_road"],curr_data["vx_start"],curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9,file)
+        [data_s, f_calc] = optim_weights_ideal(theta,curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a, axcom8b, axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file)
         dict_sol_list.append(data_s)
 
     # Calculating averaged calculated solution
@@ -163,7 +145,7 @@ while rec <= 1:
 
     if converged != 1:
         length = amount_features
-        [del_theta_prev, exception, theta, update] = RPROP(grad_curr,n_neg,case,length,update,theta,del_theta_prev,conflict_flags,1)
+        [del_theta_prev, exception, theta, update] = RPROP(grad_curr,case,length,update,theta,del_theta_prev,1)
         grad_prev = grad_curr
         rec = rec + 1
         his_weights.append([str(rec) + "//", theta])
@@ -278,21 +260,22 @@ for i in plt.arange(0,len(file_list),1):
 
 print('This is the theta_tracker: ',theta_tracker)
 post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
+
 #########################################
 # Saving figures and creating csv file
 #########################################
-figure_style_saving()
-path = "results\Av_FT_It"+str(rec)+"D"+str(len(file_list))+".csv"
-file = open(path,'w',newline= "")
-writer = csv.writer(file)
-writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
-
-for i in range(N+1):
-    if i == N: # last control point has no physical meaning
-        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
-    else:
-        writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
-file.close()
+# figure_style_saving()
+# path = "results\Av_FT_It"+str(rec)+"D"+str(len(file_list))+".csv"
+# file = open(path,'w',newline= "")
+# writer = csv.writer(file)
+# writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","aty","any"])
+#
+# for i in range(N+1):
+#     if i == N: # last control point has no physical meaning
+#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i-1], delta_sol[i-1], aty_sol[i], any_sol[i]])
+#     else:
+#         writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i], jy_tot_sol[i],psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i], aty_sol[i],any_sol[i]])
+# file.close()
 #####################
 plt.show()
 #####################
