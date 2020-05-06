@@ -1,6 +1,4 @@
 log.txt
-learning model/used_data/DataA_V22.22_L3.47.csv
-log.txt
 /Generating data/Dynamics.ame
 /Generating data/line_data.mat
 /Generating data/line_data1.mat
@@ -133,3 +131,16 @@ log.txt
 /learning model/used_data/
 /tracking_non_linear_VM/DATA2_V22.22_L3.47.csv
 /learning model working non-linear model/
+/learning model/not_used on moment
+/Correcting/reading_dataset/
+/Correcting/01-05/reading_dataset/
+/Correcting/01-05/afbeeldingen/
+/Correcting/01-05/clean version/reading_dataset
+/Correcting/01-05/analytical acc/reading_dataset/
+/Correcting/01-05/writting_C/
+/Correcting/01-05/analytical acc/writting_C
+/Correcting/01-05/Sending/
+/Correcting/04-05/Sending/reading_dataset/
+/Correcting/04-05/reading_dataset/
+/Correcting/04-05/writting_C
+/Correcting/04-05/analytical_update.zip

@@ -14,11 +14,6 @@ from optim_weights_ideal import optim_weights_ideal
 import glob
 # import seaborn as sns
 
-# Remarks
-# ########
-# No normalization necessary with respect of gradient --> size doesn't matter in RPROP implementation.
-# Optimization objective is normalized in order to have dimensionless weights --> better start (+-equal size of optimization terms at start)
-
 # Defining weights
 ##################
 fixed_feature_index = 1
