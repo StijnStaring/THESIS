@@ -296,7 +296,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontweight('bold')
 
     # Different parts of the local lateral acceleration
-    plt.figure("Axt", figsize=(10, 4))
+    plt.figure("Ayt", figsize=(10, 4))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom9a = plt.gca()

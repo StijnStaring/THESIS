@@ -95,6 +95,8 @@ for N in N_list:
             # throttle_dot_guess = data_cl['throttle_dot_cl']
             delta_dot_guess = signal.resample(data_cl['delta_dot_cl'], N,axis= 1)
             # delta_dot_guess = data_cl['delta_dot_cl']
+            # ax_total_guess = signal.resample(data_cl['ax_cl'],N+1,axis= 1)
+            # ay_total_guess = signal.resample(data_cl['ay_cl'], N + 1, axis=1)
 
             # ###############
             # Plot guesses
@@ -120,6 +122,10 @@ for N in N_list:
             # plt.plot(plt.linspace(0, time_guess, N ), plt.squeeze(throttle_dot_guess))
             # plt.figure('delta_dot')
             # plt.plot(plt.linspace(0, time_guess, N), plt.squeeze(delta_dot_guess))
+            # # plt.figure('ax_tot')
+            # # plt.plot(plt.linspace(0, time_guess, N+1 ), plt.squeeze(ax_total_guess))
+            # # plt.figure('ay_tot')
+            # # plt.plot(plt.linspace(0, time_guess, N+1), plt.squeeze(ay_total_guess))
 
             print("")
             print("vx_start: ",vx_start," and width_road: ",width_road)
@@ -234,8 +240,8 @@ for N in N_list:
             psi_dot = X[5,:] #yaw rate
             throttle = X[6,:] # gas padel
             delta = X[7,:] # angle of front wheel
-            # ax_total = X[8,:]
-            # ay_total = X[9,:]
+            ax_total = X[8,:]
+            ay_total = X[9,:]
 
             # Decision variables for control vector
             throttle_dot = U[0,:]
@@ -285,6 +291,8 @@ for N in N_list:
             opti.set_initial(throttle_dot, throttle_dot_guess)
             opti.set_initial(delta_dot, delta_dot_guess)
             opti.set_initial(T, time_guess)
+            # opti.set_initial(ax_total, ax_total_guess)
+            # opti.set_initial(ay_total, ay_total_guess)
 
             ##
             # -----------------------------------------------

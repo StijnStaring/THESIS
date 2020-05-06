@@ -68,7 +68,7 @@ for file in file_list:
 
 
 # Calculate the averaged
-av_features_data = plt.zeros([amount_features,1])
+av_features_data = plt.zeros(amount_features)
 for i in plt.arange(0,len(file_list),1):
     av_features_data = av_features_data + data_list[i]['features']
 av_features_data = av_features_data/len(file_list)
@@ -94,7 +94,7 @@ while converged != 1 and rec <= 300:
         dict_sol_list.append(data_s)
 
     # Calculating averaged calculated solution
-    av_features_calc = plt.zeros([amount_features, 1])
+    av_features_calc = plt.zeros(amount_features)
     for i in plt.arange(0, len(file_list), 1):
         av_features_calc = av_features_calc + dict_sol_list[i]['features']
     av_features_calc = av_features_calc / len(file_list)
@@ -103,16 +103,20 @@ while converged != 1 and rec <= 300:
     # Normalization for plots
     f_calc_rel = av_features_calc/av_features_data
     grad_curr = av_features_data - av_features_calc
+
     print('This is summed grad current: ', plt.sum(plt.absolute(grad_curr)))
     print('\n')
-    axf.plot([f_calc_rel[0], f_calc_rel[1], f_calc_rel[2], f_calc_rel[3], f_calc_rel[4]], '-', marker='o', markersize=6)
-    axfn.plot([av_features_calc[0], av_features_calc[1], av_features_calc[2], av_features_calc[3], av_features_calc[4]], '-', marker='o', markersize=6)
+    axf.plot([f_calc_rel[0], f_calc_rel[1], f_calc_rel[2], f_calc_rel[3], f_calc_rel[4], f_calc_rel[5]], '-', marker='o', markersize=6)
+    axfn.plot([av_features_calc[0], av_features_calc[1], av_features_calc[2], av_features_calc[3], av_features_calc[4],av_features_calc[4]], '-', marker='o', markersize=6)
 
     print("----------------------------------------------")
     print('This is f_calc_rel: ')
     print(str(rec) + "// ", f_calc_rel)
+    f_calc_rel = f_calc_rel[:, plt.newaxis]
     his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
+    grad_curr = grad_curr[:, plt.newaxis]
     his_grad_current.append([str(rec) + "//", grad_curr])
+
     # Problem was: exception is specified as an specific global array (not for integers) and added each time to a list. When this global variable itself is updated --> changes all values in list because all point to the same global variable.
     # Can be solved by recalling the variable in the loop so that it now points to a local definition. (Again called in RPROP) Global var exception is updated by an array (local var) exception = plt.array([])..., no relation with previous value added to his_exception. Create a new point.
     # if make a list of exception and add an array and later what is on this place in exception add to his_exception and then later update this place in exception, will also change all variables in his_exception becaue they point to the same place in the excepion list.

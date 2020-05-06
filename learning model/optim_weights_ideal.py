@@ -1,5 +1,4 @@
 import pylab as plt
-from scipy import signal
 from define_plots import define_plots
 from casadi import *
 
@@ -48,29 +47,39 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
 
     # Resampling mostly not needed with this data file
     N_old = data_cl['x_cl'].shape[1] - 1
+    if N_old != N:
+        print("Error: N_old is not equal to N, make use of resampling of the observation.")
+        sys.exit(-1)
     time_guess = data_cl['time_cl'][0, -1]
-    x_guess = signal.resample_poly(data_cl['x_cl'], N, N_old, axis=1, padtype='line')
-    x_guess = x_guess[None, 0, 0:N + 1]
-    # x_guess = data_cl['x_cl']
-    y_guess = signal.resample_poly(data_cl['y_cl'], N, N_old, axis=1, padtype='maximum')
-    y_guess = y_guess[None, 0, 0:N + 1]
-    # y_guess = data_cl['y_cl']
+    # x_guess = signal.resample_poly(data_cl['x_cl'], N, N_old, axis=1, padtype='line')
+    # x_guess = x_guess[None, 0, 0:N + 1]
+    x_guess = data_cl['x_cl']
+    # y_guess = signal.resample_poly(data_cl['y_cl'], N, N_old, axis=1, padtype='maximum')
+    # y_guess = y_guess[None, 0, 0:N + 1]
+    y_guess = data_cl['y_cl']
     # vx_guess = signal.resample_poly(data_cl['vx_cl'], N, N_old,axis= 1 ,padtype='line')
     # vx_guess = vx_guess[None, 0, 0:N + 1]
-    vx_guess = signal.resample(data_cl['vx_cl'], N + 1, axis=1)
-    # vx_guess = data_cl['vx_cl']
-    vy_guess = signal.resample(data_cl['vy_cl'], N + 1, axis=1)
-    # vy_guess = data_cl['vy_cl']
-    psi_guess = signal.resample(data_cl['psi_cl'], N + 1, axis=1)
-    # psi_guess = data_cl['psi_cl']
-    psi_dot_guess = signal.resample(data_cl['psi_dot_cl'], N + 1, axis=1)
-    # psi_dot_guess = data_cl['psi_dot_cl']
-    throttle_guess = signal.resample(data_cl['throttle_cl'], N + 1,axis=1)  # throttle and delta use to be inputs
-    delta_guess = signal.resample(data_cl['delta_cl'], N + 1, axis=1)
-    throttle_dot_guess = signal.resample(data_cl['throttle_dot_cl'], N, axis=1)
-    # throttle_dot_guess = data_cl['throttle_dot_cl']
-    delta_dot_guess = signal.resample(data_cl['delta_dot_cl'], N, axis=1)
-    # delta_dot_guess = data_cl['delta_dot_cl']
+    # vx_guess = signal.resample(data_cl['vx_cl'], N + 1, axis=1)
+    vx_guess = data_cl['vx_cl']
+    # vy_guess = signal.resample(data_cl['vy_cl'], N + 1, axis=1)
+    vy_guess = data_cl['vy_cl']
+    # psi_guess = signal.resample(data_cl['psi_cl'], N + 1, axis=1)
+    psi_guess = data_cl['psi_cl']
+    # psi_dot_guess = signal.resample(data_cl['psi_dot_cl'], N + 1, axis=1)
+    psi_dot_guess = data_cl['psi_dot_cl']
+    # throttle_guess = signal.resample(data_cl['throttle_cl'], N + 1,axis=1)  # throttle and delta use to be inputs
+    throttle_guess = data_cl['throttle_cl']
+    # delta_guess = signal.resample(data_cl['delta_cl'], N + 1, axis=1)
+    delta_guess = data_cl['delta_cl']
+    # throttle_dot_guess = signal.resample(data_cl['throttle_dot_cl'], N, axis=1)
+    throttle_dot_guess = data_cl['throttle_dot_cl']
+    # delta_dot_guess = signal.resample(data_cl['delta_dot_cl'], N, axis=1)
+    delta_dot_guess = data_cl['delta_dot_cl']
+    # ax_total_guess = signal.resample(data_cl['ax_cl'],N+1,axis= 1)
+    ax_total_guess = data_cl['ax_cl']
+    # ay_total_guess = signal.resample(data_cl['ay_cl'], N + 1, axis=1)
+    ay_total_guess = data_cl['ay_cl']
+    print('This is the shape of your guesses: ', data_cl['x_cl'].shape)
 
     # ###############
     # Plot guesses
@@ -210,8 +219,8 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     psi_dot = X[5, :]  # yaw rate
     throttle = X[6, :]  # gas padel
     delta = X[7, :]  # angle of front wheel
-    # ax_total = X[8, :]
-    # ay_total = X[9, :]
+    ax_total = X[8, :]
+    ay_total = X[9, :]
 
     # Decision variables for control vector
     throttle_dot = U[0, :]
@@ -261,6 +270,8 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     opti.set_initial(throttle_dot, throttle_dot_guess)
     opti.set_initial(delta_dot, delta_dot_guess)
     opti.set_initial(T, time_guess)
+    opti.set_initial(ax_total, ax_total_guess)
+    opti.set_initial(ay_total, ay_total_guess)
 
     ##
     # -----------------------------------------------
@@ -387,18 +398,21 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     data_s['psi_dot_s'] = sol.value(psi_dot)
     data_s['throttle_s'] = sol.value(throttle)
     data_s['delta_s'] = sol.value(delta)
+    data_s['throttle_s'] = sol.value(throttle_dot)
+    data_s['delta_s'] = sol.value(delta_dot)
     data_s['T_s'] = sol.value(T)
     data_s['dt_s'] = data_s['T_s'] / N
     data_s['ax_tot_s'] = ax_tot_sol
     data_s['ay_tot_s'] = ay_tot_sol
     data_s['aty_s'] = aty_sol
     data_s['any_s'] = any_sol
+    data_s['atx_s'] = atx_sol
+    data_s['anx_s'] = anx_sol
     data_s['jx_s'] = jx_tot_sol
     data_s['jy_s'] = jy_tot_sol
     data_s['psi_ddot_s'] = psi_ddot_sol
 
     features = plt.array([sol.value(f0_cal),sol.value(f1_cal),sol.value(f2_cal),sol.value(f3_cal),sol.value(f4_cal),sol.value(f5_cal)])
-    features = features[:,plt.newaxis]
     data_s['features'] = features
     time_vector = plt.linspace(0, T_sol, len(x_sol))
 

@@ -16,6 +16,7 @@ def import_ID_5mei(file):
     data_cl['vx_cl'] = plt.array([data.vx])
     data_cl['vy_cl'] = plt.array([data.vy])
     data_cl['ax_cl'] = plt.array([data.ax]) #total acc
+    data_cl['ay_cl'] = plt.array([data.ay])  # total acc
     data_cl['jy_cl'] = plt.array([data.jy]) #total jerk
     data_cl['psi_cl'] = plt.array([data.psi]) # in rad
     data_cl['psi_dot_cl'] = plt.array([data.psi_dot])
