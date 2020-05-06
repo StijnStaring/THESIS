@@ -402,7 +402,7 @@ for N in N_list:
             #    Storing of data in a csv-file
             # ----------------------------------
 
-            path = "writting_C\ DATAC2_V" + str(speed) + "_L"+str(width)+".csv"
+            path = "writting_C\ DCA2_V" + str(speed) + "_L"+str(width)+".csv"
             file = open(path,'w',newline= "")
             writer = csv.writer(file)
             writer.writerow(["time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","throttle_dot","delta_dot","aty","any","atx","anx"])
