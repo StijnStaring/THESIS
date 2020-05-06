@@ -8,7 +8,7 @@ def comparing_features(data_cl,file_name):
     font = 16
 
     # Define plot to compare normalized features
-    plt.figure("Comparing Normalized Features")
+    plt.figure("Comparing Normalized Features", figsize=(24,12))
     plt.tight_layout()
     axf = plt.gca()
     plt.xlabel("Feature number", fontsize=font,fontweight='bold')
@@ -22,9 +22,9 @@ def comparing_features(data_cl,file_name):
     for tick in axf.yaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
-
+    plt.clf()
     # Define plot to compare not normalized features
-    plt.figure("Comparing Features")
+    plt.figure("Comparing Features", figsize=(24,12))
     plt.tight_layout()
     axfn = plt.gca()
     plt.xlabel("Feature number", fontsize=font,fontweight='bold')
@@ -38,9 +38,9 @@ def comparing_features(data_cl,file_name):
     for tick in axfn.yaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
-
+    plt.clf()
     # comparison of used weights
-    plt.figure("Comparison weights", figsize=(10, 4))
+    plt.figure("Comparison weights", figsize=(24,12))
     plt.tight_layout()
     acw = plt.gca()
     plt.xlabel("Weight number", fontsize=font,fontweight='bold')
@@ -55,11 +55,14 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
 
+    plt.clf()
+    plt.close('all')
+
     # comparison of data and calculations
     #####################################
 
     # X(t)/Y(t)
-    plt.figure("Comparison X(t) and Y(t)", figsize=(10, 4))
+    plt.figure("Comparison X(t) and Y(t)", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom1a = plt.gca()
@@ -90,7 +93,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontweight('bold')
 
     # Path
-    plt.figure("Comparison paths", figsize=(10, 4))
+    plt.figure("Comparison paths", figsize=(24, 12))
     plt.tight_layout()
     axcom2 = plt.gca()
     plt.xlabel("x [m]", fontsize=font,fontweight='bold')
@@ -108,7 +111,7 @@ def comparing_features(data_cl,file_name):
 
     # Vx(t)/Vy(t)
 
-    plt.figure("Comparison velocities", figsize=(10, 4))
+    plt.figure("Comparison velocities", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom3a = plt.gca()
@@ -139,7 +142,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontweight('bold')
 
     # Ax(t)/Ay(t)
-    plt.figure("Comparison accelerations", figsize=(10, 4))
+    plt.figure("Comparison accelerations", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom4a = plt.gca()
@@ -171,7 +174,7 @@ def comparing_features(data_cl,file_name):
 
     # Jx(t)/Jy(t)
 
-    plt.figure("Comparison jerks", figsize=(10, 4))
+    plt.figure("Comparison jerks", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom5a = plt.gca()
@@ -203,7 +206,7 @@ def comparing_features(data_cl,file_name):
 
     # yaw(t)/yaw/s(t)
 
-    plt.figure("Yaw angle", figsize=(10, 4))
+    plt.figure("yaw angle", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom6a = plt.gca()
@@ -234,7 +237,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontweight('bold')
 
     # Inputs
-    plt.figure("throttle", figsize=(10, 4))
+    plt.figure("throttle", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom7a = plt.gca()
@@ -265,7 +268,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontweight('bold')
 
     # Different parts of the longitudinal lateral acceleration
-    plt.figure("Axt", figsize=(10, 4))
+    plt.figure("Axt", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom8a = plt.gca()
@@ -295,8 +298,9 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
 
+
     # Different parts of the local lateral acceleration
-    plt.figure("Ayt", figsize=(10, 4))
+    plt.figure("Ayt", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom9a = plt.gca()
@@ -326,9 +330,10 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
 
+
     # yaw acceleration
 
-    plt.figure("Yaw acceleration", figsize=(10, 4))
+    plt.figure("yaw acceleration", figsize=(24, 12))
     plt.tight_layout()
     axcom10 = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
@@ -344,7 +349,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontweight('bold')
 
     # Inputs_dot
-    plt.figure("throttle_dot", figsize=(10, 4))
+    plt.figure("throttle_dot", figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(1, 2, 1)
     axcom11a = plt.gca()

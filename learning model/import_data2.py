@@ -87,7 +87,7 @@ def import_data2(file,ak):
         print('integrand = plt.squeeze((delta_lane - data_cl[y_cl]) ** 2)')
         print(f5_cal)
 
-    features = plt.array([f0_cal,f1_cal,f2_cal,f3_cal,f4_cal,f5_cal])
+    features = plt.squeeze(plt.array([f0_cal,f1_cal,f2_cal,f3_cal,f4_cal,f5_cal]))
     data_cl['features'] = features
 
     return data_cl

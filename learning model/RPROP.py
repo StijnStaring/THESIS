@@ -13,31 +13,29 @@ def RPROP(grad_curr,case,length,update,w_curr,del_w_prev,index_fixed_value):
 
     # algorithm
     for i in plt.arange(0,length,1):
-        if i == index_fixed_value:
-            w_new[i] = w_curr[i]
-        else:
-            print('feature in RPROP  = ',i)
-            print('\n')
+        # if i == index_fixed_value:
+        #     w_new[i] = w_curr[i]
+        # else:
 
-            if case[i] == 1:
-                update[i] = min(update[i]*n_pos,del_max)
-                del_w[i] = -plt.sign(grad_curr[i])*update[i]
-                w_new[i] = w_curr[i] + del_w[i]
-                exception[i] = 0
-                print('2x pos grad')
+        if case[i] == 1:
+            update[i] = min(update[i]*n_pos,del_max)
+            del_w[i] = -plt.sign(grad_curr[i])*update[i]
+            w_new[i] = w_curr[i] + del_w[i]
+            exception[i] = 0
 
-            elif case[i] == 2:
-                update[i] = max(update[i] * n_neg, del_min)
-                del_w[i] = - del_w_prev[i]
-                w_new[i] = w_curr[i] +del_w[i]
-                exception[i] = 1
-                print('2x neg grad')
 
-            elif case[i] == 3:
-                del_w[i] = -plt.sign(grad_curr[i]) * update[i]
-                w_new[i] = w_curr[i] + del_w[i]
-                exception[i] = 0
-                print('2x grad = 0')
+        elif case[i] == 2:
+            update[i] = max(update[i] * n_neg, del_min)
+            del_w[i] = - del_w_prev[i]
+            w_new[i] = w_curr[i] +del_w[i]
+            exception[i] = 1
+
+
+        elif case[i] == 3:
+            del_w[i] = -plt.sign(grad_curr[i]) * update[i]
+            w_new[i] = w_curr[i] + del_w[i]
+            exception[i] = 0
+
 
     for i in plt.arange(0,len(update),1):
         update_out[i] = update[i] # now is pointing to local defined here

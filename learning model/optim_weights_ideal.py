@@ -398,8 +398,8 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     data_s['psi_dot_s'] = sol.value(psi_dot)
     data_s['throttle_s'] = sol.value(throttle)
     data_s['delta_s'] = sol.value(delta)
-    data_s['throttle_s'] = sol.value(throttle_dot)
-    data_s['delta_s'] = sol.value(delta_dot)
+    data_s['throttle_dot_s'] = sol.value(throttle_dot)
+    data_s['delta_dot_s'] = sol.value(delta_dot)
     data_s['T_s'] = sol.value(T)
     data_s['dt_s'] = data_s['T_s'] / N
     data_s['ax_tot_s'] = ax_tot_sol
@@ -412,7 +412,7 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     data_s['jy_s'] = jy_tot_sol
     data_s['psi_ddot_s'] = psi_ddot_sol
 
-    features = plt.array([sol.value(f0_cal),sol.value(f1_cal),sol.value(f2_cal),sol.value(f3_cal),sol.value(f4_cal),sol.value(f5_cal)])
+    features = plt.squeeze(plt.array([sol.value(f0_cal),sol.value(f1_cal),sol.value(f2_cal),sol.value(f3_cal),sol.value(f4_cal),sol.value(f5_cal)]))
     data_s['features'] = features
     time_vector = plt.linspace(0, T_sol, len(x_sol))
 

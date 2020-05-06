@@ -3,19 +3,19 @@ def figure_style_saving():
     import pylab as plt
     # Save figures and CSV file - still to be implemented (use solutions array for csv file)
     # call figure again and then save it
-    plt.figure("Comparing Normalized Features")
-    fname = "results/norm_features.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w',orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches=None, pad_inches=0.1,metadata=None)
-
-    plt.figure("Comparing Features")
-    fname = "results/features.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
-
-    plt.figure("Comparison Weights")
-    fname = "results/comparison_weights.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    # plt.figure("Comparing Normalized Features")
+    #     # fname = "results/norm_features.png"
+    #     # plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w',orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1,metadata=None)
+    #     #
+    #     # plt.figure("Comparing Features")
+    #     # fname = "results/features.png"
+    #     # plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
+    #     #             transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    #     #
+    #     # plt.figure("Comparison Weights")
+    #     # fname = "results/comparison_weights.png"
+    #     # plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
+    #     #             transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Comparison X(t) and Y(t)")
     fname = "results/x(t)_y(t).png"
@@ -42,13 +42,18 @@ def figure_style_saving():
     plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
-    plt.figure("Comparison Yaw angle")
+    plt.figure("yaw angle")
     fname = "results/psi(t)_psi_dot(t).png"
     plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
-    plt.figure("Comparison throttle")
+    plt.figure("throttle")
     fname = "results/inputs.png"
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
+                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+
+    plt.figure("Axt")
+    fname = "results/ay(t).png"
     plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
@@ -57,8 +62,13 @@ def figure_style_saving():
     plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
-    plt.figure("Yaw acceleration")
+    plt.figure("yaw acceleration")
     fname = "results/psi_ddot(t).png"
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
+                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+
+    plt.figure("throttle_dot")
+    fname = "results/throttle_dot(t).png"
     plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
@@ -79,6 +89,11 @@ def figure_style_saving():
 
     plt.figure("Weights")
     fname = "results/delta_weight.png"
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
+                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+
+    plt.figure("delta theta")
+    fname = "results/diff_theta_prev.png"
     plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
