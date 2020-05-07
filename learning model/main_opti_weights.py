@@ -35,7 +35,7 @@ N = 1000
 tol = 1e-3
 # Comfort cost function: ax**2+t1*ay**2+t2*jx**2+t3*jy**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 theta = plt.array([1.0,1.0,1.0,1.0,1.0,1.0])
-# theta = plt.array([3.9,4.9,0.9,5.9,0.,1.8])
+# theta = plt.array([4.0,5.0,1.0,6.0,1.0,2.0])
 # RPROP variables
 del_0 = 0.1
 exception = plt.zeros([amount_features])
@@ -77,7 +77,7 @@ solutions = []
 converged = 0
 grad_prev = plt.zeros([amount_features])
 
-# while rec <= 1:
+# while rec <= 3:
 while converged != 1 and rec <= 300:
     converged = 0
     dict_sol_list = []
@@ -126,7 +126,9 @@ while converged != 1 and rec <= 300:
     his_del_theta_prev.append(del_theta_prev)
 
     # Check if all features are converged or that the weights are not changing anymore
-    if all(plt.absolute(f_calc_rel - 1) <= tol) or all(update <= 1e-4):
+    f_calc_rel_check = plt.array([f_calc_rel[1],f_calc_rel[3],f_calc_rel[5]])
+    update_check = plt.array([update[1], update[3], update[5]])
+    if all(plt.absolute(f_calc_rel_check - 1) <= tol) or all(update_check <= 1e-4):
         converged = 1
         if all(update <= 1e-4):
             print('No change in theta detected anymore - learning terminated')
