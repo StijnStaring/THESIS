@@ -132,7 +132,9 @@ for m in plt.arange(0,len(file_list_extern),1):
         his_del_theta_prev.append(del_theta_prev)
 
         # Check if all features are converged or that the weights are not changing anymore
-        if all(plt.absolute(f_calc_rel - 1) <= tol) or all(update <= 1e-4):
+        f_calc_rel_check = plt.array([f_calc_rel[1], f_calc_rel[3], f_calc_rel[5]])
+        update_check = plt.array([update[1], update[3], update[5]])
+        if all(plt.absolute(f_calc_rel_check - 1) <= tol) or all(update_check <= 1e-4):
             converged = 1
             if all(update <= 1e-4):
                 print('No change in theta detected anymore - learning terminated')
