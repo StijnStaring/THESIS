@@ -3,15 +3,6 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     Theta_iter is a string
     """
     import pylab as plt
-    # left = 0.125  # the left side of the subplots of the figure
-    # right = 0.9  # the right side of the subplots of the figure
-    # bottom = 0.1  # the bottom of the subplots of the figure
-    # top = 0.9  # the top of the subplots of the figure
-    # wspace = 0.2  # the amount of width reserved for space between subplots,
-    # # expressed as a fraction of the average axis width
-    # hspace = 0.2  # the amount of height reserved for space between subplots,
-    # # expressed as a fraction of the average axis height
-    # plt.subplots_adjust(left=0, bottom=None, right=None, top=None, wspace=0.4, hspace= None)
     plt.rc('axes', linewidth=2)
     plt.rc('legend',fontsize=16) # using a size in points
     # plt.rcParams["legend.loc"] = 'best'
@@ -19,10 +10,6 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     font = 16
 
     # Plot 1: normalized calculated features
-    length = len(his_f_calc_rel)
-    iterations = plt.arange(1, length + 1, 1)
-    iterations = iterations[:, plt.newaxis]
-
     # Plotting convergence of normalized features
     plt.figure("Convergence of features", figsize=(24, 12))
     plt.tight_layout()
@@ -109,8 +96,8 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     for tick in acf6.yaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
-
-    for i in plt.arange(0, length, 1):
+    iterations = plt.arange(1, len(his_f_calc_rel) + 1, 1)
+    for i in plt.arange(0, len(iterations), 1):
         acf1.plot(iterations[i], his_f_calc_rel[i][1][0], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         acf2.plot(iterations[i], his_f_calc_rel[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         acf3.plot(iterations[i], his_f_calc_rel[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
@@ -205,8 +192,8 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     for tick in acgc6.yaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
-
-    for i in plt.arange(0, len(his_grad_current), 1):
+    iterations = plt.arange(1, len(his_grad_current) + 1, 1)
+    for i in plt.arange(0, len(iterations), 1):
         acgc1.plot(iterations[i], his_grad_current[i][1][0], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         acgc2.plot(iterations[i], his_grad_current[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         acgc3.plot(iterations[i], his_grad_current[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
@@ -216,9 +203,6 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # ac7.plot(iterations[i], his_grad_current[i][1][6], 'o', label="iteration " + str(i + 1), linewidth=3.0)
 
     # Weights over iterations
-    length = len(his_weights)
-    iterations = plt.arange(1, length + 1, 1)
-    iterations = iterations[:, plt.newaxis]
     plt.figure("Weights",figsize=(24, 12))
     plt.tight_layout()
     plt.subplot(2, 3, 1)
@@ -306,15 +290,14 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
 
-    iterations_w = plt.arange(1, len(his_weights) + 1, 1)
-    iterations_w = iterations_w[:, plt.newaxis]
+    iterations = plt.arange(1, len(his_weights) + 1, 1)
     for i in plt.arange(0,len(his_weights),1):
-        acw1.plot(iterations_w[i], his_weights[i][1][0], 'o', label= "iteration "+str(i+1), linewidth=3.0)
-        acw2.plot(iterations_w[i], his_weights[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        acw3.plot(iterations_w[i], his_weights[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        acw4.plot(iterations_w[i], his_weights[i][1][3], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        acw5.plot(iterations_w[i], his_weights[i][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
-        acw6.plot(iterations_w[i], his_weights[i][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        acw1.plot(iterations[i], his_weights[i][1][0], 'o', label= "iteration "+str(i+1), linewidth=3.0)
+        acw2.plot(iterations[i], his_weights[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        acw3.plot(iterations[i], his_weights[i][1][2], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        acw4.plot(iterations[i], his_weights[i][1][3], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        acw5.plot(iterations[i], his_weights[i][1][4], 'o', label="iteration " + str(i + 1), linewidth=3.0)
+        acw6.plot(iterations[i], his_weights[i][1][5], 'o', label="iteration " + str(i + 1), linewidth=3.0)
 
 
     # Plotting update of theta
@@ -404,6 +387,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
 
+    iterations = plt.arange(2, len(his_weights)+1 + 1, 1)
     if len(his_weights) != 1:
         for i in plt.arange(1, len(his_weights), 1):
             acu1.plot(iterations[i], his_weights[i][1][0]-his_weights[i-1][1][0], 'o', label="iteration " + str(i + 1), linewidth=3.0)
@@ -515,6 +499,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.grid(True)
     # plt.title('Multi grad of features 7', fontsize=14)
 
+    iterations = plt.arange(1, len(his_multi_grads) + 1 + 1, 1)
     for i in plt.arange(0, len(his_multi_grads), 1):
         acm1.plot(iterations[i], his_multi_grads[i][1][0], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         acm2.plot(iterations[i], his_multi_grads[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
@@ -624,7 +609,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.ylabel("Multi grad feature 7 [-]", fontsize=14)
     # plt.grid(True)
     # plt.title('Multi grad of features 7', fontsize=14)
-
+    iterations = plt.arange(1, len(his_diff_theta) + 1, 1)
     for i in plt.arange(0, len(his_diff_theta), 1):
         acdw1.plot(iterations[i], his_diff_theta[i][1][0], 'o', label="iteration " + str(i + 1), linewidth=3.0)
         acdw2.plot(iterations[i], his_diff_theta[i][1][1], 'o', label="iteration " + str(i + 1), linewidth=3.0)
