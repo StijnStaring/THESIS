@@ -34,8 +34,8 @@ rec = 1
 N = 1000
 tol = 1e-3
 # Comfort cost function: ax**2+t1*ay**2+t2*jx**2+t3*jy**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
-# theta = plt.array([1.0,1.0,1.0,1.0,1.0,1.0])
-theta = plt.array([4.0,5.0,1.0,6.0,1.0,2.0])
+theta = plt.array([1.0,1.0,1.0,1.0,1.0,1.0])
+# theta = plt.array([4.0,5.0,1.0,6.0,1.0,2.0])
 # RPROP variables
 del_0 = 0.1
 exception = plt.zeros([amount_features])
