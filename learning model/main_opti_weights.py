@@ -35,6 +35,7 @@ N = 1000
 tol = 1e-3
 # Comfort cost function: ax**2+t1*ay**2+t2*jx**2+t3*jy**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 theta = plt.array([1.0,1.0,1.0,1.0,1.0,1.0])
+# theta = plt.array([3.9,4.9,0.9,5.9,0.,1.8])
 # RPROP variables
 del_0 = 0.1
 exception = plt.zeros([amount_features])
@@ -52,7 +53,7 @@ axcom6a=0;axcom6b=0;axcom7a=0;axcom7b=0;axcom8a=0;axcom8b=0;axcom9a=0;axcom9b=0;
 theta_tracker = []
 theta_tracker.append(theta)
 his_weights.append([str(rec) + "//", theta[:,plt.newaxis]])
-theta_chosen = plt.array([4,5,1,6,1,2]) # This is the theta used to generate the data
+theta_chosen = plt.array([4.0,5.0,1.0,6.0,1.0,2.0]) # This is the theta used to generate the data
 data_list = []
 file_list = glob.glob("used_data/*.csv")
 for file in file_list:
@@ -76,8 +77,8 @@ solutions = []
 converged = 0
 grad_prev = plt.zeros([amount_features])
 
-while rec <= 1:
-# while converged != 1 and rec <= 300:
+# while rec <= 1:
+while converged != 1 and rec <= 300:
     converged = 0
     dict_sol_list = []
     print('Iteration: ', rec)

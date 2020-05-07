@@ -23,6 +23,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
     plt.clf()
+    plt.close()
     # Define plot to compare not normalized features
     plt.figure("Comparing Features", figsize=(24,12))
     plt.tight_layout()
@@ -39,6 +40,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontsize(fontsize)
         tick.label1.set_fontweight('bold')
     plt.clf()
+    plt.close()
     # comparison of used weights
     plt.figure("Comparison weights", figsize=(24,12))
     plt.tight_layout()
@@ -56,7 +58,7 @@ def comparing_features(data_cl,file_name):
         tick.label1.set_fontweight('bold')
 
     plt.clf()
-    plt.close('all')
+    plt.close()
 
     # comparison of data and calculations
     #####################################
