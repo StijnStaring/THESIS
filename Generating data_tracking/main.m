@@ -1,5 +1,6 @@
 %% Initialization
 % Kijk naar het andere voertuigmodel!!  Gsteer als werkt met Amesim!!
+% Made a mistake with not including 
 clear vars
 close all 
 clc
@@ -31,7 +32,7 @@ addpath(fullfile(getenv('AME'),'scripting','matlab','amesim'));
 ! AMECirChecker -g -q --nobackup --nologfile Dynamics.ame
 ! AMELoad Dynamics.ame
 % Adjusted this state manually
-ameputgpar('Dynamics', 'V0', 80/3.6)
+ameputgpar('Dynamics', 'V0', 80/3.6) % this command only is not working --> have to set manual in amesim block in simulink
 sim_opt = amegetsimopt('Dynamics');
 amerunsingle('Dynamics', sim_opt);
 

@@ -1,2 +1,0 @@
-EVRB is serving as initial guess. theta is chosen an all one vector. 
-Normalization factors is to be found. The acceleration maneuver has a change of 10 m/s.

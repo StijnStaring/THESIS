@@ -272,6 +272,8 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     opti.set_initial(T, time_guess)
     opti.set_initial(ax_total, ax_total_guess)
     opti.set_initial(ay_total, ay_total_guess)
+    if iteration != 1:
+        opti.set_initial(opti.lam_g, data_cl['lam_sol']) # gives the solution of the previous iteration as starting point
 
     ##
     # -----------------------------------------------
@@ -310,6 +312,7 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     print('Relative weights: ', theta)
 
     # Implementation of the solver
+
     # options = dict()
     # options["expand"] = True
     opti.solver('ipopt')
@@ -412,6 +415,8 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     data_s['jy_s'] = jy_tot_sol
     data_s['psi_ddot_s'] = psi_ddot_sol
 
+
+
     features = plt.squeeze(plt.array([sol.value(f0_cal),sol.value(f1_cal),sol.value(f2_cal),sol.value(f3_cal),sol.value(f4_cal),sol.value(f5_cal)]))
     data_s['features'] = features
     time_vector = plt.linspace(0, T_sol, len(x_sol))
@@ -459,6 +464,6 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
         axcom11a.legend()
         axcom11b.legend()
 
-    return data_s, features
+    return data_s, features,sol.value(opti.lam_g)
 
 

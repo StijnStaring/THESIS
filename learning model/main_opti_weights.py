@@ -72,9 +72,7 @@ for i in plt.arange(0,len(file_list),1):
     av_features_data = av_features_data + data_list[i]['features']
 av_features_data = av_features_data/len(file_list)
 
-
 solutions = []
-
 converged = 0
 grad_prev = plt.zeros([amount_features])
 
@@ -83,13 +81,15 @@ while rec <= 1:
     converged = 0
     dict_sol_list = []
     print('Iteration: ', rec)
-    print('This is the difference of theta: ', theta_chosen - theta)
-    his_diff_theta.append([str(rec) + "//", theta_chosen - theta])
+    diff_theta = theta_chosen - theta
+    print('This is the difference of theta: ', diff_theta[:,plt.newaxis])
+    his_diff_theta.append([str(rec) + "//", diff_theta[:,plt.newaxis]])
 
     for k in range(len(file_list)):
         file = file_list[k]
         curr_data = data_list[k]
-        [data_s, f_calc] = optim_weights_ideal(theta,curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a, axcom8b, axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file)
+        [data_s, f_calc,lambda_sol] = optim_weights_ideal(theta,curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a, axcom8b, axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file)
+        data_list[k]['lam_sol'] = lambda_sol
         dict_sol_list.append(data_s)
 
     # Calculating averaged calculated solution
@@ -196,9 +196,9 @@ if len(his_weights) != 1: # takes current iterate minus the previous one
         print(diff[:,plt.newaxis])
 
 # Plotting end solution in comparinson
-for i in plt.arange(0,len(file_list),1):
-    file = file_list[i]
-    data_s = solutions[-1][i]
+for k in plt.arange(0,len(file_list),1):
+    file = file_list[k]
+    data_s = solutions[-1][k]
     x_sol = data_s['x_s']
     y_sol = data_s['y_s']
     vx_sol = data_s['vx_s']
@@ -271,14 +271,11 @@ for i in plt.arange(0,len(file_list),1):
     path = "results\Av_It" + str(rec) + "D" + str(len(file_list)) +"F"+file[15:-4]+ ".csv"
     file = open(path, 'w', newline="")
     writer = csv.writer(file)
-    writer.writerow(
-        ["time", "x", "y", "vx", "vy", "ax", "ay", "jx", "jy", "psi", "psi_dot", "psi_ddot", "throttle", "delta",
-         "throttle_dot", "delta_dot", "aty", "a_ny", "atx", "anx"])
+    writer.writerow(["time", "x", "y", "vx", "vy", "ax", "ay", "jx", "jy", "psi", "psi_dot", "psi_ddot", "throttle", "delta","throttle_dot", "delta_dot", "aty", "a_ny", "atx", "anx"])
 
     for i in range(N + 1):
         if i == N:  # last control point has no physical meaning
-            writer.writerow(
-                [i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i],jy_tot_sol[i], psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i],throttle_dot_sol[i - 1], delta_dot_sol[i - 1], aty_sol[i], any_sol[i], atx_sol[i], anx_sol[i]])
+            writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i],jy_tot_sol[i], psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i],throttle_dot_sol[i - 1], delta_dot_sol[i - 1], aty_sol[i], any_sol[i], atx_sol[i], anx_sol[i]])
         else:
             writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i],jy_tot_sol[i], psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i],throttle_dot_sol[i], delta_dot_sol[i], aty_sol[i], any_sol[i], atx_sol[i], anx_sol[i]])
     file.close()
