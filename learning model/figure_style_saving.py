@@ -19,93 +19,72 @@ def figure_style_saving():
 
     plt.figure("Comparison X(t) and Y(t)")
     fname = "results/x(t)_y(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Comparison paths")
     fname = "results/path.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Comparison velocities")
     fname = "results/vx(t)_vy(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Comparison accelerations")
     fname = "results/ax(t)_ay(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Comparison jerks")
     fname = "results/jX(t)_jY(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("yaw angle")
     fname = "results/psi(t)_psi_dot(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("throttle")
     fname = "results/inputs.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Axt")
     fname = "results/ay(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Ayt")
     fname = "results/ay(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("yaw acceleration")
     fname = "results/psi_ddot(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("throttle_dot")
     fname = "results/throttle_dot(t).png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Convergence of features")
     fname = "results/fdiff_rel.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("History of current gradient")
     fname = "results/fdiff_abs.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Weights")
     fname = "results/weights.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
-    plt.figure("Weights")
-    fname = "results/delta_weight.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("delta theta")
     fname = "results/diff_theta_prev.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Multiplication history of the gradients")
     fname = "results/RPROP_case.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("History of diff theta")
     fname = "results/diff_chosen_weights.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     # plt.rc('axes', linewidth=2)
     # plt.rc('legend',fontsize=12) # using a size in points
