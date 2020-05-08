@@ -1,80 +1,28 @@
 import pylab as plt
+fontsize = 14
 
-
-def accuracy(data, amount_features):
-    ref = plt.ones([amount_features, 1])
-    sum5 = plt.zeros([amount_features, 1])
-    for k in plt.arange(0, len(data[1]), 1):
-        sum5 = sum5 + plt.absolute(ref - data[1][k])
+def accuracy(data,amount_features):
+    sum5 = plt.zeros([amount_features])
+    ref = plt.ones([amount_features])
+    for k in plt.arange(len(data)):
+        sum5 = sum5 + plt.absolute(ref - plt.squeeze(data[k]))
     sum5 = sum5 * 100
+    return sum5 / len(data)
 
-    return sum5 / len(data[1])
+data_1 = [plt.array([[0.98812153],
+       [0.99849737],
+       [0.99935298],
+       [0.99891749],
+       [0.99172111],
+       [1.00038716]]), plt.array([0.99762178, 0.99935854, 1.01619369, 1.00042546, 0.98773897 ,1.00009021])]
 
+data_2 = [[0.99392706 ,1.00026585, 0.99113348, 1.00156341, 1.00087249, 0.9998164 ] , [0.99130714 ,0.99930115 ,0.98681464 ,0.99992436, 0.99854521 ,1.00014452], [1.00032749 ,1.00015496 ,1.00320535, 1.00143575 ,0.99408281 ,0.99984878]]
+data_3 = [[0.99997562 ,1.00023764 ,0.98602149 ,1.00118025 ,0.99722565 ,0.99985419],[0.99727138 ,0.99924905, 0.98160448, 0.99949518 ,0.99483734, 1.00019095],[1.00635125 ,1.00012406 ,0.99829497, 1.00104949, 0.99022146, 0.99988737]]
 
-# data_5 = ['14//', [plt.array([[0.9963245 ],
-#    [1.00779448],
-#    [1.03313514],
-#    [0.98553052],
-#    [0.99785629]]), plt.array([[0.99275782],
-#    [1.02545127],
-#    [1.05708292],
-#    [0.96348837],
-#    [0.99477323]]), plt.array([[0.99951578],
-#    [0.99409866],
-#    [1.01380527],
-#    [0.99797314],
-#    [1.00138409]]), plt.array([[0.99312771],
-#    [1.02172643],
-#    [1.05593979],
-#    [0.96978943],
-#    [0.9953709 ]]), plt.array([[1.00301675],
-#    [0.98033718],
-#    [0.99297743],
-#    [1.01017053],
-#    [1.0053102 ]])]]
-#
-# data_3 = ['17//', [plt.array([[0.99889349],
-#        [0.99992747],
-#        [1.01140094],
-#        [0.99539895],
-#        [1.00052086]]), plt.array([[1.00268378],
-#        [0.98423694],
-#        [0.98948475],
-#        [1.00947011],
-#        [1.00485724]]), plt.array([[0.99456194],
-#        [1.01872307],
-#        [1.04055215],
-#        [0.9758468 ],
-#        [0.99630615]])]]
+acc_1 = accuracy(data_1, 6)
+acc_2 = accuracy(data_2, 6)
+acc_3 = accuracy(data_3, 6)
 
-data_1 = ['17//', [plt.array([[0.99372266],
-                              [1.0364602],
-                              [1.05047609],
-                              [0.96796123],
-                              [0.99053099]])]]
-
-data_2 = ['17//', [plt.array([[1.01466279],
-                              [0.94177966],
-                              [0.91670696],
-                              [1.05395378],
-                              [1.01738989]])]]
-
-acc_1 = accuracy(data_1, 5)
-acc_2 = accuracy(data_2, 5)
-
-# # Accuracy figure
-# plt.figure("Average error between f_calculated and f_data")
-# acc = plt.gca()
-# plt.xlabel("feature [-]",fontsize=14)
-# plt.ylabel("error [%]",fontsize=14)
-# plt.title("Average error between f_calculated and f_data",fontsize=14)
-# plt.grid(True)
-#
-# features = [0,1,2,3,4]
-# acc.plot(features, acc_5, '-',marker = '*',linewidth=3.0)
-# acc.plot(features, acc_3, '-', marker = 'o', linewidth=3.0)
-# plt.legend(['5 datasets','3 datasets'])
-# plt.show()
 
 # Accuracy figure
 plt.figure("Average error between f_calculated and f_data")
@@ -84,10 +32,21 @@ plt.ylabel("error [%]", fontsize=14)
 plt.title("Average error between f_calculated and f_data", fontsize=14)
 plt.grid(True)
 
-features = [0, 1, 2, 3, 4]
+
+features = [0, 1, 2, 3, 4, 5]
 acc.plot(features, acc_1, '-', marker='*', linewidth=3.0)
 acc.plot(features, acc_2, '-', marker='o', linewidth=3.0)
-plt.legend(['Initial guess V22.22_L6.94', 'Initial guess V25.0_L3.47'])
+acc.plot(features, acc_3, '-', marker='s', linewidth=3.0)
+plt.legend(['Sequential method', 'Conflict method', 'Average method'])
+
+
+for tick in acc.xaxis.get_major_ticks():
+    tick.label1.set_fontsize(fontsize)
+    tick.label1.set_fontweight('bold')
+for tick in acc.yaxis.get_major_ticks():
+    tick.label1.set_fontsize(fontsize)
+    tick.label1.set_fontweight('bold')
+
 plt.show()
 
 
