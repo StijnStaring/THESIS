@@ -1,4 +1,4 @@
-def figure_style_saving():
+def figure_style_saving(file_list):
 
     import pylab as plt
     # Save figures and CSV file - still to be implemented (use solutions array for csv file)
@@ -72,23 +72,19 @@ def figure_style_saving():
     plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
-    plt.figure("Convergence of features")
-    fname = "results/fdiff_rel.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+    for file in file_list:
+        plt.figure("Convergence of features "+ file[15:-4])
+        fname = "results/fdiff_rel "+ file[15:-4]+".png"
+        plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
+                    transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
-    plt.figure("History of current gradient")
-    fname = "results/fdiff_abs.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
+        plt.figure("History of current gradient " + file[15:-4])
+        fname = "results/fdiff_abs " + file[15:-4]+".png"
+        plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
+                    transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 
     plt.figure("Weights")
     fname = "results/weights.png"
-    plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
-                transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
-
-    plt.figure("Weights")
-    fname = "results/delta_weight.png"
     plt.savefig(fname, dpi=None, facecolor='w', edgecolor='w', orientation='portrait', papertype=None, format=None,
                 transparent=False, bbox_inches='tight', pad_inches=0.1, metadata=None)
 

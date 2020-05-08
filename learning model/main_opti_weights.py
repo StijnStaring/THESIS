@@ -30,6 +30,7 @@ his_update = []
 his_del_theta_prev = []
 his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 6
+conflict_flags = plt.zeros(amount_features)
 rec = 1
 N = 1000
 tol = 1e-3
@@ -68,14 +69,17 @@ for file in file_list:
     # acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4], theta[5]], '-', marker='*', markersize=6)
 
 # Calculate the averaged
-av_features_data = plt.zeros(amount_features)
-for i in plt.arange(0,len(file_list),1):
-    av_features_data = av_features_data + data_list[i]['features']
-av_features_data = av_features_data/len(file_list)
+# av_features_data = plt.zeros(amount_features)
+# for i in plt.arange(0,len(file_list),1):
+#     av_features_data = av_features_data + data_list[i]['features']
+# av_features_data = av_features_data/len(file_list)
 
 solutions = []
 converged = 0
-grad_prev = plt.zeros([amount_features])
+grad_prev_list = []
+grad_prev_it = plt.zeros([amount_features,1])
+for z in range(len(file_list)):
+    grad_prev_list.append(grad_prev_it)
 
 # while rec <= 3:
 while converged != 1 and rec <= 300:
@@ -85,6 +89,8 @@ while converged != 1 and rec <= 300:
     diff_theta = theta_chosen - theta
     print('This is the difference of theta: ', diff_theta[:,plt.newaxis])
     his_diff_theta.append([str(rec) + "//", diff_theta[:,plt.newaxis]])
+    grad_curr_list = []
+    f_calc_rel = []
 
     for k in range(len(file_list)):
         file = file_list[k]
@@ -92,30 +98,20 @@ while converged != 1 and rec <= 300:
         [data_s, f_calc,lambda_sol] = optim_weights_ideal(theta,curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a, axcom8b, axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file)
         data_list[k]['lam_sol'] = lambda_sol
         dict_sol_list.append(data_s)
+        grad_curr_list.append((curr_data['features'] - data_s['features'])[:,plt.newaxis])
+        print("grad of " + file + "is: ", curr_data['features'] - data_s['features'])
+        print("This is summed grad current of file " + file + ":", plt.sum(curr_data['features'] - data_s['features']))
+        f_calc_rel.append((f_calc / curr_data["features"])[:,plt.newaxis])
 
-    # Calculating averaged calculated solution
-    av_features_calc = plt.zeros(amount_features)
-    for i in plt.arange(0, len(file_list), 1):
-        av_features_calc = av_features_calc + dict_sol_list[i]['features']
-    av_features_calc = av_features_calc / len(file_list)
-    print('av_features_data: ',av_features_data)
-    print('av_features_calc: ', av_features_calc)
-
-    # Normalization for plots
-    f_calc_rel = av_features_calc/av_features_data
-    grad_curr = av_features_data - av_features_calc
-
-    print('This is summed grad current: ', plt.sum(plt.absolute(grad_curr)))
-    print('\n')
-    axf.plot([f_calc_rel[0], f_calc_rel[1], f_calc_rel[2], f_calc_rel[3], f_calc_rel[4], f_calc_rel[5]], '-', marker='o', markersize=6)
-    axfn.plot([av_features_calc[0], av_features_calc[1], av_features_calc[2], av_features_calc[3], av_features_calc[4],av_features_calc[4]], '-', marker='o', markersize=6)
+    # axf.plot([f_calc_rel[0], f_calc_rel[1], f_calc_rel[2], f_calc_rel[3], f_calc_rel[4], f_calc_rel[5]], '-', marker='o', markersize=6)
+    # axfn.plot([av_features_calc[0], av_features_calc[1], av_features_calc[2], av_features_calc[3], av_features_calc[4],av_features_calc[4]], '-', marker='o', markersize=6)
 
     print("----------------------------------------------")
     print('This is f_calc_rel: ')
     print(str(rec) + "// ", f_calc_rel)
 
-    his_f_calc_rel.append([str(rec) + "//", f_calc_rel[:,plt.newaxis]])
-    his_grad_current.append([str(rec) + "//", grad_curr[:,plt.newaxis]])
+    his_f_calc_rel.append([str(rec) + "//", f_calc_rel])
+    his_grad_current.append([str(rec) + "//", grad_curr_list])
 
     # Problem was: exception is specified as an specific global array (not for integers) and added each time to a list. When this global variable itself is updated --> changes all values in list because all point to the same global variable.
     # Can be solved by recalling the variable in the loop so that it now points to a local definition. (Again called in RPROP) Global var exception is updated by an array (local var) exception = plt.array([])..., no relation with previous value added to his_exception. Create a new point.
@@ -126,8 +122,11 @@ while converged != 1 and rec <= 300:
     his_del_theta_prev.append(del_theta_prev)
 
     # Check if all features are converged or that the weights are not changing anymore
-    f_calc_rel_check = plt.array([f_calc_rel[1],f_calc_rel[3],f_calc_rel[5]])
+    f_calc_rel_check = plt.zeros(len(file_list)*3)
     update_check = plt.array([update[1], update[3], update[5]])
+    for m in plt.arange(0,len(file_list),1):
+        f_calc_rel_check[0+m*3:3+m*3] = plt.array([f_calc_rel[m][1,0],f_calc_rel[m][3,0],f_calc_rel[m][5,0]])
+
     if all(plt.absolute(f_calc_rel_check - 1) <= tol) or all(update_check <= 1e-4):
         converged = 1
         if all(update <= 1e-4):
@@ -136,22 +135,47 @@ while converged != 1 and rec <= 300:
 
     # Check what direction to go in optimization
     case = plt.ones(amount_features)
-    for j in plt.arange(0,amount_features):
+    for j in plt.arange(0, amount_features):
         print('*********')
-        if exception[j] == 1 or grad_curr[j] * grad_prev[j] == 0:
+        if exception[j] == 1 or grad_curr_list[0][j,0] * grad_prev_list[0][j,0] == 0:
             case[j] = 3
-            print("case["+str(j)+")] is: ",case[j])
-        elif grad_curr[j]*grad_prev[j]<0:
+            print("case[" + str(j) + ")] is: ", case[j])
+        elif grad_curr_list[0][j,0] * grad_prev_list[0][j,0] < 0:
             case[j] = 2
-            print("case["+str(j)+")] is: ", case[j])
+            print("case[" + str(j) + ")] is: ", case[j])
         else:
-            print("case["+str(j)+")] is: ", case[j])
+            print("case[" + str(j) + ")] is: ", case[j])
 
-    his_multi_grads.append([str(rec) + "//", case[:,plt.newaxis]])
+    his_multi_grads.append([str(rec) + "//", case[:, plt.newaxis]])
+
+    for j in plt.arange(0, amount_features):
+            flag = 1
+            for i in plt.arange(1, len(file_list), 1):
+                if grad_curr_list[0][j,0] * grad_curr_list[i][j,0] < 0 and flag == 1:
+                    conflict_flags[j] = 1
+                    flag = 0
+                    print("")
+                    print('-----------------------------------')
+                    print('Direction conflict: F' + str(j))
+                    print('-----------------------------------')
+                elif grad_curr_list[0][j,0] * grad_curr_list[i][j,0] > 0 and flag == 1:
+                    conflict_flags[j] = 0  # conflict is resolved
+
+
+    # Check if can still improve something?
+    if any(conflict_flags == 0):
+        print('Still improvement possible in a certain direction for all datasets')
+        for j in plt.arange(0,len(conflict_flags),1):
+            if conflict_flags[j] == 0:
+                print("Improvement possible in feature: ", j)
+    else:
+        print('Cannot improve solution further')
+        converged = 1
+
 
     if converged != 1:
-        [del_theta_prev, exception, theta, update] = RPROP(grad_curr,case,amount_features,update,theta,del_theta_prev,1)
-        grad_prev = grad_curr
+        [del_theta_prev, exception, theta, update] = RPROP(grad_curr_list[0],case,amount_features,update,theta,del_theta_prev,conflict_flags,1)
+        grad_prev_list = grad_curr_list
         rec = rec + 1
         his_weights.append([str(rec) + "//", theta[:,plt.newaxis]])
         acw.plot([theta[0], theta[1], theta[2], theta[3], theta[4],theta[5]], '-', marker='o', markersize=6)
@@ -293,12 +317,12 @@ for i in plt.arange(0,len(file_list),1):
     print("")
 
 print('This is the theta_tracker: ',theta_tracker)
-post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
+post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta,file_list)
 
 #########################################
 # Saving figures
 #########################################
-figure_style_saving()
+figure_style_saving(file_list)
 
 #####################
 plt.show()

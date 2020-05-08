@@ -1,4 +1,4 @@
-def RPROP(grad_curr,case,length,update,w_curr,del_w_prev,index_fixed_value):
+def RPROP(grad_curr,case,length,update,w_curr,del_w_prev,conflict_flags,index_fixed_value):
     import pylab as plt
 
     # definition of parameters:
@@ -13,28 +13,30 @@ def RPROP(grad_curr,case,length,update,w_curr,del_w_prev,index_fixed_value):
 
     # algorithm
     for i in plt.arange(0,length,1):
-        # if i == index_fixed_value:
-        #     w_new[i] = w_curr[i]
-        # else:
+        if conflict_flags[i] == 1:
+            del_w[i] = 0
+            w_new[i] = w_curr[i]
+            exception[i] = 1  # Stands for in conflict - after is solved --> go to case 3
 
-        if case[i] == 1:
-            update[i] = min(update[i]*n_pos,del_max)
-            del_w[i] = -plt.sign(grad_curr[i])*update[i]
-            w_new[i] = w_curr[i] + del_w[i]
-            exception[i] = 0
-
-
-        elif case[i] == 2:
-            update[i] = max(update[i] * n_neg, del_min)
-            del_w[i] = - del_w_prev[i]
-            w_new[i] = w_curr[i] +del_w[i]
-            exception[i] = 1
+        else:
+            if case[i] == 1:
+                update[i] = min(update[i]*n_pos,del_max)
+                del_w[i] = -plt.sign(grad_curr[i])*update[i]
+                w_new[i] = w_curr[i] + del_w[i]
+                exception[i] = 0
 
 
-        elif case[i] == 3:
-            del_w[i] = -plt.sign(grad_curr[i]) * update[i]
-            w_new[i] = w_curr[i] + del_w[i]
-            exception[i] = 0
+            elif case[i] == 2:
+                update[i] = max(update[i] * n_neg, del_min)
+                del_w[i] = - del_w_prev[i]
+                w_new[i] = w_curr[i] +del_w[i]
+                exception[i] = 1
+
+
+            elif case[i] == 3:
+                del_w[i] = -plt.sign(grad_curr[i]) * update[i]
+                w_new[i] = w_curr[i] + del_w[i]
+                exception[i] = 0
 
 
     for i in plt.arange(0,len(update),1):
