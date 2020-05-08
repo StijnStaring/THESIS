@@ -30,6 +30,7 @@ his_update = []
 his_del_theta_prev = []
 his_f_calc_rel = [] # procentual difference between the calculated features
 amount_features = 6
+lambda_sol = 0
 rec = 1
 N = 1000
 tol = 1e-3
@@ -54,10 +55,12 @@ theta_tracker = []
 theta_tracker.append(theta)
 his_weights.append([str(rec) + "//", theta[:,plt.newaxis]])
 theta_chosen = plt.array([4.0,5.0,1.0,6.0,1.0,2.0]) # This is the theta used to generate the data
-data_list = []
+
 file_list_extern = glob.glob("used_data/*.csv")
 for m in plt.arange(0,len(file_list_extern),1):
+    plot_init = 1
     file_list = []
+    data_list = []
     file_list.append(file_list_extern[m])
 
     for file in file_list:
@@ -95,9 +98,9 @@ for m in plt.arange(0,len(file_list_extern),1):
         for k in range(len(file_list)):
             file = file_list[k]
             curr_data = data_list[k]
-            [data_s, f_calc,lambda_sol] = optim_weights_ideal(theta,curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a, axcom8b, axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file)
-            data_list[k]['lam_sol'] = lambda_sol
+            [data_s, f_calc,lambda_sol] = optim_weights_ideal(plot_init,lambda_sol, theta,curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a, axcom8b, axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file)
             dict_sol_list.append(data_s)
+            plot_init = 0
 
         # Calculating averaged calculated solution
         av_features_calc = plt.zeros(amount_features)

@@ -2,7 +2,7 @@ import pylab as plt
 from define_plots import define_plots
 from casadi import *
 
-def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file):
+def optim_weights_ideal(plot_init,lambda_sol,theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file):
 
     theta = plt.squeeze(theta)
     width_road = data_cl['width']
@@ -273,7 +273,7 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     opti.set_initial(ax_total, ax_total_guess)
     opti.set_initial(ay_total, ay_total_guess)
     if iteration != 1:
-        opti.set_initial(opti.lam_g, data_cl['lam_sol']) # gives the solution of the previous iteration as starting point
+        opti.set_initial(opti.lam_g, lambda_sol) # gives the solution of the previous iteration as starting point
 
     ##
     # -----------------------------------------------
@@ -421,7 +421,7 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     data_s['features'] = features
     time_vector = plt.linspace(0, T_sol, len(x_sol))
 
-    if iteration == 1:
+    if plot_init == 1:
         axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0,label="init "+file[15:-4])
         axcom1b.plot(time_vector, y_sol, '.-',  linewidth=3.0,label="init "+file[15:-4])
         axcom2.plot(x_sol, y_sol, '.-',  linewidth=3.0,label="initial solution"+file[15:-4])
