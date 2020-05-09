@@ -9,22 +9,22 @@ def accuracy(data,amount_features):
     sum5 = sum5 * 100
     return sum5 / len(data)
 
-data_1 = [plt.array([[0.98812153],
-       [0.99849737],
-       [0.99935298],
-       [0.99891749],
-       [0.99172111],
-       [1.00038716]]), plt.array([0.99762178, 0.99935854, 1.01619369, 1.00042546, 0.98773897 ,1.00009021])]
+def weight_error(weight,chosen_weight):
+    diff = plt.absolute(weight - chosen_weight)
+    result = 100 * diff/chosen_weight
+    return result
 
-data_2 = [[0.99392706 ,1.00026585, 0.99113348, 1.00156341, 1.00087249, 0.9998164 ] , [0.99130714 ,0.99930115 ,0.98681464 ,0.99992436, 0.99854521 ,1.00014452], [1.00032749 ,1.00015496 ,1.00320535, 1.00143575 ,0.99408281 ,0.99984878]]
-data_3 = [[0.99997562 ,1.00023764 ,0.98602149 ,1.00118025 ,0.99722565 ,0.99985419],[0.99727138 ,0.99924905, 0.98160448, 0.99949518 ,0.99483734, 1.00019095],[1.00635125 ,1.00012406 ,0.99829497, 1.00104949, 0.99022146, 0.99988737]]
+data_1 = []
+weight_1 = plt.array([1,1,1])
+chosen_weight = plt.array([2,2,3])
+print(weight_error(weight_1,chosen_weight))
+data_2 = []
+weight_2 = plt.array([1,1,1])
 
-acc_1 = accuracy(data_1, 6)
-acc_2 = accuracy(data_2, 6)
-acc_3 = accuracy(data_3, 6)
+acc_1 = accuracy(data_1, 3)
+acc_2 = accuracy(data_2, 3)
 
-
-# Accuracy figure
+# Accuracy figure - f_calc
 plt.figure("Average error between f_calculated and f_data")
 acc = plt.gca()
 plt.xlabel("feature [-]", fontsize=14)
@@ -33,11 +33,11 @@ plt.title("Average error between f_calculated and f_data", fontsize=14)
 plt.grid(True)
 
 
-features = [0, 1, 2, 3, 4, 5]
+features = [1, 3, 5]
 acc.plot(features, acc_1, '-', marker='*', linewidth=3.0)
 acc.plot(features, acc_2, '-', marker='o', linewidth=3.0)
-acc.plot(features, acc_3, '-', marker='s', linewidth=3.0)
-plt.legend(['Sequential method', 'Conflict method', 'Average method'])
+
+plt.legend(['Conflict method', 'Average method'])
 
 
 for tick in acc.xaxis.get_major_ticks():
@@ -46,6 +46,33 @@ for tick in acc.xaxis.get_major_ticks():
 for tick in acc.yaxis.get_major_ticks():
     tick.label1.set_fontsize(fontsize)
     tick.label1.set_fontweight('bold')
+
+
+
+# Accuracy figure - learned weights
+plt.figure("Relative error of learned weights")
+awe = plt.gca()
+plt.xlabel("weight", fontsize=14)
+plt.ylabel("error [%]", fontsize=14)
+plt.title("Relative error of learned weights", fontsize=14)
+plt.grid(True)
+
+
+features = [1, 3, 5]
+awe.plot(features, we_1, '-', marker='*', linewidth=3.0)
+awe.plot(features, we_2, '-', marker='o', linewidth=3.0)
+
+plt.legend(['Conflict method', 'Average method'])
+
+
+for tick in awe.xaxis.get_major_ticks():
+    tick.label1.set_fontsize(fontsize)
+    tick.label1.set_fontweight('bold')
+for tick in awe.yaxis.get_major_ticks():
+    tick.label1.set_fontsize(fontsize)
+    tick.label1.set_fontweight('bold')
+
+
 
 plt.show()
 
