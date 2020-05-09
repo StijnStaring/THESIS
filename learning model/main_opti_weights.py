@@ -112,7 +112,8 @@ for m in plt.arange(0,len(file_list_extern),1):
 
         # Normalization for plots
         f_calc_rel = av_features_calc/av_features_data
-        grad_curr = av_features_data - av_features_calc
+        grad_curr = plt.ones(amount_features) - f_calc_rel  # now is the normalized version
+        # grad_curr = av_features_data - av_features_calc
 
         print('This is summed grad current: ', plt.sum(plt.absolute(grad_curr)))
         print('\n')
