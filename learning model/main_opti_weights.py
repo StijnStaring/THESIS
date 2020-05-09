@@ -98,7 +98,8 @@ while converged != 1 and rec <= 300:
         [data_s, f_calc,lambda_sol] = optim_weights_ideal(theta,curr_data,rec,N,plotting_calc,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a, axcom8b, axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file)
         data_list[k]['lam_sol'] = lambda_sol
         dict_sol_list.append(data_s)
-        grad_curr_list.append((curr_data['features'] - data_s['features'])[:,plt.newaxis])
+        # grad_curr_list.append((curr_data['features'] - data_s['features'])[:,plt.newaxis])
+        grad_curr_list.append((plt.ones([amount_features]) - f_calc / curr_data["features"])[:, plt.newaxis])
         print("grad of " + file + "is: ", curr_data['features'] - data_s['features'])
         print("This is summed grad current of file " + file + ":", plt.sum(curr_data['features'] - data_s['features']))
         f_calc_rel.append((f_calc / curr_data["features"])[:,plt.newaxis])
