@@ -8,7 +8,7 @@ import casadi.*
 global x_sol_prev lam_prev tracking_lane_change iteration dt N data N_sim Ts_MP
 
 files = {'DATA2_V22.22_L3.47.csv'};
-N = 580; % Control horizon of one optimization of the MPC.
+N = 100; % Control horizon of one optimization of the MPC.
 sampling_rate = 100;
 dt = 1/sampling_rate;
 Tf = 10.0; % if want same length as reference lane change set Tf = 0
