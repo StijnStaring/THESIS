@@ -1,4 +1,4 @@
-function data = get_data(file,sampling_rate,N,Tf)
+function data = get_data(file)
     % This function is for defining the data parameters in a structure
     % 'data'. 
     % Read data
@@ -18,100 +18,36 @@ function data = get_data(file,sampling_rate,N,Tf)
     psi_dot_d = read(:,11);
     psi_ddot_d = read(:,12);
     throttle_d = read(:,13);
-    delta_d = read(:,14);
-    aty_d = read(:,15);
-    any_d = read(:,16);  
+    delta_d = 16.96*read(:,14);
+    throttle_dot_d = read(:,15);
+    delta_dot_d = 16.96*read(:,16);
+    aty_d = read(:,17);
+    any_d = read(:,18);
+    atx_d = read(:,19);
+    anx_d = read(:,20);
     
-    % adjusting sampling rate --> amount of samples per second
+    data.time = time_d;
+    data.x = x_d;
+    data.y = y_d;
+    data.vx = vx_d;
+    data.vy = vy_d;
+    data.ax = ax_d;
+    data.ay = ay_d;
+    data.jx = jx_d;
+    data.jy = jy_d;
+    data.psi = psi_d;
+    data.psi_dot = psi_dot_d;
+    data.psi_ddot = psi_ddot_d;
+    data.throttle = throttle_d;
+    data.delta = delta_d;
+    data.throttle_dot = throttle_dot_d;
+    data.delta_dot = delta_dot_d;
+    data.aty = aty_d;
+    data.any = any_d;
+    data.atx = atx_d;
+    data.anx = anx_d;
     
-    [x,time] = resample(x_d,time_d,sampling_rate,1,1);
-    [y,~] = resample(y_d,time_d,sampling_rate,1,1);
-    [vx,~] = resample(vx_d,time_d,sampling_rate,1,1);
-    [vy,~] = resample(vy_d,time_d,sampling_rate,1,1);
-    [ax,~] = resample(ax_d,time_d,sampling_rate,1,1);
-    [ay,~] = resample(ay_d,time_d,sampling_rate,1,1);
-    [jx,~] = resample(jx_d,time_d,sampling_rate,1,1);
-    [jy,~] = resample(jy_d,time_d,sampling_rate,1,1);
-    [psi,~] = resample(psi_d,time_d,sampling_rate,1,1);
-    [psi_dot,~] = resample(psi_dot_d,time_d,sampling_rate,1,1);
-    [psi_ddot,~] = resample(psi_ddot_d,time_d,sampling_rate,1,1);
-    [throttle,~] = resample(throttle_d,time_d,sampling_rate,1,1);
-    [delta,~] = resample(delta_d,time_d,sampling_rate,1,1);
-    [aty,~] = resample(aty_d,time_d,sampling_rate,1,1);
-    [any,~] = resample(any_d,time_d,sampling_rate,1,1);
-    
-    d_t = 1/sampling_rate;
-    if time(end) < Tf
-        N_extra = (Tf - time(end))/d_t;
-    else
-        N_extra = 0;
-    end
-    
-    data.time = zeros(length(time)+N+N_extra-1,1);
-    data.time(1:length(time),1) = time;
-    data.time(length(time)+1:end,1) = time(end)+1/sampling_rate:1/sampling_rate:time(end)+(N+N_extra-1)*1/sampling_rate;
-    
-    data.x = zeros(length(time)+N+N_extra-1,1);
-    data.x(1:length(time),1) = x;
-    x_dot = cos(psi(end))*vx(end)-sin(psi(end))*vy(end);
-    data.x(length(time)+1:end,1) = x(end)+x_dot*(1/sampling_rate:1/sampling_rate:(N+N_extra-1)*1/sampling_rate);
-       
-    data.y = zeros(length(time)+N+N_extra-1,1);
-    data.y(1:length(time),1) = y;
-    data.y(length(time)+1:end,1) = y(end)*ones(N+N_extra-1,1);
-    
-    data.vx = zeros(length(time)+N+N_extra-1,1);
-    data.vx(1:length(time),1) = vx;
-    data.vx(length(time)+1:end,1) = vx(end)*ones(N+N_extra-1,1);
-    
-    data.vy = zeros(length(time)+N+N_extra-1,1);
-    data.vy(1:length(time),1) = vy;
-    data.vy(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.ax = zeros(length(time)+N+N_extra-1,1);
-    data.ax(1:length(time),1) = ax;
-    data.ax(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.ay = zeros(length(time)+N+N_extra-1,1);
-    data.ay(1:length(time),1) = ay;
-    data.ay(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.jx = zeros(length(time)+N+N_extra-1,1);
-    data.jx(1:length(time),1) = jx;
-    data.jx(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.jy = zeros(length(time)+N+N_extra-1,1);
-    data.jy(1:length(time),1) = jy;
-    data.jy(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.psi = zeros(length(time)+N+N_extra-1,1);
-    data.psi(1:length(time),1) = psi;
-    data.psi(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.psi_dot = zeros(length(time)+N+N_extra-1,1);
-    data.psi_dot(1:length(time),1) = psi_dot;
-    data.psi_dot(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.psi_ddot = zeros(length(time)+N+N_extra-1,1);
-    data.psi_ddot(1:length(time),1) = psi_ddot;
-    data.psi_ddot(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.throttle = zeros(length(time)+N+N_extra-1,1);
-    data.throttle(1:length(time),1) = throttle;
-    data.throttle(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.delta = zeros(length(time)+N+N_extra-1,1);
-    data.delta(1:length(time),1) = delta;
-    data.delta(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.aty = zeros(length(time)+N+N_extra-1,1);
-    data.aty(1:length(time),1) = aty;
-    data.aty(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
-    data.any = zeros(length(time)+N+N_extra-1,1);
-    data.any(1:length(time),1) = any;
-    data.any(length(time)+1:end,1) = zeros(N+N_extra-1,1);
-    
+ 
     % plotting
     %Postion vs time
     figure('name', 'pos')

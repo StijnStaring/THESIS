@@ -41,7 +41,6 @@ pi = 3.14159265359
 theta = plt.array([4,5,1,6,1,2])
 nx = 10 # amount of states
 nc = 2 # amount of controls
-N = 1000 # amount of control intervals
 
 x_start = 0
 y_start = 0
@@ -55,7 +54,7 @@ psi_dot_start = 0
 # N_list = [500,1000]
 N_list = [1000]
 # T_limit_list = [20,50,100]
-T_limit_list = [30]
+T_limit_list = [25]
 for N in N_list:
     for T_limit in T_limit_list:
         print("")

@@ -1,27 +1,31 @@
 %% Initialization
 % Kijk naar het andere voertuigmodel!!  Gsteer als werkt met Amesim!!
 % Made a mistake with not including 
-clearvars
+clear vars
 close all 
 clc
 import casadi.*
-global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data N_sim T_MPC
+global x_sol_prev lam_prev tracking_lane_change iteration dt N data N_sim Ts_MP
 
-files = {'DCA2_V22.22_L3.47.csv'};
-
+files = {'DATA2_V22.22_L3.47.csv'};
 N = 100; % Control horizon of one optimization of the MPC.
-Tf = 22.5; % if want same length as reference lane change set Tf = 0
-data = get_data(char(files(:,1)));
-N_sim = length(data.time) - (N + 1);
+sampling_rate = 100;
+dt = 1/sampling_rate;
+Tf = 10.0; % if want same length as reference lane change set Tf = 0
+data = get_data(char(files(:,1)),sampling_rate,N,Tf);
+N_sim = length(data.time) - N;
 update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
 iteration = 1;
 lane_change = 1;
 
+
 % Simulation sampling time and duration
-Ts = 0.01; % sampling rate Amesim - taken standard value
-T_MPC = 0.1; % sampling rate of tracking algorithm
-T_pl = data.time(1,1) - data.time(2,1);
+Ts = dt; % sampling rate Amesim 
+Ts_MP = 0.1; % sampling rate of tracking algorithm
+if Tf == 0
+    Tf = dt*N_sim;
+end
 
 % Set the initial speed in the Amesim model
 addpath(fullfile(getenv('AME'),'scripting','matlab','amesim'));
@@ -413,7 +417,3 @@ T = array2table(M,'VariableNames',{'time','x','y','vx','vy','ax','ay','jx','jy',
 % Write the table to a CSV file
 writetable(T,convertStringsToChars(".\written_data\DataA_V"+convertCharsToStrings(name(8:12))+"_L"+ convertCharsToStrings(name(15:18))+".csv"))
 disp('CSV-file written')
-
-
-
-
