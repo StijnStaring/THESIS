@@ -116,9 +116,9 @@ X = opti.variable(nx,N+1);
 x    = X(1,:);
 y  = X(2,:);
 vx = X(3,:);
-% vy = X(4,:);
+vy = X(4,:);
 psi = X(5,:);
-% psi_dot = X(6,:);
+psi_dot = X(6,:);
 
 % Decision variables for control vector
 U =  opti.variable(nc,N);
@@ -173,9 +173,9 @@ mdelta_dot = mean(delta_dot_ref);
 
 % opti.minimize(1/mx*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10/my*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+10/mpsi*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+ 0.01/mthrottle_dot*sumsqr(throttle_dot) + 0.01/mdelta_dot*sumsqr(delta_dot));
 
-opti.minimize(1/mx*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10/my*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+10/mpsi*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+0.01/mthrottle_dot*sumsqr(throttle_dot) + 0.01/mdelta_dot*sumsqr(delta_dot));
+% opti.minimize(1/mx*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10/my*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+10/mpsi*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+0.01/mthrottle_dot*sumsqr(throttle_dot) + 0.01/mdelta_dot*sumsqr(delta_dot));
 
-% opti.minimize(10*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+100*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))) + 5*sumsqr(throttle_dot) + 0.01*sumsqr(delta_dot));
+opti.minimize(10*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+100*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))) + 5*sumsqr(throttle_dot) + 0.01*sumsqr(delta_dot));
 
 % opti.minimize(sumsqr((x-ref(1,1:N+1)))+sumsqr((y-ref(2,1:N+1)))+ sumsqr(U(1,:))+sumsqr(U(2,:)));
 % opti.minimize((x-x_ref_obj)*transpose((x-x_ref_obj))+(y-y_ref_obj)*transpose((y-y_ref_obj)));
@@ -194,12 +194,13 @@ options.expand = true; % expand makes function evaluations faster but requires m
 
 % solver
 options.qpsol = 'qrqp';
-% options.qpsol_options.print_iter = false;
-% options.qpsol_options.print_header = false;
-% options.print_iteration = false;
-% options.print_header = false;
-% options.print_status = false;
+options.qpsol_options.print_iter = false;
+options.qpsol_options.print_header = false;
+options.print_iteration = false;
+options.print_header = false;
+options.print_status = false;
 opti.solver('sqpmethod',options)
+
 % options.ipopt.print_level = 0;
 % opti.solver('ipopt',options)
 
