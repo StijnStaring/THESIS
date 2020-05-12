@@ -1,6 +1,5 @@
 %% Initialization
-% Kijk naar het andere voertuigmodel!!  Gsteer als werkt met Amesim!!
-% Made a mistake with not including 
+% Change throttle initial
 clearvars
 close all 
 clc
@@ -8,7 +7,7 @@ import casadi.*
 global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected iteration_throttle plot_MPC
 iteration_throttle = 1;
 files = {'DCA2_V22.22_L3.47.csv'};
-plot_MPC = 0;
+plot_MPC = 1;
 N = 50; % Control horizon of one optimization of the MPC.
 Tf = 22.5; % if want same length as reference lane change set Tf = 0
 data = get_data(char(files(:,1)));
@@ -16,6 +15,7 @@ update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
 iteration = 1;
 lane_change = 1;
+throttle_start = 0.02296;
 
 % Simulation sampling time and duration
 Ts = 0.01; % sampling rate Amesim - taken standard value
