@@ -145,4 +145,17 @@ log.txt
 /Correcting/04-05/writting_C
 /Correcting/04-05/analytical_update.zip
 /learning model/results/
+/Generating data_tracking_jerk_model/*
+!Generating data_tracking_jerk_model/Function_generation.py
+!Generating data_tracking_jerk_model/Function_generation.m
+!Generating data_tracking_jerk_model/generating_data_lane_change.slx
+!Generating data_tracking_jerk_model/Function_generation.m
+!Generating data_tracking_jerk_model/get_data.m
+!Generating data_tracking_jerk_model/import_ideal_data.py
+!Generating data_tracking_jerk_model/main.m
+!Generating data_tracking_jerk_model/PlanningFunction_lane_change.m
+!Generating data_tracking_jerk_model/PlanningFunction.m
+!Generating data_tracking_jerk_model/previous_solution.mat
+!Generating data_tracking_jerk_model/tracking_mpc.m
+!Generating data_tracking_jerk_model/deriv2.m
 
