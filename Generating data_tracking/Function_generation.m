@@ -161,11 +161,11 @@ opti.subject_to(X(:,1)==x0);
 % -----------------------------------------------
 %    Objective
 % -----------------------------------------------
-mx = mean(x_ref);
-my = mean(y_ref);
-mpsi = mean(psi_ref);
-mthrottle_dot = mean(throttle_dot_ref);
-mdelta_dot = mean(delta_dot_ref);
+% mx = mean(x_ref);
+% my = mean(y_ref);
+% mpsi = mean(psi_ref);
+% mthrottle_dot = mean(throttle_dot_ref);
+% mdelta_dot = mean(delta_dot_ref);
 
 % Objective: vehicle tries to follow a moving point model: x(t) and y(t)
 % opti.minimize((x-ref(1,1:N+1))*transpose((x-ref(1,1:N+1)))+(y-ref(2,1:N+1))*transpose((y-ref(2,1:N+1)))+(psi-ref(5,1:N+1))*transpose((psi-ref(5,1:N+1))));

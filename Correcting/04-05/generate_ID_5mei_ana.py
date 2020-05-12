@@ -263,7 +263,7 @@ for N in N_list:
             # jy_start = JY_TOT(X[:, 0], U[:, 0])
             # opti.subject_to(jx_start == 0)
             # opti.subject_to(jy_start == 0)
-            opti.subject_to(X[6, 0] == (Cr0+Cr2*vx_start**2)/(2*c)) # no longitudinal acc when drag force taken into account
+            opti.subject_to(X[6, 0] == (Cr0+Cr2*vx_start**2)/(2*c)) # no longitudinal acc when drag force taken into account 0.024991358024691337
             opti.subject_to(X[7,0] == 0) # driving straigth
             # T_limit = 10
             opti.subject_to(T <= T_limit)
