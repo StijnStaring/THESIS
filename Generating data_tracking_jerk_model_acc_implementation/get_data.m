@@ -6,6 +6,7 @@ function data = get_data(file)
     % Struct data
     data = struct;
     time_d = read(:,1);
+    T_pl = time_d(2,1) - time_d(1,1);
     x_d = read(:,2);
     y_d = read(:,3);
     vx_d =read(:,4);
@@ -26,6 +27,26 @@ function data = get_data(file)
     atx_d = read(:,19);
     anx_d = read(:,20);
     
+    % Adding a straight part to the reference path
+    T_e = 10;
+    vx_start = vx_d(1,1);
+    N_e = T_e/T_pl+1;
+    
+    x_e = linspace(0,vx_start*T_e,N_e)';
+    y_e = zeros(N_e,1); y_e(end) = y_d(1,1);
+    vx_e = vx_start*ones(N_e,1);
+    vy_e = zeros(N_e,1); vy_e(end) = vy_d(1,1);
+    psi_e = zeros(N_e,1); psi_e(end) = psi_d(1,1);
+    psi_dot_e = zeros(N_e,1); psi_dot_e(end) = psi_dot_d(1,1);
+    throttle_e = 0.02295*ones(N_e,1);
+    delta_e = zeros(N_e,1); delta_e(end) = delta_d(1,1);
+    throttle_dot_e = zeros(N_e,1); throttle_dot_e(end) = throttle_dot_d(1,1);
+    delta_dot_e = zeros(N_e,1); delta_dot_e(end) = delta_dot_d(1,1);
+    ax_e = zeros(N_e,1); ax_e(end)
+    ay_e = zeros(N_e,1);
+    
+    
+    % Loading the signals in the datastruct
     data.time = time_d;
     data.x = x_d;
     data.y = y_d;

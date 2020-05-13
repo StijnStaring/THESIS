@@ -16,7 +16,7 @@ update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
 iteration = 1;
 
-throttle_start = 0.02296;
+throttle_start = 0.02295;
 
 % Simulation sampling time and duration
 Ts = 0.01; % sampling rate Amesim - taken standard value
