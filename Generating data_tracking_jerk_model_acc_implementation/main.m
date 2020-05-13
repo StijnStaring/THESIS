@@ -14,7 +14,7 @@ data = get_data(char(files(:,1)));
 update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
 iteration = 1;
-lane_change = 1;
+
 throttle_start = 0.02296;
 
 % Simulation sampling time and duration
@@ -35,10 +35,10 @@ sim_opt = amegetsimopt('Dynamics');
 amerunsingle('Dynamics', sim_opt);
 
 %% Load the CasADi function for the MPC planner
-if lane_change == 1
-    tracking_lane_change = Function.load('tracking_lane_change.casadi');
-    DM.set_precision(15);
-end
+
+tracking_lane_change = Function.load('tracking_lane_change.casadi');
+DM.set_precision(15);
+
 
 %% run simulation simulink
 open('generating_data_lane_change');
@@ -59,6 +59,7 @@ psi_mpc = Results_States.signals(5).values';
 psi_dot_mpc   = Results_States.signals(6).values';  
 throttle_mpc = squeeze(Results_States.signals(7).values)';
 delta_mpc = squeeze(Results_States.signals(8).values)';
+
 
 time_acc = Accelerations_output.time;
 ax_mpc       = Accelerations_output.signals.values(:,1)';  % in the beginning --> undesired deaccelleration due to delay in controls.

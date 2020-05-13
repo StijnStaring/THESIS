@@ -24,8 +24,8 @@ throttle_ref = data.throttle';
 delta_ref = data.delta';
 throttle_dot_ref = data.throttle_dot';
 delta_dot_ref = data.delta_dot';
-% ax_ref = data.ax';
-% ay_ref = data.ay';
+ax_ref = data.ax';
+ay_ref = data.ay';
 
 
 %% Parameters of the optimization
@@ -35,7 +35,7 @@ fprintf('The control horizon in points: %i \n',N)
 fprintf('The control horizon in seconds: %i \n',N*dt)
 fprintf('Time discretization of dataset: %i \n',dt)
 
-nx = 8;
+nx = 10;
 nc = 2;
 
 %%
@@ -53,7 +53,6 @@ Tmax = 584;
 pi = 3.14159265359;
 Gsteering = 16.96; 
 
-
 % Equations of the vehicle model
 x = SX.sym('x') ;
 y = SX.sym('y');
@@ -63,8 +62,8 @@ psi = SX.sym('psi');
 psi_dot = SX.sym('psi_dot'); 
 throttle = SX.sym('throttle');
 delta = SX.sym('delta')  ; % This is the steeringwheelangle
-% ax_total = SX.sym('ax_tot');
-% ay_total = SX.sym('ay_tot');
+ax_total = SX.sym('ax_tot');
+ay_total = SX.sym('ay_tot');
 
 % Controls
 throttle_dot = SX.sym('throttle_dot');
@@ -84,17 +83,17 @@ atx = (cos(delta/Gsteering)*Fxf-sin(delta/Gsteering)*Fyf+Fxr-F_d)/M +vy*psi_dot;
 aty = (sin(delta/Gsteering)*Fxf+cos(delta/Gsteering)*Fyf+Fyr)/M -vx*psi_dot;
 psi_ddot = (sin(delta/Gsteering)*Fxf*a+cos(delta/Gsteering)*Fyf*a-b*Fyr)/Izz;
 
-% c = Tmax/(2*rw);
-% jx_total = (c*throttle_dot - 2*Cr2*vx*atx + 2*Kyf*sin(delta/Gsteering)*(((a*psi_ddot + aty)/vx - ((vy + a*psi_dot)*atx)/vx^2)/((vy + a*psi_dot)^2/vx^2 + 1) - delta_dot/Gsteering) + c*cos(delta/Gsteering)*throttle_dot - 2*Kyf*cos(delta/Gsteering)*(delta/Gsteering- atan2((vy + a*psi_dot),vx))*delta_dot/Gsteering - c*sin(delta/Gsteering)*throttle*delta_dot/Gsteering)/M;
-% jy_total = ((2*Kyr*((b*psi_ddot - aty)/vx + ((vy - b*psi_dot)*atx)/vx^2))/((vy - b*psi_dot)^2/vx^2 + 1) - 2*Kyf*cos(delta/Gsteering)*(((a*psi_ddot + aty)/vx - ((vy + a*psi_dot)*atx)/vx^2)/((vy + a*psi_dot)^2/vx^2 + 1) - delta_dot/Gsteering) + c*sin(delta/Gsteering)*throttle_dot - 2*Kyf*sin(delta/Gsteering)*(delta/Gsteering - atan2((vy + a*psi_dot),vx))*delta_dot/Gsteering + c*cos(delta/Gsteering)*throttle*delta_dot/Gsteering)/M;
+c = Tmax/(2*rw);
+jx_total = (c*throttle_dot - 2*Cr2*vx*atx + 2*Kyf*sin(delta/Gsteering)*(((a*psi_ddot + aty)/vx - ((vy + a*psi_dot)*atx)/vx^2)/((vy + a*psi_dot)^2/vx^2 + 1) - delta_dot/Gsteering) + c*cos(delta/Gsteering)*throttle_dot - 2*Kyf*cos(delta/Gsteering)*(delta/Gsteering- atan2((vy + a*psi_dot),vx))*delta_dot/Gsteering - c*sin(delta/Gsteering)*throttle*delta_dot/Gsteering)/M;
+jy_total = ((2*Kyr*((b*psi_ddot - aty)/vx + ((vy - b*psi_dot)*atx)/vx^2))/((vy - b*psi_dot)^2/vx^2 + 1) - 2*Kyf*cos(delta/Gsteering)*(((a*psi_ddot + aty)/vx - ((vy + a*psi_dot)*atx)/vx^2)/((vy + a*psi_dot)^2/vx^2 + 1) - delta_dot/Gsteering) + c*sin(delta/Gsteering)*throttle_dot - 2*Kyf*sin(delta/Gsteering)*(delta/Gsteering - atan2((vy + a*psi_dot),vx))*delta_dot/Gsteering + c*cos(delta/Gsteering)*throttle*delta_dot/Gsteering)/M;
 
 
 % states: x, y, vx, vy, psi, psi_dot
 % controls: torque, delta
-rhs = [vx_glob; vy_glob; atx; aty; psi_dot; psi_ddot; throttle_dot;delta_dot];
+rhs = [vx_glob; vy_glob; atx; aty; psi_dot; psi_ddot; throttle_dot;delta_dot;jx_total;jy_total];
 
 % Continuous system dynamics as a CasADi Function
-states = [x; y; vx; vy; psi; psi_dot; throttle; delta;];
+states = [x; y; vx; vy; psi; psi_dot; throttle; delta;ax_total;ay_total];
 controls = [throttle_dot; delta_dot];
 f = Function('f', {states,controls}, {rhs},{'states','controls'},{'rhs'});
 
@@ -136,8 +135,8 @@ psi = X(5,:);
 psi_dot = X(6,:);
 throttle = X(7,:);
 delta = X(8,:);
-% ax = X(9,:);
-% ay = X(10,:);
+ax = X(9,:);
+ay = X(10,:);
 
 % Decision variables for control vector
 U =  opti.variable(nc,N);
@@ -147,8 +146,9 @@ delta_dot = U(2,:);
 % Parameters
 x0 = opti.parameter(nx);
 ref = opti.parameter(nx+2,N);
-opti.set_value(x0,[0;0;vx_start;0;0;0;0.02296;0;]);
-opti.set_value(ref,[x_ref(2:N+1);y_ref(2:N+1);vx_ref(2:N+1);vy_ref(2:N+1);psi_ref(2:N+1);psi_dot_ref(2:N+1);throttle_ref(2:N+1);delta_ref(2:N+1);throttle_dot_ref(1:N);delta_dot_ref(1:N)]);
+opti.set_value(x0,[0;0;vx_start;0;0;0;0.0249913580246913;0;ax_ref(1,1);ay_ref(1,1)]);
+
+opti.set_value(ref,[x_ref(2:N+1);y_ref(2:N+1);vx_ref(2:N+1);vy_ref(2:N+1);psi_ref(2:N+1);psi_dot_ref(2:N+1);throttle_ref(2:N+1);delta_ref(2:N+1);throttle_dot_ref(1:N);delta_dot_ref(1:N);ax_ref(2:N+1);ay_ref(2:N+1)]);
 
 % Gap-closing shooting constraints
 for k=1:N
@@ -185,53 +185,16 @@ opti.subject_to(X(:,1)==x0);
 % mdelta_dot = mean(delta_dot_ref);
 
 % Objective: vehicle tries to follow a moving point model: x(t) and y(t)
-% opti.minimize((x-ref(1,1:N+1))*transpose((x-ref(1,1:N+1)))+(y-ref(2,1:N+1))*transpose((y-ref(2,1:N+1)))+(psi-ref(5,1:N+1))*transpose((psi-ref(5,1:N+1))));
+opti.minimize(10*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+100*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(ax(2:N+1)-ref(11,1:N))*transpose((ax(2:N+1)-ref(11,1:N)))+(ay(2:N+1)-ref(12,1:N))*transpose((ay(2:N+1)-ref(12,1:N))));
 
-
-% opti.minimize(1/mx*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10/my*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+10/mpsi*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+ 0.01/mthrottle_dot*sumsqr(throttle_dot) + 0.01/mdelta_dot*sumsqr(delta_dot));
-
-% opti.minimize(1/mx*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10/my*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+10/mpsi*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+0.01/mthrottle_dot*sumsqr(throttle_dot) + 0.01/mdelta_dot*sumsqr(delta_dot));
-
-% opti.minimize(10*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+100*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N)))+(ax(2:N+1)-ref(9,1:N))*transpose((ax(2:N+1)-ref(9,1:N))) + 10*(ay(2:N+1)-ref(10,1:N))*transpose((ay(2:N+1)-ref(10,1:N))));
-opti.minimize(10*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+100*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))) + 10*sumsqr(throttle) + 0.01*sumsqr(delta_dot));
-
-
-
-% opti.minimize(100*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+1000*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+10000*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))) + (throttle(2:N+1)-ref(7,1:N))*transpose((throttle(2:N+1)-ref(7,1:N)))+ (delta(2:N+1)-ref(8,1:N))*transpose((delta(2:N+1)-ref(8,1:N)))+ (throttle_dot(1:N)-ref(9,1:N))*transpose((throttle_dot(1:N)-ref(9,1:N)))+ (delta_dot(1:N)-ref(10,1:N))*transpose((delta_dot(1:N)-ref(10,1:N))));
-
-% opti.minimize(sumsqr((x-ref(1,1:N+1)))+sumsqr((y-ref(2,1:N+1)))+ sumsqr(U(1,:))+sumsqr(U(2,:)));
-% opti.minimize((x-x_ref_obj)*transpose((x-x_ref_obj))+(y-y_ref_obj)*transpose((y-y_ref_obj)));
-% opti.minimize(sumsqr((x-ref(1,1:N+1)))+sumsqr((y-ref(2,1:N+1)))+ sumsqr((vy-ref(4,1:N+1))) + sumsqr(U(1,:))+sumsqr(U(2,:)));
-
-% opti.minimize(sumsqr((x-ref(1,1:N+1))))
-% opti.minimize(sumsqr((y-ref(2,1:N+1))))
-% % % opti.minimize(sumsqr((psi-ref(5,1:N+1))))
-% % % opti.minimize(sumsqr((psi_dot-ref(6,1:N+1))))
-% opti.minimize(sumsqr(U(1,:))+sumsqr(U(2,:)))
 
 % solve optimization problem
 options = struct;
 options.print_time = false;
 options.expand = true; % expand makes function evaluations faster but requires more memory: MX --> SX
-
-% solver
-% options.qpsol = 'qrqp';
-% options.qpsol_options.print_iter = false;
-% options.qpsol_options.print_header = false;
-% options.print_iteration = false;
-% options.print_header = false;
-% options.print_status = false;
-% opti.solver('sqpmethod',options)
-
 options.ipopt.print_level = 0;
 opti.solver('ipopt',options)
 
-%sqp --> this approximates the lagrangian of the problam by a quadratic problem with
-%the same KKT conditions. 
-% sqp is faster --> required for MPC.
-% options.ipopt.print_level = 0;
-% opti.solver('ipopt',options)
-% ipopt --> this is a constraint relaxation method
 
 %% Initial guesses
 % states: x, y, vx, vy, psi, psi_dot
