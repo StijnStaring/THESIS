@@ -477,15 +477,51 @@ fprintf('\n')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Write data to a csv file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% name = char(files(:,1));
-% throttle_dot_mpc = derivative(throttle_mpc,Ts);
-% brake_dot_mpc = derivative(brake_mpc,Ts);
-% delta_dot_mpc = derivative(delta_mpc,Ts);
-% % Save values
-% M = [t_mpc', x_mpc',y_mpc',vx_mpc',vy_mpc',ax_mpc',ay_mpc',jx_mpc',jy_mpc',psi_mpc',psi_dot_mpc',psi_ddot_mpc',throttle_mpc',brake_mpc',delta_mpc',throttle_dot_mpc',brake_dot_mpc',delta_dot_mpc',aty_mpc',any_mpc',atx_mpc',anx_mpc'];
-% % Convert cell to a table and use first row as variable names
-% T = array2table(M,'VariableNames',{'time','x','y','vx','vy','ax','ay','jx','jy','psi','psi_dot','psi_ddot','throttle','brake','delta','throttle_dot','brake_dot','delta_dot','aty','a_ny','atx','anx'});
-% % Write the table to a CSV file
-% writetable(T,convertStringsToChars(".\written_data\DataA_V"+convertCharsToStrings(name(7:11))+"_L"+ convertCharsToStrings(name(14:17))+".csv"))
-% disp('CSV-file written')
+name = char(files(:,1));
+t_mpc_s = t_mpc(1,1001:end) - t_mpc(1,1001);
+x_mpc_s = x_mpc(1,1001:end) - x_mpc(1,1001);
+y_mpc_s = y_mpc(1,1001:end);
+vx_mpc_s = vx_mpc(1,1001:end);
+vy_mpc_s = vy_mpc(1,1001:end);
+ax_mpc_s = ax_mpc(1,1001:end);
+ay_mpc_s = ay_mpc(1,1001:end);
+jx_mpc_s = jx_mpc(1,1001:end);
+jy_mpc_s = jy_mpc(1,1001:end);
+psi_mpc_s = psi_mpc(1,1001:end);
+psi_dot_mpc_s = psi_dot_mpc(1,1001:end);
+psi_ddot_mpc_s = psi_ddot_mpc(1,1001:end);
+throttle_mpc_s = throttle_mpc(1,1001:end);
+delta_mpc_s = delta_mpc(1,1001:end);
+
+throttle_dot_mpc_s = zeros(1,size(t_mpc_s,2));
+throttle_dot_iter = throttle_dot_mpc(1,101:end);
+iter = 1;
+for curr = throttle_dot_iter(1,1:end-1)
+    throttle_dot_mpc_s((iter-1)*10+1:(iter-1)*10+10) = curr*ones(1,int64(T_MPC/Ts));
+    iter = iter +1;
+end
+throttle_dot_mpc_s(end) = throttle_dot_iter(end);
+
+delta_dot_mpc_s = zeros(1,size(t_mpc_s,2));
+delta_dot_iter = delta_dot_mpc(1,101:end);
+iter = 1;
+for curr = delta_dot_iter(1,1:end-1)
+    delta_dot_mpc_s((iter-1)*10+1:(iter-1)*10+10) = curr*ones(1,int64(T_MPC/Ts));
+    iter = iter +1;
+end
+delta_dot_mpc_s(end) = delta_dot_iter(end);
+
+aty_mpc_s = aty_mpc(1,1001:end);
+any_mpc_s = any_mpc(1,1001:end);
+atx_mpc_s = atx_mpc(1,1001:end);
+anx_mpc_s = anx_mpc(1,1001:end);
+
+
+% Save values
+M = [t_mpc_s', x_mpc_s',y_mpc_s',vx_mpc_s',vy_mpc_s',ax_mpc_s',ay_mpc_s',jx_mpc_s',jy_mpc_s',psi_mpc_s',psi_dot_mpc_s',psi_ddot_mpc_s',throttle_mpc_s',delta_mpc_s',throttle_dot_mpc_s',delta_dot_mpc_s',aty_mpc_s',any_mpc_s',atx_mpc_s',anx_mpc_s'];
+% Convert cell to a table and use first row as variable names
+T = array2table(M,'VariableNames',{'time','x','y','vx','vy','ax','ay','jx','jy','psi','psi_dot','psi_ddot','throttle','delta','throttle_dot','delta_dot','aty','a_ny','atx','anx'});
+% Write the table to a CSV file
+writetable(T,convertStringsToChars(".\written_data\TRData_V"+convertCharsToStrings(name(7:11))+"_L"+ convertCharsToStrings(name(14:17))+".csv"))
+disp('CSV-file written')
 
