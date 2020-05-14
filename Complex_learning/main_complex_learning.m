@@ -114,28 +114,33 @@ while converged ~= 1 && rec <= 300
     if all(abs(f_calc_rel_check - 1) <= tol) || all(update_check <= 1e-4)
         converged = 1;
         if all(update <= 1e-4)
-            print('No change in theta detected anymore - learning terminated')
+            fprintf('No change in theta detected anymore - learning terminated')
+            fprintf('\n')
         end
     end
     print('Converged vector: ',converged)
-% 
-%     # Check what direction to go in optimization
-%     case = plt.ones(amount_features)
-%     for j in plt.arange(0,amount_features):
-%         print('*********')
-%         if exception[j] == 1 or grad_curr[j] * grad_prev[j] == 0:
-%             case[j] = 3
-%             print("case["+str(j)+")] is: ",case[j])
-%         elif grad_curr[j]*grad_prev[j]<0:
-%             case[j] = 2
-%             print("case["+str(j)+")] is: ", case[j])
-%         else:
-%             print("case["+str(j)+")] is: ", case[j])
-% 
-%     his_multi_grads.append([str(rec) + "//", case[:,plt.newaxis]])
+
+    % Check what direction to go in optimization
+    cas = plt.ones(1,amount_features);
+    for j = 1:1:amount_features
+        fprintf('*********')
+        fprintf('\n')
+        if exception(j) == 1 || grad_curr(j) * grad_prev(j) == 0
+            cas(j) = 3;
+            print("cas["+num2str(j)+")] is: ",cas(j))
+        elseif grad_curr(j)*grad_prev(j)<0
+            cas(j) = 2;
+            print("cas["+num2str(j)+")] is: ", cas(j))
+        else
+            print("cas["+num2str(j)+")] is: ", cas(j))
+            
+        end
+    end
+
+    his_multi_grads.append([str(rec) + "//", cas[:,plt.newaxis]])
 % 
 %     if converged != 1:
-%         [del_theta_prev, exception, theta, update] = RPROP(grad_curr,case,amount_features,update,theta,del_theta_prev,1)
+%         [del_theta_prev, exception, theta, update] = RPROP(grad_curr,cas,amount_features,update,theta,del_theta_prev,1)
 %         grad_prev = grad_curr
 %         rec = rec + 1
 %         his_weights.append([str(rec) + "//", theta[:,plt.newaxis]])
