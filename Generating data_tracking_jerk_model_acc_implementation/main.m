@@ -492,6 +492,7 @@ psi_dot_mpc_s = psi_dot_mpc(1,1001:end);
 psi_ddot_mpc_s = psi_ddot_mpc(1,1001:end);
 throttle_mpc_s = throttle_mpc(1,1001:end);
 delta_mpc_s = delta_mpc(1,1001:end);
+delta_mpc_s = 1/16.96*delta_mpc_s; % transforming back to front wheel angle
 
 throttle_dot_mpc_s = zeros(1,size(t_mpc_s,2));
 throttle_dot_iter = throttle_dot_mpc(1,101:end);
@@ -510,6 +511,7 @@ for curr = delta_dot_iter(1,1:end-1)
     iter = iter +1;
 end
 delta_dot_mpc_s(end) = delta_dot_iter(end);
+delta_dot_mpc_s = 1/16.96*delta_dot_mpc_s; % transforming back to front wheel angle
 
 aty_mpc_s = aty_mpc(1,1001:end);
 any_mpc_s = any_mpc(1,1001:end);
