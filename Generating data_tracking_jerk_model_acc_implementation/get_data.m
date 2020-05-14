@@ -56,10 +56,11 @@ function data = get_data(file)
     % at finish
     T_f = 2.5;
     vx_end = vx_d(end,1);
+    y_end = y_d(end,1);
     N_f = int64(T_f/T_pl); % Last point equals the first point of the original dataset. 
     time_f = linspace(0,T_f,N_f+1)';
     x_f = linspace(0,vx_end*T_f,N_f+1)';
-    y_f = zeros(N_f,1); 
+    y_f = y_end*ones(N_f,1); 
     vx_f = vx_end*ones(N_f,1);
     vy_f = zeros(N_f,1); 
     psi_f = zeros(N_f,1); 
@@ -77,29 +78,28 @@ function data = get_data(file)
     any_f = zeros(N_f,1);
     jx_f = zeros(N_f,1);
     jy_f = zeros(N_f,1);
-       
-    
+        
     % Loading the signals in the datastruct
-    data.time = [time_e(1:N_e);time_d+time_e(end)];
-    data.x = [x_e(1:N_e);x_d+x_e(end)];
-    data.y = [y_e;y_d];
-    data.vx = [vx_e;vx_d];
-    data.vy = [vy_e;vy_d];
-    data.ax = [ax_e;ax_d];
-    data.ay = [ay_e;ay_d];
-    data.jx = [jx_e;jx_d];
-    data.jy = [jy_e;jy_d];
-    data.psi = [psi_e;psi_d];
-    data.psi_dot = [psi_dot_e;psi_dot_d];
-    data.psi_ddot = [psi_ddot_e;psi_ddot_d];
-    data.throttle = [throttle_e;throttle_d];
-    data.delta = [delta_e;delta_d];
-    data.throttle_dot = [throttle_dot_e;throttle_dot_d];
-    data.delta_dot = [delta_dot_e;delta_dot_d];
-    data.aty = [aty_e;aty_d];
-    data.any = [any_e;any_d];
-    data.atx = [atx_e;atx_d];
-    data.anx = [anx_e;anx_d];
+    data.time = [time_e(1:N_e);time_d+time_e(end);time_d(end)+time_e(end) + time_f(2:N_f+1)];
+    data.x = [x_e(1:N_e);x_d+x_e(end);x_d(end)+x_e(end) + x_f(2:N_f+1)];
+    data.y = [y_e;y_d;y_f];
+    data.vx = [vx_e;vx_d;vx_f];
+    data.vy = [vy_e;vy_d;vy_f];
+    data.ax = [ax_e;ax_d;ax_f];
+    data.ay = [ay_e;ay_d;ay_f];
+    data.jx = [jx_e;jx_d;jx_f];
+    data.jy = [jy_e;jy_d;jy_f];
+    data.psi = [psi_e;psi_d;psi_f];
+    data.psi_dot = [psi_dot_e;psi_dot_d;psi_dot_f];
+    data.psi_ddot = [psi_ddot_e;psi_ddot_d;psi_ddot_f];
+    data.throttle = [throttle_e;throttle_d;throttle_f];
+    data.delta = [delta_e;delta_d;delta_f];
+    data.throttle_dot = [throttle_dot_e;throttle_dot_d;throttle_dot_f];
+    data.delta_dot = [delta_dot_e;delta_dot_d;delta_dot_f];
+    data.aty = [aty_e;aty_d;aty_f];
+    data.any = [any_e;any_d;any_f];
+    data.atx = [atx_e;atx_d;atx_f];
+    data.anx = [anx_e;anx_d;anx_f];
     
  
     % plotting

@@ -9,7 +9,7 @@ iteration_throttle = 1;
 files = {'DCA2_V22.22_L3.47.csv'};
 plot_MPC = 0;
 N = 50; % Control horizon of one optimization of the MPC.
-Tf = 32.5; % if want same length as reference lane change set Tf = 0
+Tf = 40; % if want same length as reference lane change set Tf = 0
 
 data = get_data(char(files(:,1)));
 update_casadi_function = 1; % in order to save time when developing
@@ -376,9 +376,9 @@ jx_mpc = jx_t+jx_n;
 % Jerks
 figure('name', 'jerks')
 subplot(2,2,1)
-plot(t_mpc,jx_mpc,'b.','LineWidth',1.0)
-hold on
 plot(t_ref,jx_ref,'r.','LineWidth',1.0)
+hold on
+plot(t_mpc,jx_mpc,'b.','LineWidth',1.0)
 title('jerk x [m/s^3]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
@@ -392,9 +392,10 @@ xlim([0, t_max])
 ylabel('Error jx [m/s³]','fontsize',12)
 
 subplot(2,2,2)
-plot(t_mpc,jy_mpc,'b.','LineWidth',1.0)
-hold on
 plot(t_ref,jy_ref,'r.','LineWidth',1.0)
+hold on
+plot(t_mpc,jy_mpc,'b.','LineWidth',1.0)
+
 title('jerk y [m/s³]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
