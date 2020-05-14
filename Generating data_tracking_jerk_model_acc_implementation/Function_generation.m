@@ -192,8 +192,17 @@ opti.minimize(10*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:
 options = struct;
 options.print_time = false;
 options.expand = true; % expand makes function evaluations faster but requires more memory: MX --> SX
-options.ipopt.print_level = 0;
-opti.solver('ipopt',options)
+
+options.qpsol = 'qrqp';
+options.qpsol_options.print_iter = false;
+options.qpsol_options.print_header = false;
+options.print_iteration = false;
+options.print_header = false;
+options.print_status = false;
+opti.solver('sqpmethod',options)
+
+% options.ipopt.print_level = 0;
+% opti.solver('ipopt',options)
 
 
 %% Initial guesses
