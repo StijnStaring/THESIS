@@ -108,16 +108,16 @@ while converged ~= 1 && rec <= 300
     his_update.("iteration_"+num2str(rec)) = update;
     his_del_theta_prev.("iteration_"+num2str(rec)) = del_theta_prev;
 
-    % Check if all features are converged or that the weights are not changing anymore
-    f_calc_rel_check = [f_calc_rel(2),f_calc_rel(4),f_calc_rel(6)];
-    update_check = [update(2), update(4), update(6)];
-    if all(abs(f_calc_rel_check - 1) <= tol) || all(update_check <= 1e-4)
-        converged = 1;
-        if all(update <= 1e-4)
-            print('No change in theta detected anymore - learning terminated')
-        end
-    end
-    print('Converged vector: ',converged)
+
+% 
+%     # Check if all features are converged or that the weights are not changing anymore
+%     f_calc_rel_check = plt.array([f_calc_rel[1],f_calc_rel[3],f_calc_rel[5]])
+%     update_check = plt.array([update[1], update[3], update[5]])
+%     if all(plt.absolute(f_calc_rel_check - 1) <= tol) or all(update_check <= 1e-4):
+%         converged = 1
+%         if all(update <= 1e-4):
+%             print('No change in theta detected anymore - learning terminated')
+%     print('Converged vector: ',converged)
 % 
 %     # Check what direction to go in optimization
 %     case = plt.ones(amount_features)

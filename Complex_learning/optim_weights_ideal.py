@@ -2,11 +2,11 @@ import pylab as plt
 from define_plots import define_plots
 from casadi import *
 
-def optim_weights_ideal(theta_d,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file):
+def optim_weights_ideal(theta_d,data_cl,iteration_d,N,plotting,axcom1a,axcom1b,axcom2,axcom3a,axcom3b,axcom4a,axcom4b,axcom5a,axcom5b,axcom6a,axcom6b,axcom7a,axcom7b,axcom8a,axcom8b,axcom9a,axcom9b,axcom10,axcom11a,axcom11b,file):
 
     theta_d = plt.squeeze(theta_d)
-    width_road = data_cl['width']
-    vx_start = data_cl['vx_start']
+    width_road_d = data_cl['width']
+    vx_start_d = data_cl['vx_start']
 
     norm0 = 0.007276047781441449
     norm1 = 2.6381715506137424
@@ -107,7 +107,7 @@ def optim_weights_ideal(theta_d,data_cl,iteration,N,plotting,axcom1a,axcom1b,axc
     # plt.plot(plt.linspace(0, time_guess, N), plt.squeeze(delta_dot_guess))
 
     print("")
-    print("vx_start: ", vx_start, " and width_road: ", width_road)
+    print("vx_start: ", vx_start_d, " and width_road: ", width_road_d)
 
     # Equations of the vehicle model
     x = SX.sym('x')  # in global axis
@@ -126,8 +126,8 @@ def optim_weights_ideal(theta_d,data_cl,iteration,N,plotting,axcom1a,axcom1b,axc
     delta_dot = SX.sym('delta_dot')
 
     # Other
-    vx_des = vx_start
-    y_change = width_road
+    vx_start = SX.sym('vx_start')
+    width_road = SX.sym('width_road')
 
     x_dot_glob = vx * cos(psi) - vy * sin(psi)
     y_dot_glob = vx * sin(psi) + vy * cos(psi)
@@ -156,8 +156,8 @@ def optim_weights_ideal(theta_d,data_cl,iteration,N,plotting,axcom1a,axcom1b,axc
     ay_total_int = ay_total ** 2
     jx_total_int = jx_total ** 2
     jy_total_int = jy_total ** 2
-    vx_diff_int = vx ** 2 - 2 * vx * vx_des + vx_des ** 2  # (vx- vx_des)**2 --> vx_des is the start vx at beginning lane change
-    y_diff_int = y ** 2 - 2 * y * y_change + y_change ** 2  # (y-y_des)**2 --> y_des is 3.47, distance to be travelled to change lane
+    vx_diff_int = vx ** 2 - 2 * vx * vx_start + vx_start ** 2  # (vx- vx_des)**2 --> vx_des is the start vx at beginning lane change
+    y_diff_int = y ** 2 - 2 * y * width_road + width_road ** 2  # (y-y_des)**2 --> y_des is 3.47, distance to be travelled to change lane
 
     # ----------------------------------
     #    continuous system dot(x)=f(x,u)
@@ -211,6 +211,18 @@ def optim_weights_ideal(theta_d,data_cl,iteration,N,plotting,axcom1a,axcom1b,axc
     T = opti.variable()  # Time [s]
     theta = opti.parameter(6)
     opti.set_value(theta,theta_d)
+    iteration = opti.parameter(1,1)
+    opti.set_value(iteration, iteration_d)
+    state_guesses = opti.parameter(10,N+1)
+    opti.set_value(state_guesses,vertcat(x_guess,y_guess,vx_guess,vy_guess,psi_guess,psi_dot_guess,throttle_guess,delta_guess,ax_total_guess,ay_total_guess))
+    control_guesses =opti.parameter(2,N)
+    opti.set_value(control_guesses,vertcat(throttle_dot_guess,delta_dot_guess))
+    time_guesses = opti.parameter()
+    opti.set_value(time_guesses,time_guess)
+    vx_start = opti.parameter()
+    opti.set_value(vx_start,vx_start_d)
+    width_road = opti.parameter()
+    opti.set_value(width_road,width_road_d)
 
 
     # Aliases for states
@@ -262,19 +274,19 @@ def optim_weights_ideal(theta_d,data_cl,iteration,N,plotting,axcom1a,axcom1b,axc
     opti.subject_to(opti.bounded(-limit * plt.pi / 180, delta, limit * plt.pi / 180))
 
     #  Set guesses
-    opti.set_initial(x, x_guess)
-    opti.set_initial(y, y_guess)
-    opti.set_initial(vx, vx_guess)
-    opti.set_initial(vy, vy_guess)
-    opti.set_initial(psi, psi_guess)
-    opti.set_initial(psi_dot, psi_dot_guess)
-    opti.set_initial(throttle, throttle_guess)
-    opti.set_initial(delta, delta_guess)
-    opti.set_initial(throttle_dot, throttle_dot_guess)
-    opti.set_initial(delta_dot, delta_dot_guess)
-    opti.set_initial(T, time_guess)
-    opti.set_initial(ax_total, ax_total_guess)
-    opti.set_initial(ay_total, ay_total_guess)
+    opti.set_initial(x, state_guesses[0,:])
+    opti.set_initial(y, state_guesses[1,:])
+    opti.set_initial(vx, state_guesses[2,:])
+    opti.set_initial(vy, state_guesses[3,:])
+    opti.set_initial(psi, state_guesses[4,:])
+    opti.set_initial(psi_dot, state_guesses[5,:])
+    opti.set_initial(throttle, state_guesses[6,:])
+    opti.set_initial(delta, state_guesses[7,:])
+    opti.set_initial(throttle_dot, control_guesses[0,:])
+    opti.set_initial(delta_dot, control_guesses[1,:])
+    opti.set_initial(T, time_guesses)
+    opti.set_initial(ax_total, state_guesses[8,:])
+    opti.set_initial(ay_total, state_guesses[9,:])
     if iteration != 1:
         opti.set_initial(opti.lam_g, data_cl['lam_sol']) # gives the solution of the previous iteration as starting point
 
@@ -467,7 +479,7 @@ def optim_weights_ideal(theta_d,data_cl,iteration,N,plotting,axcom1a,axcom1b,axc
         axcom11a.legend()
         axcom11b.legend()
 
-        #     Saving opti environment to a casADi function
+        #  Saving opti environment to a casADi function
         inputs = [theta, data_cl, iteration, N]
         outputs = [data_s, features, opti.lam_g]
         plan_path = opti.to_function('plan_path', inputs, outputs)
