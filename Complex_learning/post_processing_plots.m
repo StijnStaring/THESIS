@@ -88,7 +88,8 @@ function post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_gr
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
       
-
+saveas(gcf,".\written_data\12frel.png")
+saveas(gcf,".\written_data\12frel.png")
  
 %plot current gradient
     figure("name","Current gradient")
@@ -174,7 +175,8 @@ function post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_gr
         temp = his_grad_current.(fn{k});
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
-
+saveas(gcf,".\written_data\13gradcurr.png")
+saveas(gcf,".\written_data\13gradcurr.png")
 
       % Weights 
     figure("name","Weights")
@@ -260,7 +262,8 @@ function post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_gr
         temp = his_weights.(fn{k});
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
-
+saveas(gcf,".\written_data\14weights.png")
+saveas(gcf,".\written_data\14weights.png")
     % Plotting diff of theta over iterations
     figure("name","Diff theta")
     subplot(2, 3,1)
@@ -344,6 +347,8 @@ function post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_gr
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
      
+saveas(gcf,".\written_data\15updateweights.png")
+saveas(gcf,".\written_data\15updateweights.png")
     % multiplication of gradient
     figure("name","his_multi_grads")
     subplot(2, 3,1)
@@ -427,7 +432,8 @@ function post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_gr
         temp = his_multi_grads.(fn{k});
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
-
+saveas(gcf,".\written_data\16multigrad.png")
+saveas(gcf,".\written_data\16multigrad.png")
 % history of difference with the chose weights
     figure("name","Diff chosen weights")
     subplot(2, 3,1)
@@ -513,6 +519,7 @@ function post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_gr
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
       
-
+saveas(gcf,".\written_data\17diffchosen.png")
+saveas(gcf,".\written_data\17diffchosen.png")
       
 end
