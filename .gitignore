@@ -171,4 +171,20 @@ log.txt
 !Generating data_tracking_jerk_model_acc_implementation/previous_solution.mat
 !Generating data_tracking_jerk_model_acc_implementation/tracking_mpc.m
 !Generating data_tracking_jerk_model_acc_implementation/deriv2.m
+/Complex_learning/*
+!Complex_learning/comparing_features.m
+!Complex_learning/get_data.m
+!Complex_learning/import_data2.m
+!Complex_learning/main_complex_learning.m
+!Complex_learning/optim_weights_ideal.m
+!Complex_learning/post_processing_plots.m
+!Complex_learning/RPROP.m
+
+
+
+
+
+
+
+
 
