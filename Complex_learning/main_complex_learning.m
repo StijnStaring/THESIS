@@ -169,7 +169,7 @@ fprintf('\n')
 
 fn = fieldnames(his_multi_grads);
 for k=1:1:numel(fn)
-fprintf('%s: %i %i %i %i %i \n',fn{k},his_multi_grads.(fn{k}))
+fprintf('%s: %i %i %i %i %i %i ',fn{k},his_multi_grads.(fn{k}))
 fprintf('\n')
 end
 
@@ -180,7 +180,7 @@ fprintf('\n')
       
 fn = fieldnames(his_grad_current);
 for k=1:numel(fn)
-fprintf('%s: %i %i %i %i %i \n',fn{k},his_grad_current.(fn{k}))
+fprintf('%s: %i %i %i %i %i %i ',fn{k},his_grad_current.(fn{k}))
 fprintf('\n')
 end
    
@@ -191,7 +191,7 @@ fprintf('\n')
     
 fn = fieldnames(his_f_calc_rel);
 for k=1:numel(fn)
-fprintf('%s: %i %i %i %i %i \n',fn{k},his_f_calc_rel.(fn{k}))
+fprintf('%s: %i %i %i %i %i %i ',fn{k},his_f_calc_rel.(fn{k}))
 fprintf('\n')
 end
 
@@ -202,7 +202,7 @@ fprintf('\n')
     
 fn = fieldnames(his_weights);
 for k=1:numel(fn)
-fprintf('%s: %i %i %i %i %i \n',fn{k},his_weights.(fn{k}))
+fprintf('%s: %i %i %i %i %i %i ',fn{k},his_weights.(fn{k}))
 fprintf('\n')
 end
 
@@ -214,7 +214,7 @@ if rec ~= 1
     fn = fieldnames(his_weights);
     for k=2:numel(fn)
         diff = his_weights.(fn{k}) - his_weights.(fn{k-1});
-    fprintf('%s: %i %i %i %i %i \n',fn{k},diff)
+    fprintf('%s: %i %i %i %i %i %i ',fn{k},diff)
     fprintf('\n')
     end
 else
@@ -223,110 +223,237 @@ else
     fprintf('\n')
 end
    
-% % Plotting end solution in comparinson
-% for k = 1:1: length(file_list)
-%     file = file_list{1,k}
-%     data_s = solutions{1, rec}{1, k}
-%     x_sol = data_s.x_s
-%     y_sol = data_s.y_s
-%     vx_sol = data_s.vx_s
-%     vy_sol = data_s.vy_s
-%     psi_sol = data_s.psi_s
-%     psi_dot_sol = data_s.psi_dot_s
-%     throttle_sol = data_s.throttle_s
-%     delta_sol = data_s.delta_s
-%     throttle_dot_sol = data_s.throttle_dot_s
-%     delta_dot_sol = data_s.delta_dot_s
-%     T_sol = data_s.T_s
-%     dt_sol = data_s.dt_s
-%     ax_tot_sol = data_s.ax_tot_s
-%     ay_tot_sol = data_s.ay_tot_s
-%     aty_sol = data_s.aty_s
-%     any_sol = data_s.any_s
-%     atx_sol = data_s.atx_s
-%     anx_sol = data_s.anx_s
-%     jx_tot_sol = data_s.jx_s
-%     jy_tot_sol = data_s.jy_s
-%     psi_ddot_sol = data_s.psi_ddot_s
-% 
-%     time_vector = linspace(0, T_sol, len(x_sol))
-%     axcom1a.plot(time_vector, x_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom1b.plot(time_vector, y_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom2.plot(x_sol, y_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom3a.plot(time_vector, vx_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom3b.plot(time_vector, vy_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom4a.plot(time_vector, ax_tot_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom4b.plot(time_vector, ay_tot_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom5a.plot(time_vector, jx_tot_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom5b.plot(time_vector, jy_tot_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom6a.plot(time_vector, psi_sol * 180 / plt.pi, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom6b.plot(time_vector, psi_dot_sol * 180 / plt.pi, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom7a.plot(time_vector, throttle_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom7b.plot(time_vector, delta_sol * 180 / plt.pi, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom8a.plot(time_vector, atx_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom8b.plot(time_vector, anx_sol, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom9a.plot(time_vector, aty_sol, '.-', linewidth=3.0, label="LS-" + file[15:-4])
-%     axcom9b.plot(time_vector, any_sol, '.-', linewidth=3.0, label="LS-" + file[15:-4])
-%     axcom10.plot(time_vector, psi_ddot_sol* 180 / plt.pi, '.-', linewidth=3.0, label="LS-"+file[15:-4])
-%     axcom11a.plot(time_vector[0:N], throttle_dot_sol, '.-', linewidth=3.0, label="LS-" + file[15:-4])
-%     axcom11b.plot(time_vector[0:N], delta_dot_sol * 180 / plt.pi, '.-', linewidth=3.0, label="LS-" + file[15:-4])
-% 
-%     axcom1a.legend()
-%     axcom1b.legend()
-%     axcom2.legend()
-%     axcom3a.legend()
-%     axcom3b.legend()
-%     axcom4a.legend()
-%     axcom4b.legend()
-%     axcom5a.legend()
-%     axcom5b.legend()
-%     axcom6a.legend()
-%     axcom6b.legend()
-%     axcom7a.legend()
-%     axcom7b.legend()
-%     axcom8a.legend()
-%     axcom8b.legend()
-%     axcom9a.legend()
-%     axcom9b.legend()
-%     axcom10.legend()
-%     axcom11a.legend()
-%     axcom11b.legend()
+% Plotting end solution in comparinson
+for k = 1:1: length(file_list)
+    file = file_list{1,k};
+    data_s = solutions{1, rec}{1, k};
 
-%     %%%%%%%%%%%%%%%%%%%%%%%%
-%     % Writing csv file
-%     %%%%%%%%%%%%%%%%%%%%%%%%
-% 
-%     path = "results\Av_It" + str(rec) + "D" + str(len(file_list)) +"F"+file[15:-4]+ ".csv"
-%     file = open(path, 'w', newline="")
-%     writer = csv.writer(file)
-%     writer.writerow(["time", "x", "y", "vx", "vy", "ax", "ay", "jx", "jy", "psi", "psi_dot", "psi_ddot", "throttle", "delta","throttle_dot", "delta_dot", "aty", "a_ny", "atx", "anx"])
-% 
-%     for i in range(N + 1):
-%         if i == N:  % last control point has no physical meaning
-%             writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i],jy_tot_sol[i], psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i],throttle_dot_sol[i - 1], delta_dot_sol[i - 1], aty_sol[i], any_sol[i], atx_sol[i], anx_sol[i]])
-%         else:
-%             writer.writerow([i * dt_sol, x_sol[i], y_sol[i], vx_sol[i], vy_sol[i], ax_tot_sol[i], ay_tot_sol[i], jx_tot_sol[i],jy_tot_sol[i], psi_sol[i], psi_dot_sol[i], psi_ddot_sol[i], throttle_sol[i], delta_sol[i],throttle_dot_sol[i], delta_dot_sol[i], aty_sol[i], any_sol[i], atx_sol[i], anx_sol[i]])
-%     file.close()
-%     print('\n')
-% 
-% print("")
-% for i in plt.arange(0,len(file_list),1):
-%     file = file_list[i]
-%     final_calculated = solutions[-1][i]['features']
-%     final_data = data_list[i]['features']
-%     print("This is f_cal_rel of file ",file[15:-4],": ", + final_calculated/final_data)
-%     print("")
-% 
-% print('This is the theta_tracker: ',theta_tracker)
-% post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Saving figures
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% figure_style_saving()
-% legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17))
+        % X(t)/Y(t)
+    figure(1)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s,data_s.x_s,'LineWidth',2)  
+         
+    hold on
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    
+    
+    subplot(1, 2, 2)   
+    plot(data_s.time_s,data_s.y_s,'LineWidth',2)  
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    
+    hold on
+    
+    saveas(gcf,".\written_data\1X_Y_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\1X_Y_N"+string(N)+"IT"+string(rec) + ".fig")
+    
+    
+    % Path
+    figure(2)
+    plot(data_s.x_s,data_s.y_s,'LineWidth',2)
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+            
+    hold on
+    saveas(gcf,".\written_data\2path_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\2path_N"+string(N)+"IT"+string(rec) + ".fig")
+    
+    % VX(t)/VY(t)
+    figure(3)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s,data_s.vx_s,'LineWidth',2)
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+           
+    hold on
+    
+    
+    subplot(1, 2, 2)    
+    plot(data_s.time_s,data_s.vy_s,'LineWidth',2)  
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+        
+    hold on
+    
+    saveas(gcf,".\written_data\3VX_VY_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\3VX_VY_N"+string(N)+"IT"+string(rec) + ".fig")
 
-% 
-% %%%%%%%%%%%%%%%%%%%%%
-% plt.show()
-% %%%%%%%%%%%%%%%%%%%%%
+    
+    % AX(t)/AY(t)
+    figure(4)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s,data_s.ax_tot_s,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+          
+    hold on
+
+    
+    
+    subplot(1, 2, 2)    
+    plot(data_s.time_s,data_s.ay_tot_s,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+         
+    hold on
+    
+    saveas(gcf,".\written_data\4AX_AY_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\4AX_AY_N"+string(N)+"IT"+string(rec) + ".fig")
+    
+    % AtX(t)/AnX(t)
+    figure(5)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s,data_s.atx_s,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+          
+    hold on
+    
+    
+    subplot(1, 2, 2)   
+    plot(data_s.time_s,data_s.anx_s,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+         
+    hold on
+    
+    saveas(gcf,".\written_data\5AtX_AnX_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\5AtX_AnX_N"+string(N)+"IT"+string(rec) + ".fig")
+    
+    % AtY(t)/AnY(t)
+    figure(6)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s,data_s.aty_s,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+          
+    hold on
+    
+    
+    subplot(1, 2, 2)    
+    plot(data_s.time_s,data_s.any_s,'LineWidth',2)  
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+        
+    hold on
+    
+    saveas(gcf,".\written_data\6AtY_AnY_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\6AtY_AnY_N"+string(N)+"IT"+string(rec) + ".fig")
+    
+      
+    % JX(t)/JY(t)
+    figure(7)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s,data_s.jx_s,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+          
+    hold on
+    
+    
+    subplot(1, 2, 2)  
+    plot(data_s.time_s,data_s.jy_s,'LineWidth',2)
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+          
+    hold on
+    
+    saveas(gcf,".\written_data\7JX_JY_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\7JX_JY_N"+string(N)+"IT"+string(rec) + ".fig")
+    
+    % yaw(t)/yaw_dot(t)
+    figure(8)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s,data_s.psi_s*180/pi,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+          
+    hold on
+    
+    
+    subplot(1, 2, 2) 
+    plot(data_s.time_s,data_s.psi_dot_s*180/pi,'LineWidth',2)
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+          
+    hold on
+    
+    saveas(gcf,".\written_data\8yaws_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\8yaws_N"+string(N)+"IT"+string(rec) + ".fig")
+    
+    % % yaw_acc(t)
+    figure(9)
+    plot(data_s.time_s,data_s.psi_ddot_s*180/pi,'LineWidth',2)   
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+       
+     hold on
+    
+    saveas(gcf,".\written_data\9yawacc_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\9yawacc_N"+string(N)+"IT"+string(rec) + ".fig")
+    % tr(t)/delta(t) DELTA = angle front wheel
+    figure(10)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s,data_s.throttle_s,'LineWidth',2)
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    hold on
+    
+    
+    subplot(1, 2, 2)    
+    plot(data_s.time_s,data_s.delta_s*180/pi,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    
+    hold on
+    
+    saveas(gcf,".\written_data\10trdelta_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\10trdelta_N"+string(N)+"IT"+string(rec) + ".fig")
+ 
+    % tr_dot(t)/delta_dot(t) DELTA = angle front wheel
+    figure(11)
+    
+    subplot(1, 2, 1)
+    plot(data_s.time_s(1,1:end-1),data_s.throttle_dot_s,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+      
+    hold on
+    
+    
+    subplot(1, 2, 2)    
+    plot(data_s.time_s(1,1:end-1),data_s.delta_dot_s*180/pi,'LineWidth',2)
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    hold on
+    
+    saveas(gcf,".\written_data\11trdelta_dot_N"+string(N)+"IT"+string(rec) + ".png")
+    saveas(gcf,".\written_data\11trdelta_dot_N"+string(N)+"IT"+string(rec) + ".fig")
+    
+   
+   % Save values
+   throttle_dot_save = [data_s.throttle_dot_s,data_s.throttle_dot_s(end)]';
+   delta_dot_save = [data_s.delta_dot_s,data_s.delta_dot_s(end)]';
+    M = [data_s.time_s',data_s.x_s',data_s.y_s',data_s.vx_s',data_s.vy_s',data_s.ax_tot_s',data_s.ay_tot_s',data_s.jx_s',data_s.jy_s',data_s.psi_s',data_s.psi_dot_s',data_s.psi_ddot_s',data_s.throttle_s',data_s.delta_s',throttle_dot_save,delta_dot_save,data_s.aty_s',data_s.any_s',data_s.atx_s',data_s.anx_s'];
+    % Convert cell to a table and use first row as variable names
+    T = array2table(M,'VariableNames',{'time','x','y','vx','vy','ax','ay','jx','jy','psi','psi_dot','psi_ddot','throttle','delta','throttle_dot','delta_dot','aty','a_ny','atx','anx'});
+    % Write the table to a CSV file
+    writetable(T,convertStringsToChars(".\written_data\DCA2_V"+convertCharsToStrings(file(7:11))+"_L"+ convertCharsToStrings(file(14:17))+".csv"))
+    disp('CSV-file written')
+    
+end
+    
+fprintf('\n')
+for k = 1:1: length(file_list)
+    file = file_list{1,k};
+    data_s = solutions{1, rec}{1, k};
+    final_calculated = data_s.features;
+    final_data = data_list{1,k}.features;
+    fprintf("This is f_cal_rel of file %s: %i %i %i %i %i %i",file,final_calculated./final_data)
+    fprintf("\n")
+end
+fprintf('\n')
+fprintf('This is the theta_tracker: '); 
+fprintf('\n')
+fn = fieldnames(theta_tracker);
+for k=1:numel(fn)
+fprintf('%s: %i %i %i %i %i %i ',fn{k},theta_tracker.(fn{k}))
+fprintf('\n')
+end
+
+post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
+
+disp('Learning process finished')
+disp('----------------------------')
+
+
+
