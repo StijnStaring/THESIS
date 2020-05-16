@@ -1,25 +1,22 @@
-%% Initialization
-% Change throttle initial
-clearvars
-close all 
-clc
+function data_mpc = track_reference(data_planned)
+% remember to take different delta_angle into account.
+disp('Tracking mpc started!')
 import casadi.*
-global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected iteration_throttle plot_MPC
-iteration_throttle = 1;
-files = {'DCA2_V22.22_L3.47.csv'};
+global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected plot_MPC Ts Tf 
 plot_MPC = 0;
 N = 50; % Control horizon of one optimization of the MPC.
-Tf = 40; % if want same length as reference lane change set Tf = 0
 
-data = get_data(char(files(:,1)));
+data_temp = data_planned;
+data_temp.delta_cl = data_planned.delta_cl*16.96; % SWA
+data_temp.delta_dot_cl = data_planned.delta_dot_cl*16.96; % SWA
+data = get_data(data_temp);
 update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
 iteration = 1;
-
 throttle_start = 0.02295;
 
 % Simulation sampling time and duration
-Ts = 0.01; % sampling rate Amesim - taken standard value
+% Ts = 0.01; % sampling rate Amesim - taken standard value
 T_MPC = 0.1; % sampling rate of tracking algorithm
 T_pl = data.time(2,1)-data.time(1,1);
 N_ref = int64(Tf/T_pl+1);
@@ -40,31 +37,28 @@ amerunsingle('Dynamics', sim_opt);
 tracking_lane_change = Function.load('tracking_lane_change.casadi');
 DM.set_precision(15);
 
-
 %% run simulation simulink
 open('generating_data_lane_change');
-sim('generating_data_lane_change'); % This is running the simulink file
+sim_out = sim('generating_data_lane_change','SrcWorkspace','current'); % This is running the simulink file with function workspace
 
 %% Figures and save data
-% Remember that added a delay --> at time = zero --> controls are zero
-
 % time_control = control_signals.time;
-t_mpc = Results_States.time';
+t_mpc = sim_out.Results_States.time';
 t_max = 23;
 x_max = 550;
-x_mpc  = Results_States.signals(1).values';  % Vector of 2551 points
-y_mpc   = Results_States.signals(2).values'; 
-vx_mpc  = Results_States.signals(3).values';
-vy_mpc  = Results_States.signals(4).values';
-psi_mpc = Results_States.signals(5).values'; 
-psi_dot_mpc   = Results_States.signals(6).values';  
-throttle_mpc = squeeze(Results_States.signals(7).values)';
-delta_mpc = squeeze(Results_States.signals(8).values)';
+x_mpc  = sim_out.Results_States.signals(1).values';  % Vector of 2551 points
+y_mpc   = sim_out.Results_States.signals(2).values'; 
+vx_mpc  = sim_out.Results_States.signals(3).values';
+vy_mpc  = sim_out.Results_States.signals(4).values';
+psi_mpc = sim_out.Results_States.signals(5).values'; 
+psi_dot_mpc   = sim_out.Results_States.signals(6).values';  
+throttle_mpc = squeeze(sim_out.Results_States.signals(7).values)';
+delta_mpc = squeeze(sim_out.Results_States.signals(8).values)';
 
 
 % time_acc = Accelerations_output.time;
-ax_mpc       = Accelerations_output.signals.values(:,1)';  % in the beginning --> undesired deaccelleration due to delay in controls.
-ay_mpc       = Accelerations_output.signals.values(:,2)';  
+ax_mpc       = sim_out.Accelerations_output.signals.values(:,1)';  % in the beginning --> undesired deaccelleration due to delay in controls.
+ay_mpc       = sim_out.Accelerations_output.signals.values(:,2)';  
 
 t_ref = data.time';
 x_ref = data.x';
@@ -104,8 +98,8 @@ xlabel('X [m]','fontsize',12)
 xlim([0, x_max])
 ylabel('Y [m]','fontsize',12)
 % legend('R\_path','C\_path','Location','southeast')
-saveas(gcf,".\written_data\1path_N"+string(N)+"_TMPC C"+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\1path_N"+string(N)+"_TMPC C"+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\1path_N"+string(N)+"_TMPC C"+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\1path_N"+string(N)+"_TMPC C"+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 % Postion vs time
 figure('name', 'Pos')
 subplot(2,2,1)
@@ -139,8 +133,8 @@ title('Error [m]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('position error Y [m]','fontsize',12)
-saveas(gcf,".\written_data\2xy_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\2xy_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\2xy_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\2xy_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 
 % Velocity vs time
 figure('name', 'Vel')
@@ -174,8 +168,8 @@ title('Error [m/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('velocity error Y [m/s]','fontsize',12)
-saveas(gcf,".\written_data\3vxy_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\3vxy_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\3vxy_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\3vxy_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Need plots of ay_tot, aty, any, ax_tot, atx, any
@@ -216,8 +210,8 @@ title('Error [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration error anY [m/s²]','fontsize',12)
-saveas(gcf,".\written_data\4ay_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\4ay_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\4ay_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\4ay_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 figure('name', 'Acc\_x')
 subplot(2,2,1)
 plot(t_ref,atx_ref,'r.','LineWidth',1.0)
@@ -249,8 +243,8 @@ title('Error [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration error anx [m/s²]','fontsize',12)
-saveas(gcf,".\written_data\5ax_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\5ax_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\5ax_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\5ax_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 %%%%%%%%%%%%%%%%%%%%%%%%%
 figure('name', 'Acc\_tot')
 subplot(2,2,1)
@@ -283,8 +277,8 @@ title('Error [m/s²]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('acceleration error axtot [m/s²]','fontsize',12)
-saveas(gcf,".\written_data\6atot_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\6atot_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\6atot_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\6atot_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 %%%%%%%%%%%%%%%%%%%%%
 % Yaw and Yaw rate 
 figure('name', 'Yaw')
@@ -318,8 +312,8 @@ title('Error [deg/s]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('yaw velocity error d\psi [deg/s]','fontsize',12)
-saveas(gcf,".\written_data\7psi_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\7psi_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\7psi_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\7psi_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 
 %  delta & throttle
 figure('name', 'tr&delta')
@@ -353,8 +347,8 @@ title('Error [-]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('throttle error tr [-]','fontsize',12)
-saveas(gcf,".\written_data\8tr&delta_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\8tr&delta_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\8tr&delta_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\8tr&delta_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 
 % Calculate the jerks
 psi_ddot_mpc = derivative(psi_dot_mpc,Ts);
@@ -408,8 +402,8 @@ xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('Error jy [m/s³]','fontsize',12)
 
-saveas(gcf,".\written_data\9jerks_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\9jerks_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\9jerks_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\9jerks_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 
 if plot_MPC == 1
     figure(1);
@@ -431,8 +425,8 @@ end
 % Output tracking
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % time_t = outputs_tracking.time';
-delta_dot_mpc = outputs_tracking.signals.values(:,1)';
-throttle_dot_mpc = outputs_tracking.signals.values(:,2)';
+delta_dot_mpc = sim_out.outputs_tracking.signals.values(:,1)';
+throttle_dot_mpc = sim_out.outputs_tracking.signals.values(:,2)';
 % time_t = output_motion_planning.time';
 % delta_dot_mpc = output_motion_planning.signals.values(:,1)';
 % throttle_dot_mpc = output_motion_planning.signals.values(:,2)';
@@ -469,16 +463,19 @@ title('Error [-]','fontsize',12,'fontweight','bold')
 xlabel('t [s]','fontsize',12)
 xlim([0, t_max])
 ylabel('throttle\_dot error  [1/s]','fontsize',12)
-saveas(gcf,".\written_data\14tr_dot&delta_dot_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
-saveas(gcf,".\written_data\14tr_dot&delta_dot_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
+% saveas(gcf,".\written_data\14tr_dot&delta_dot_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
+% saveas(gcf,".\written_data\14tr_dot&delta_dot_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 
 fprintf('\n')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Write data to a csv file
+% saving data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-name = char(files(:,1));
-t_mpc_s = t_mpc(1,1001:end) - t_mpc(1,1001);
+% "time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","throttle_dot","delta_dot","aty","any","atx","anx"
+data_mpc = struct();
+% Struct data: 1xN
+
+time_mpc_s = t_mpc(1,1001:end) - t_mpc(1,1001);
 x_mpc_s = x_mpc(1,1001:end) - x_mpc(1,1001);
 y_mpc_s = y_mpc(1,1001:end);
 vx_mpc_s = vx_mpc(1,1001:end);
@@ -494,23 +491,22 @@ throttle_mpc_s = throttle_mpc(1,1001:end);
 delta_mpc_s = delta_mpc(1,1001:end);
 delta_mpc_s = 1/16.96*delta_mpc_s; % transforming back to front wheel angle
 
-throttle_dot_mpc_s = zeros(1,size(t_mpc_s,2));
+throttle_dot_mpc_s = zeros(1,size(time_mpc_s,2)-1);
 throttle_dot_iter = throttle_dot_mpc(1,101:end);
 iter = 1;
 for curr = throttle_dot_iter(1,1:end-1)
     throttle_dot_mpc_s((iter-1)*10+1:(iter-1)*10+10) = curr*ones(1,int64(T_MPC/Ts));
     iter = iter +1;
 end
-throttle_dot_mpc_s(end) = throttle_dot_iter(end);
 
-delta_dot_mpc_s = zeros(1,size(t_mpc_s,2));
+delta_dot_mpc_s = zeros(1,size(time_mpc_s,2)-1);
 delta_dot_iter = delta_dot_mpc(1,101:end);
 iter = 1;
 for curr = delta_dot_iter(1,1:end-1)
     delta_dot_mpc_s((iter-1)*10+1:(iter-1)*10+10) = curr*ones(1,int64(T_MPC/Ts));
     iter = iter +1;
 end
-delta_dot_mpc_s(end) = delta_dot_iter(end);
+
 delta_dot_mpc_s = 1/16.96*delta_dot_mpc_s; % transforming back to front wheel angle
 
 aty_mpc_s = aty_mpc(1,1001:end);
@@ -519,11 +515,104 @@ atx_mpc_s = atx_mpc(1,1001:end);
 anx_mpc_s = anx_mpc(1,1001:end);
 
 
-% Save values
-M = [t_mpc_s', x_mpc_s',y_mpc_s',vx_mpc_s',vy_mpc_s',ax_mpc_s',ay_mpc_s',jx_mpc_s',jy_mpc_s',psi_mpc_s',psi_dot_mpc_s',psi_ddot_mpc_s',throttle_mpc_s',delta_mpc_s',throttle_dot_mpc_s',delta_dot_mpc_s',aty_mpc_s',any_mpc_s',atx_mpc_s',anx_mpc_s'];
-% Convert cell to a table and use first row as variable names
-T = array2table(M,'VariableNames',{'time','x','y','vx','vy','ax','ay','jx','jy','psi','psi_dot','psi_ddot','throttle','delta','throttle_dot','delta_dot','aty','a_ny','atx','anx'});
-% Write the table to a CSV file
-writetable(T,convertStringsToChars(".\written_data\TRData_V"+convertCharsToStrings(name(7:11))+"_L"+ convertCharsToStrings(name(14:17))+".csv"))
-disp('CSV-file written')
+data_mpc.time_cl = time_mpc_s;
+N = size(data_mpc.time_cl,2) -1;
+data_mpc.dt_cl = data_mpc.time_cl(1,2) - data_mpc.time_cl(1,1);
+data_mpc.x_cl = x_mpc_s;
+data_mpc.y_cl = y_mpc_s;
+data_mpc.vx_cl =vx_mpc_s;
+data_mpc.vy_cl = vy_mpc_s;
+data_mpc.ax_cl = ax_mpc_s; % total acc
+data_mpc.ay_cl = ay_mpc_s; % total acc
+data_mpc.jx_cl = jx_mpc_s;
+data_mpc.jy_cl = jy_mpc_s;
+data_mpc.psi_cl = psi_mpc_s;
+data_mpc.psi_dot_cl = psi_dot_mpc_s;
+data_mpc.psi_ddot_cl = psi_ddot_mpc_s;
+data_mpc.throttle_cl = throttle_mpc_s;
+data_mpc.delta_cl = delta_mpc_s; % delta is the angle of the front wheel
+data_mpc.throttle_dot_cl = throttle_dot_mpc_s;
+data_mpc.delta_dot_cl = delta_dot_mpc_s; % delta is the angle of the front wheel
+data_mpc.aty_cl = aty_mpc_s;
+data_mpc.any_cl= any_mpc_s;
+data_mpc.atx_cl = atx_mpc_s;
+data_mpc.anx_cl = anx_mpc_s;
+data_mpc.width = data_mpc.y_cl(1,end);
+data_mpc.vx_start = data_mpc.vx_cl(1,1);
+
+
+% Calculation of features
+% f0: longitudinal acceleration
+integrand = data_mpc.ax_cl .^  2;
+f0_cal = 0;
+for i = 1:1:N
+    f0_cal = f0_cal + 0.5 * (integrand(i) + integrand(i+1) )* data_mpc.dt_cl;
+end
+
+% f1: lateral acceleration
+integrand = data_mpc.ay_cl .^  2;
+f1_cal = 0;
+for i = 1:1:N
+    f1_cal = f1_cal + 0.5 * (integrand(i) + integrand(i+1) )* data_mpc.dt_cl;
+end
+% f2: longitudinal jerk
+integrand = data_mpc.jx_cl .^  2;
+f2_cal = 0;
+for i = 1:1:N
+    f2_cal = f2_cal + 0.5 * (integrand(i) + integrand(i+1) )* data_mpc.dt_cl;
+end
+% f3: lateral jerk
+integrand = data_mpc.jy_cl .^  2;
+f3_cal = 0;
+for i = 1:1:N
+    f3_cal = f3_cal + 0.5 * (integrand(i) + integrand(i+1) )* data_mpc.dt_cl;
+end
+% f4: desired velocity
+integrand = (data_mpc.vx_start - data_mpc.vx_cl) .^  2;
+f4_cal = 0;
+for i = 1:1:N
+    f4_cal = f4_cal + 0.5 * (integrand(i) + integrand(i+1) )* data_mpc.dt_cl;
+end
+% f5: desired lane change
+integrand = (data_mpc.width - data_mpc.y_cl) .^  2;
+f5_cal = 0;
+for i = 1:1:N
+    f5_cal = f5_cal + 0.5 * (integrand(i) + integrand(i+1))* data_mpc.dt_cl;
+end
+
+fprintf("\n")
+fprintf('Integrated feature values of the DATA ')
+fprintf("\n")
+fprintf('------------------------------')
+fprintf("\n")
+fprintf('integrand = plt.squeeze(data_mpc[ax_cl].^ 2)')
+fprintf("\n")
+fprintf('%i ',f0_cal)
+fprintf("\n")
+fprintf('integrand = plt.squeeze(data_mpc[ay_cl] .^  2)')
+fprintf("\n")
+fprintf('%i ',f1_cal)
+fprintf("\n")
+fprintf('integrand = plt.squeeze(data_mpc[jx_cl] .^  2)')
+fprintf("\n")
+fprintf('%i ',f2_cal)
+fprintf("\n")
+fprintf('integrand = plt.squeeze(data_mpc[jy_cl] .^  2)')
+fprintf("\n")
+fprintf('%i ',f3_cal)
+fprintf("\n")
+fprintf('integrand = plt.squeeze((desired_speed - data_mpc[vx_cl]) .^  2)')
+fprintf("\n")
+fprintf('%i ',f4_cal)
+fprintf("\n")
+fprintf('integrand = plt.squeeze((delta_lane - data_mpc[y_cl]) .^  2)')
+fprintf("\n")
+fprintf('%i ',f5_cal)
+fprintf("\n")
+
+
+data_mpc.features = [f0_cal,f1_cal,f2_cal,f3_cal,f4_cal,f5_cal];
+close all
+
+end
 

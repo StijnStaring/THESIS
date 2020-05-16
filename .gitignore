@@ -179,12 +179,9 @@ log.txt
 !Complex_learning/optim_weights_ideal.m
 !Complex_learning/post_processing_plots.m
 !Complex_learning/RPROP.m
-
-
-
-
-
-
-
-
+!Complex_learning/deriv2.m
+!Complex_learning/derivative.m
+!Complex_learning/Function_generation.m
+!Complex_learning/track_reference.m
+!Complex_learning/TrackingFunction_lane_change.m
 

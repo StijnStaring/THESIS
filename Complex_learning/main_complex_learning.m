@@ -1,7 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % stijnstaring@hotmail.com
 % 
-% The program automatically uses all the csv files stored in the 'used_data' folder.
+% Matlab version used: R2018b
+% Amesim version used: 2019.2
 % Github stijn staring for more information
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc
@@ -11,6 +12,12 @@ clearvars
 % Remarks
 % No normalization necessary of gradient --> size doesn't matter in RPROP implementation.
 % Optimization objective is normalized in order to have dimensionless weights --> better start (+-equal size of optimization terms at start)
+
+disp('Learning algorithm started!')
+global Ts Tf 
+Ts = 0.01;
+Tf = 40;
+
 
 % Defining weights
 %%%%%%%%%%%%%%%%%%
@@ -43,14 +50,16 @@ theta_tracker.("iteration_"+num2str(rec)) = theta;
 his_weights.("iteration_"+num2str(rec)) = theta;
 theta_chosen = [4.0,5.0,1.0,6.0,1.0,2.0];% This is the theta used to generate the data
 
-file_list = {'DCA2_V22.22_L3.47.csv'};
+file_list = {'DCA2_V22.22_L3.47.csv'}; % With original bicycle model data
 data_list  = cell(1,length(file_list));
 for i = 1:1:length(file_list)
     file = file_list{1,i};
     fprintf("\n The name of the file: %s\n", file);
+    fprintf('\n')
     data_cl = import_data2(file, 1);   
-    data_list{1,i} = data_cl;
-    comparing_features(data_cl)
+    data_tracked = track_reference(data_cl);
+    data_list{1,i} = data_tracked;
+    comparing_features(data_tracked)
 end
 
 %  Calculate the averaged
@@ -64,8 +73,8 @@ solutions = cell(1,max_iterations);
 converged = 0;
 grad_prev = zeros(1,amount_features);
 
-% while converged ~= 1 && rec <= max_iterations
-while rec <= 1
+while converged ~= 1 && rec <= max_iterations
+% while rec <= 1
     
     dict_sol_list = cell(1,length(file_list));
     fprintf('Iteration: %i \n', rec)
@@ -77,7 +86,8 @@ while rec <= 1
     for k = 1:1:length(file_list)
         file = file_list{1,k};
         curr_data = data_list{1,k};
-        [data_s,lambda_sol] = optim_weights_ideal(theta,curr_data,rec,N,file);
+        [data_planned,lambda_sol] = optim_weights_ideal(theta,curr_data,rec,N,file);
+        data_s = track_reference(data_planned);
         data_list{1,k}.lam_sol = lambda_sol;
         dict_sol_list{1,k} = data_s;
     end
@@ -452,6 +462,7 @@ end
 
 post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_current,his_diff_theta)
 
+fprintf('\n')
 disp('Learning process finished')
 disp('----------------------------')
 
