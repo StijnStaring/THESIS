@@ -39,9 +39,23 @@ function [del_w, exception, w_new, update_out] = RPROP(grad_curr,cas,length,upda
         end
     end
 
-
+    % do check if weight becomes negative
+    for i = 1:1:length
+        if w_new(i) < 0
+            w_new(i) = 1e-8;
+            update(i) = abs(1e-8 - w_curr(i));
+            del_w(i) = -sign(grad_curr(i)) * update(i); 
+            
+            fprintf('\n')
+            fprintf('A negative weight spotted - weight %i!',i)
+            fprintf('\n')
+        end      
+    end
+    
     for i = 1:1:length
         update_out(i) = update(i); % now is pointing to local defined update
     end
+    
+
     
 end

@@ -17,6 +17,8 @@ disp('Learning algorithm started!')
 global Ts Tf 
 Ts = 0.01;
 Tf = 40;
+font = 14;
+font_ax = 12;    
 
 
 % Defining weights
@@ -52,11 +54,13 @@ theta_chosen = [4.0,5.0,1.0,6.0,1.0,2.0];% This is the theta used to generate th
 
 file_list = {'DCA2_V22.22_L3.47.csv'}; % With original bicycle model data
 data_list  = cell(1,length(file_list));
+data_list_ID  = cell(1,length(file_list));
 for i = 1:1:length(file_list)
     file = file_list{1,i};
     fprintf("\n The name of the file: %s\n", file);
     fprintf('\n')
-    data_cl = import_data2(file, 1);   
+    data_cl = import_data2(file, 1);
+    data_list_ID{1,i} = data_cl;
     data_tracked = track_reference(data_cl);
     data_list{1,i} = data_tracked;
     comparing_features(data_tracked)
@@ -77,18 +81,23 @@ while converged ~= 1 && rec <= max_iterations
 % while rec <= 1
     
     dict_sol_list = cell(1,length(file_list));
-    fprintf('Iteration: %i \n', rec)
-    diff_theta = theta_chosen - theta;
-    fprintf('This is the difference of theta: %i %i %i %i %i %i \n', diff_theta)
-    his_diff_theta.("iteration_"+num2str(rec))=  diff_theta;
     fprintf('\n')
+    fprintf('########################')
+    fprintf('\n')
+    fprintf('Learning algorithm iteration: %i \n', rec)
+    diff_theta = theta_chosen - theta;
+    his_diff_theta.("iteration_"+num2str(rec))=  diff_theta;
+    
       
     for k = 1:1:length(file_list)
         file = file_list{1,k};
-        curr_data = data_list{1,k};
+        curr_data = data_list_ID{1,k};
         [data_planned,lambda_sol] = optim_weights_ideal(theta,curr_data,rec,N,file);
+        data_list_ID{1,k}.lam_sol = lambda_sol;
         data_s = track_reference(data_planned);
-        data_list{1,k}.lam_sol = lambda_sol;
+        if rec == 1
+            comparing_features(data_s)
+        end
         dict_sol_list{1,k} = data_s;
     end
 
@@ -160,6 +169,8 @@ while converged ~= 1 && rec <= max_iterations
         his_weights.("iteration_"+num2str(rec)) = theta;
             
     end
+    fprintf('\n')
+    fprintf('This is the update of theta: %i %i %i %i %i %i',update)
 
     % solutions.append([str(rec) + "//", dict_sol_list])
     
@@ -242,17 +253,27 @@ for k = 1:1: length(file_list)
     figure(1)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.x_s,'LineWidth',2)  
-         
+    plot(data_s.time_cl,data_s.x_cl,'LineWidth',2)  
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Horizontal distance [m]", 'fontsize',font,'fontweight','bold')
+    grid on
+     
     hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
     
     
     subplot(1, 2, 2)   
-    plot(data_s.time_s,data_s.y_s,'LineWidth',2)  
-    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    plot(data_s.time_cl,data_s.y_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Vertical distance [m]", 'fontsize',font,'fontweight','bold')
+    grid on
     
     hold on
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    
+    
     
     saveas(gcf,".\written_data\1X_Y_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\1X_Y_N"+string(N)+"IT"+string(rec) + ".fig")
@@ -260,10 +281,16 @@ for k = 1:1: length(file_list)
     
     % Path
     figure(2)
-    plot(data_s.x_s,data_s.y_s,'LineWidth',2)
+    plot(data_s.x_cl,data_s.y_cl,'LineWidth',2)
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Horizontal distance [m]", 'fontsize',font,'fontweight','bold')
+    ylabel("Vertical distance [m]", 'fontsize',font,'fontweight','bold')
+    grid on
+        
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
             
-    hold on
+    
     saveas(gcf,".\written_data\2path_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\2path_N"+string(N)+"IT"+string(rec) + ".fig")
     
@@ -271,14 +298,25 @@ for k = 1:1: length(file_list)
     figure(3)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.vx_s,'LineWidth',2)
+    plot(data_s.time_cl,data_s.vx_cl,'LineWidth',2)
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Horizontal velocity [m/s]", 'fontsize',font,'fontweight','bold')
+    grid on
+       
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
            
-    hold on
+    
     
     
     subplot(1, 2, 2)    
-    plot(data_s.time_s,data_s.vy_s,'LineWidth',2)  
+    plot(data_s.time_cl,data_s.vy_cl,'LineWidth',2)  
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Vertical velocity [m/s]", 'fontsize',font,'fontweight','bold')
+    grid on
+    
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
         
     hold on
@@ -291,19 +329,27 @@ for k = 1:1: length(file_list)
     figure(4)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.ax_tot_s,'LineWidth',2) 
+    plot(data_s.time_cl,data_s.ax_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Horizontal acceleration [m/s²]", 'fontsize',font,'fontweight','bold')
+    grid on
+      
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
           
-    hold on
-
-    
+     
     
     subplot(1, 2, 2)    
-    plot(data_s.time_s,data_s.ay_tot_s,'LineWidth',2) 
+    plot(data_s.time_cl,data_s.ay_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Vertical acceleration [m/s²]", 'fontsize',font,'fontweight','bold')
+    grid on
+     
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
          
-    hold on
-    
     saveas(gcf,".\written_data\4AX_AY_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\4AX_AY_N"+string(N)+"IT"+string(rec) + ".fig")
     
@@ -311,18 +357,27 @@ for k = 1:1: length(file_list)
     figure(5)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.atx_s,'LineWidth',2) 
-    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
-          
+    plot(data_s.time_cl,data_s.atx_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Tangential ax [m/s²]", 'fontsize',font,'fontweight','bold')
+    grid on
+      
     hold on
-    
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+           
     
     subplot(1, 2, 2)   
-    plot(data_s.time_s,data_s.anx_s,'LineWidth',2) 
+    plot(data_s.time_cl,data_s.anx_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Normal ax [m/s²]", 'fontsize',font,'fontweight','bold')
+    grid on
+     
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
          
-    hold on
-    
+       
     saveas(gcf,".\written_data\5AtX_AnX_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\5AtX_AnX_N"+string(N)+"IT"+string(rec) + ".fig")
     
@@ -330,18 +385,28 @@ for k = 1:1: length(file_list)
     figure(6)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.aty_s,'LineWidth',2) 
+    plot(data_s.time_cl,data_s.aty_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Tangential ay [m/s²]", 'fontsize',font,'fontweight','bold')
+    grid on
+      
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
           
-    hold on
+   
     
     
     subplot(1, 2, 2)    
-    plot(data_s.time_s,data_s.any_s,'LineWidth',2)  
-    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
-        
-    hold on
+    plot(data_s.time_cl,data_s.any_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Normal ay [m/s²]", 'fontsize',font,'fontweight','bold')
+    grid on
     
+    hold on
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+            
     saveas(gcf,".\written_data\6AtY_AnY_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\6AtY_AnY_N"+string(N)+"IT"+string(rec) + ".fig")
     
@@ -350,18 +415,27 @@ for k = 1:1: length(file_list)
     figure(7)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.jx_s,'LineWidth',2) 
-    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
-          
+    plot(data_s.time_cl,data_s.jx_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Horizontal jerk [m/s³]", 'fontsize',font,'fontweight','bold')
+    grid on
+      
     hold on
-    
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+            
     
     subplot(1, 2, 2)  
-    plot(data_s.time_s,data_s.jy_s,'LineWidth',2)
+    plot(data_s.time_cl,data_s.jy_cl,'LineWidth',2)
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("Vertical jerk [m/s³]", 'fontsize',font,'fontweight','bold')
+    grid on
+      
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
           
-    hold on
-    
+       
     saveas(gcf,".\written_data\7JX_JY_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\7JX_JY_N"+string(N)+"IT"+string(rec) + ".fig")
     
@@ -369,27 +443,40 @@ for k = 1:1: length(file_list)
     figure(8)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.psi_s*180/pi,'LineWidth',2) 
-    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
-          
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("yaw angle [°]", 'fontsize',font,'fontweight','bold')
+    grid on
+      
     hold on
-    
+    plot(data_s.time_cl,data_s.psi_cl*180/pi,'LineWidth',2) 
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+      
     
     subplot(1, 2, 2) 
-    plot(data_s.time_s,data_s.psi_dot_s*180/pi,'LineWidth',2)
+    plot(data_s.time_cl,data_s.psi_dot_cl*180/pi,'LineWidth',2)
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("yaw rate [°/s]", 'fontsize',font,'fontweight','bold')
+    grid on
+      
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
           
-    hold on
-    
+     
     saveas(gcf,".\written_data\8yaws_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\8yaws_N"+string(N)+"IT"+string(rec) + ".fig")
     
     % % yaw_acc(t)
     figure(9)
-    plot(data_s.time_s,data_s.psi_ddot_s*180/pi,'LineWidth',2)   
+    plot(data_s.time_cl,data_s.psi_ddot_cl*180/pi,'LineWidth',2)   
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("yaw angle acc [°/s²]", 'fontsize',font,'fontweight','bold')
+    grid on
+     hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
        
-     hold on
     
     saveas(gcf,".\written_data\9yawacc_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\9yawacc_N"+string(N)+"IT"+string(rec) + ".fig")
@@ -397,16 +484,28 @@ for k = 1:1: length(file_list)
     figure(10)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.throttle_s,'LineWidth',2)
-    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    plot(data_s.time_cl,data_s.throttle_cl,'LineWidth',2)
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("throttle [-]", 'fontsize',font,'fontweight','bold')
+    grid on
+       
     hold on
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+   
     
     
     subplot(1, 2, 2)    
-    plot(data_s.time_s,data_s.delta_s*180/pi,'LineWidth',2) 
+    plot(data_s.time_cl,data_s.delta_cl*180/pi,'LineWidth',2)
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("delta [°]", 'fontsize',font,'fontweight','bold')
+    grid on
+     
+    hold on
     legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
     
-    hold on
+   
     
     saveas(gcf,".\written_data\10trdelta_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\10trdelta_N"+string(N)+"IT"+string(rec) + ".fig")
@@ -415,25 +514,36 @@ for k = 1:1: length(file_list)
     figure(11)
     
     subplot(1, 2, 1)
-    plot(data_s.time_s(1,1:end-1),data_s.throttle_dot_s,'LineWidth',2) 
-    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    plot(data_s.time_cl(1,1:end-1),data_s.throttle_dot_cl,'LineWidth',2) 
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("throttle\_dot [1/s]", 'fontsize',font,'fontweight','bold')
+    grid on
       
     hold on
-    
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+      
+      
     
     subplot(1, 2, 2)    
-    plot(data_s.time_s(1,1:end-1),data_s.delta_dot_s*180/pi,'LineWidth',2)
-    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    plot(data_s.time_cl(1,1:end-1),data_s.delta_dot_cl*180/pi,'LineWidth',2)
+    set(gca,'fontsize',font_ax,'fontweight','bold')
+    xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
+    ylabel("delta\_dot [°/s]", 'fontsize',font,'fontweight','bold')
+    grid on
+     
     hold on
+    legend("Data: " + file(6:11)+"-"+ file(13:17),"Init: " + file(6:11)+"-"+ file(13:17),"Learned: " + file(6:11)+"-"+ file(13:17));
+    
     
     saveas(gcf,".\written_data\11trdelta_dot_N"+string(N)+"IT"+string(rec) + ".png")
     saveas(gcf,".\written_data\11trdelta_dot_N"+string(N)+"IT"+string(rec) + ".fig")
     
    
    % Save values
-   throttle_dot_save = [data_s.throttle_dot_s,data_s.throttle_dot_s(end)]';
-   delta_dot_save = [data_s.delta_dot_s,data_s.delta_dot_s(end)]';
-    M = [data_s.time_s',data_s.x_s',data_s.y_s',data_s.vx_s',data_s.vy_s',data_s.ax_tot_s',data_s.ay_tot_s',data_s.jx_s',data_s.jy_s',data_s.psi_s',data_s.psi_dot_s',data_s.psi_ddot_s',data_s.throttle_s',data_s.delta_s',throttle_dot_save,delta_dot_save,data_s.aty_s',data_s.any_s',data_s.atx_s',data_s.anx_s'];
+   throttle_dot_save = [data_s.throttle_dot_cl,data_s.throttle_dot_cl(end)]';
+   delta_dot_save = [data_s.delta_dot_cl,data_s.delta_dot_cl(end)]';
+    M = [data_s.time_cl',data_s.x_cl',data_s.y_cl',data_s.vx_cl',data_s.vy_cl',data_s.ax_cl',data_s.ay_cl',data_s.jx_cl',data_s.jy_cl',data_s.psi_cl',data_s.psi_dot_cl',data_s.psi_ddot_cl',data_s.throttle_cl',data_s.delta_cl',throttle_dot_save,delta_dot_save,data_s.aty_cl',data_s.any_cl',data_s.atx_cl',data_s.anx_cl'];
     % Convert cell to a table and use first row as variable names
     T = array2table(M,'VariableNames',{'time','x','y','vx','vy','ax','ay','jx','jy','psi','psi_dot','psi_ddot','throttle','delta','throttle_dot','delta_dot','aty','a_ny','atx','anx'});
     % Write the table to a CSV file

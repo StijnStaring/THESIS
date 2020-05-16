@@ -2,10 +2,10 @@ function [result] = TrackingFunction_lane_change(current_states)
 
     global  x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected plot_MPC
     
-    disp('This is the current state')
-    disp('-----------------------------')
-    disp(current_states)
-    fprintf('\n iteration: %i',iteration)
+%     disp('This is the current state')
+%     disp('-----------------------------')
+%     disp(current_states)
+%     fprintf('\n iteration: %i',iteration)
     jump = T_MPC/T_pl;
     current_ref = zeros(12,N);
     current_ref(1,1:N) = data.x(int64(jump*(iteration-1)+2):int64(N+(iteration-1)*jump+1));
@@ -22,14 +22,14 @@ function [result] = TrackingFunction_lane_change(current_states)
     current_ref(12,1:N) = data.ay(int64(jump*(iteration-1)+2):int64(N+(iteration-1)*jump+1));
     
 % Solving the optimization problem by calling the CasADi function
-    fprintf('\n time spend in CasADi optimization: ')
-    tic
+%     fprintf('\n time spend in CasADi optimization: ')
+%     tic
     [X,U,x_sol_prev,lam_prev] = tracking_lane_change(current_states,current_ref,x_sol_prev,lam_prev);
-    toc
+%     toc
     X = full(X);
     U = full(U);
     result = U(:,1);
-    fprintf('\n')
+%     fprintf('\n')
    
     
     if iteration > iter_expected

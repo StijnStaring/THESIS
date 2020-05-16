@@ -36,14 +36,14 @@ function [data_s, sol_lambda] = optim_weights_ideal(theta,data_cl,iteration,N,fi
 
     T_limit = 25;
     fprintf("\n")
-    fprintf("start simulatie! \n")
+    fprintf("start opti weights simulatie! \n")
     fprintf('-------------------------------------------------- \n')
     fprintf('N:  %i, and T_limit: %i  ', N,T_limit)
     fprintf('\n')
     fprintf("The name of the file: %s", file)
     fprintf('\n')
-
-    % Resampling mostly not needed with this data file
+    
+        % Resampling mostly not needed with this data file
     N_old = size(data_cl.x_cl,2) - 1;
     if N_old ~= N
         error("Error: N_old is not equal to N, make use of resampling of the observation.")
@@ -371,77 +371,6 @@ function [data_s, sol_lambda] = optim_weights_ideal(theta,data_cl,iteration,N,fi
     end
     jx_tot_sol(N+1) = full(JXT(sol.value(X(:, N+1)),sol.value(U(:, N ))));  % uses previous control to approximate the jerk
     jy_tot_sol(N+1) = full(JYT(sol.value(X(:, N+1)), sol.value(U(:, N))));
-    % jx_tot_sol(N) = (ax_tot_sol(N) - ax_tot_sol(N-1))/(T_sol/N)
-    % jy_tot_sol(N) = (ay_tot_sol(N) - ay_tot_sol(N-1))/(T_sol/N)
-
-%     width = round(width_road, 2);
-%     speed = round(vx_start, 2);
-
-
-% Calculating solution features
-    f0_s = 0;
-    f1_s = 0;
-    f2_s = 0;
-    f3_s = 0;
-    f4_s = 0;
-    f5_s = 0;
-    
-    for i = 1:1:N
-        if i == N
-            f0_s = f0_s + 0.5 * (sol.value(AXT_int(X(:, i))) + sol.value(AXT_int(X(:, i + 1)))) * (sol.value(T / N));
-            f1_s = f1_s + 0.5 * (sol.value(AYT_int(X(:, i))) + sol.value(AYT_int(X(:, i + 1)))) * (sol.value(T / N));
-            f2_s = f2_s + 0.5 * (sol.value(JXT_int(X(:, i), U(:, i))) + sol.value(JXT_int(X(:, i + 1), U(:, i)))) * (sol.value(T / N));
-            f3_s = f3_s + 0.5 * (sol.value(JYT_int(X(:, i), U(:, i))) + sol.value(JYT_int(X(:, i + 1), U(:, i)))) * (sol.value(T / N));
-            f4_s = f4_s + 0.5 * (sol.value(VXD_int(X(:, i))) + sol.value(VXD_int(X(:, i + 1))))* (sol.value(T / N));
-            f5_s = f5_s + 0.5 * (sol.value(YD_int(X(:, i)))+ sol.value(YD_int(X(:, i + 1))))* (sol.value(T / N));
-        else
-            f0_s = f0_s + 0.5 * (sol.value(AXT_int(X(:, i))) + sol.value(AXT_int(X(:, i + 1)))) * (sol.value(T / N));
-            f1_s = f1_s + 0.5 * (sol.value(AYT_int(X(:, i))) + sol.value(AYT_int(X(:, i + 1)))) * (sol.value(T / N));
-            f2_s = f2_s + 0.5 * (sol.value(JXT_int(X(:, i), U(:, i))) + sol.value(JXT_int(X(:, i + 1), U(:, i + 1)))) * (sol.value(T / N));
-            f3_s = f3_s + 0.5 * (sol.value(JYT_int(X(:, i), U(:, i))) + sol.value(JYT_int(X(:, i + 1), U(:, i + 1)))) * (sol.value(T / N));
-            f4_s = f4_s + 0.5 * (sol.value(VXD_int(X(:, i))) + sol.value(VXD_int(X(:, i + 1)))) * (sol.value(T / N));
-            f5_s = f5_s + 0.5 * (sol.value(YD_int(X(:, i))) + sol.value(YD_int(X(:, i + 1)))) * (sol.value(T / N));
-        end
-    end
-    
-    f0_s = full(f0_s);
-    f1_s = full(f1_s);
-    f2_s = full(f2_s);
-    f3_s = full(f3_s);
-    f4_s = full(f4_s);
-    f5_s = full(f5_s);
-    
-    fprintf("\n")
-    fprintf("dt is equal to: %i", dt_sol)
-    fprintf("\n")
-    fprintf('Integrated calculated feature values: ')
-    fprintf("\n")
-    fprintf('-----------------------------------------')
-    fprintf("\n")
-    fprintf('integrand = squeeze(data_cl(ax_cl)^2)')
-    fprintf("\n")
-    fprintf('%i',f0_s)
-    fprintf("\n")
-    fprintf('integrand = squeeze(data_cl(ay_cl) ^ 2)')
-    fprintf("\n")
-    fprintf('%i',f1_s)
-    fprintf("\n")
-    fprintf('integrand = squeeze(data_cl(jx_cl) ^ 2)')
-    fprintf("\n")
-    fprintf('%i',f2_s)
-    fprintf("\n")
-    fprintf('integrand = squeeze(data_cl(jy_cl) ^ 2)')
-    fprintf("\n")
-    fprintf('%i',f3_s)
-    fprintf("\n")
-    fprintf('integrand = squeeze((desired_speed - data_cl(vx_cl)) ^ 2)')
-    fprintf("\n")
-    fprintf('%i',f4_s)
-    fprintf("\n")
-    fprintf('integrand = squeeze((delta_lane - data_cl(y_cl)) ^ 2)')
-    fprintf("\n")
-    fprintf('%i',f5_s)
-    fprintf("\n")
 
     if (T_limit - dt_sol) < T_sol
         fprintf("-------------------------------------")
@@ -451,205 +380,34 @@ function [data_s, sol_lambda] = optim_weights_ideal(theta,data_cl,iteration,N,fi
         fprintf("-------------------------------------")
         fprintf("\n")
     end
-    fprintf('Simulation completed!')
-    fprintf("\n")
+    
 
     data_s = struct();
-    data_s.x_s = sol.value(x);
-    data_s.time_s = linspace(0, T_sol, size(data_s.x_s,2));    
-    data_s.y_s = sol.value(y);
-    data_s.vx_s = sol.value(vx);
-    data_s.vy_s = sol.value(vy);
-    data_s.psi_s = sol.value(psi);
-    data_s.psi_dot_s = sol.value(psi_dot);
-    data_s.throttle_s = sol.value(throttle);
-    data_s.delta_s = sol.value(delta);
-    data_s.throttle_dot_s = sol.value(throttle_dot);
-    data_s.delta_dot_s = sol.value(delta_dot);
-    data_s.T_s = sol.value(T);
-    data_s.dt_s = data_s.T_s / N;
-    data_s.ax_tot_s = ax_tot_sol;
-    data_s.ay_tot_s = ay_tot_sol;
-    data_s.aty_s = aty_sol;
-    data_s.any_s = any_sol;
-    data_s.atx_s = atx_sol;
-    data_s.anx_s = anx_sol;
-    data_s.jx_s = jx_tot_sol;
-    data_s.jy_s = jy_tot_sol;
-    data_s.psi_ddot_s = psi_ddot_sol;
-    
-    data_s.features = [f0_s,f1_s,f2_s,f3_s,f4_s,f5_s];
-    
-    if iteration == 1
-        % X(t)/Y(t)
-    figure(1)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.x_s,'LineWidth',2)  
-         
-    hold on
-    
-    
-    subplot(1, 2, 2)   
-    plot(data_s.time_s,data_s.y_s,'LineWidth',2)  
-
-    
-    hold on
-    
-    
-    % Path
-    figure(2)
-    plot(data_s.x_s,data_s.y_s,'LineWidth',2)
-
-        
-    hold on
-    
-    
-    % VX(t)/VY(t)
-    figure(3)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.vx_s,'LineWidth',2)
-
-       
-    hold on
-    
-    
-    subplot(1, 2, 2)    
-    plot(data_s.time_s,data_s.vy_s,'LineWidth',2)  
-
-    
-    hold on
-    
-
-    
-    % AX(t)/AY(t)
-    figure(4)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.ax_tot_s,'LineWidth',2) 
-
-      
-    hold on
-    
-    
-    subplot(1, 2, 2)    
-    plot(data_s.time_s,data_s.ay_tot_s,'LineWidth',2) 
-
-     
-    hold on
-    
-    
-    
-    % AtX(t)/AnX(t)
-    figure(5)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.atx_s,'LineWidth',2) 
-
-      
-    hold on
-    
-    
-    subplot(1, 2, 2)   
-    plot(data_s.time_s,data_s.anx_s,'LineWidth',2) 
-
-     
-    hold on
-    
-    
-    % AtY(t)/AnY(t)
-    figure(6)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.aty_s,'LineWidth',2) 
-
-      
-    hold on
-    
-    
-    subplot(1, 2, 2)    
-    plot(data_s.time_s,data_s.any_s,'LineWidth',2)  
-
-    
-    hold on
-    
-    
-      
-    % JX(t)/JY(t)
-    figure(7)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.jx_s,'LineWidth',2) 
-
-      
-    hold on
-    
-    
-    subplot(1, 2, 2)  
-    plot(data_s.time_s,data_s.jy_s,'LineWidth',2)
-
-      
-    hold on
-    
-    
-    % yaw(t)/yaw_dot(t)
-    figure(8)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.psi_s*180/pi,'LineWidth',2) 
-
-      
-    hold on
-    
-    
-    subplot(1, 2, 2) 
-    plot(data_s.time_s,data_s.psi_dot_s*180/pi,'LineWidth',2)
-
-      
-    hold on
-    
-    
-    % % yaw_acc(t)
-    figure(9)
-    plot(data_s.time_s,data_s.psi_ddot_s*180/pi,'LineWidth',2)   
-   
-     hold on
-    
-    
-    % tr(t)/delta(t) DELTA = angle front wheel
-    figure(10)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s,data_s.throttle_s,'LineWidth',2)
-    hold on
-    
-    
-    subplot(1, 2, 2)    
-    plot(data_s.time_s,data_s.delta_s*180/pi,'LineWidth',2) 
-
-    hold on
-    
- 
-    % tr_dot(t)/delta_dot(t) DELTA = angle front wheel
-    figure(11)
-    
-    subplot(1, 2, 1)
-    plot(data_s.time_s(1,1:end-1),data_s.throttle_dot_s,'LineWidth',2) 
-
-      
-    hold on
-    
-    
-    subplot(1, 2, 2)    
-    plot(data_s.time_s(1,1:end-1),data_s.delta_dot_s*180/pi,'LineWidth',2) 
-
-     
-    hold on
-    
-    
-    end
+    data_s.x_cl = sol.value(x);
+    data_s.time_cl = linspace(0, T_sol, size(data_s.x_cl,2));
+    data_s.y_cl = sol.value(y);
+    data_s.vx_cl = sol.value(vx);
+    data_s.vy_cl = sol.value(vy);
+    data_s.psi_cl = sol.value(psi);
+    data_s.psi_dot_cl = sol.value(psi_dot);
+    data_s.psi_ddot_cl = psi_ddot_sol;
+    data_s.throttle_cl = sol.value(throttle);
+    data_s.delta_cl = sol.value(delta);
+    data_s.throttle_dot_cl = sol.value(throttle_dot);
+    data_s.delta_dot_cl = sol.value(delta_dot);
+    data_s.T_cl = sol.value(T);
+    data_s.dt_cl = data_s.T_cl / N;
+    data_s.ax_cl = ax_tot_sol;
+    data_s.ay_cl = ay_tot_sol;
+    data_s.aty_cl = aty_sol;
+    data_s.any_cl = any_sol;
+    data_s.atx_cl = atx_sol;
+    data_s.anx_cl = anx_sol;
+    data_s.jx_cl = jx_tot_sol;
+    data_s.jy_cl = jy_tot_sol;
     
     sol_lambda = sol.value(opti.lam_g);
     
+    fprintf('Simulation opti weights completed!')
+    fprintf("\n")
 end
