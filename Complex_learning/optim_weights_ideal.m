@@ -34,7 +34,7 @@ function [data_s, sol_lambda] = optim_weights_ideal(theta,data_cl,iteration,N,fi
     psi_start = 0;
     psi_dot_start = 0;
 
-    T_limit = 30;
+    T_limit = 25;
     fprintf("\n")
     fprintf("start simulatie! \n")
     fprintf('-------------------------------------------------- \n')
