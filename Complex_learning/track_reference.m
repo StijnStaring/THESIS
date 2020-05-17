@@ -2,7 +2,7 @@ function data_mpc = track_reference(data_planned)
 % remember to take different delta_angle into account.
 disp('Tracking mpc started!')
 import casadi.*
-global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected plot_MPC Ts Tf 
+global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected plot_MPC Ts Tf V0
 plot_MPC = 0;
 N = 50; % Control horizon of one optimization of the MPC.
 
@@ -28,7 +28,7 @@ addpath(fullfile(getenv('AME'),'scripting','matlab','amesim'));
 ! AMECirChecker -g -q --nobackup --nologfile Dynamics.ame
 ! AMELoad Dynamics.ame
 % Adjusted this state manually
-ameputgpar('Dynamics', 'V0', 80/3.6) % this command only is not working --> have to set manual in amesim block in simulink
+ameputgpar('Dynamics', 'V0', V0) 
 sim_opt = amegetsimopt('Dynamics');
 amerunsingle('Dynamics', sim_opt);
 
@@ -60,30 +60,30 @@ delta_mpc = squeeze(sim_out.Results_States.signals(8).values)';
 ax_mpc       = sim_out.Accelerations_output.signals.values(:,1)';  % in the beginning --> undesired deaccelleration due to delay in controls.
 ay_mpc       = sim_out.Accelerations_output.signals.values(:,2)';  
 
-t_ref = data.time';
-x_ref = data.x';
-y_ref = data.y';
-vx_ref = data.vx';
-vy_ref = data.vy';
-psi_ref = data.psi';
-psi_dot_ref = data.psi_dot';
-
-atx_ref = data.atx';
-anx_ref = data.anx';
-ax_ref = data.ax';
-
-aty_ref = data.aty';
-any_ref = data.any';
-ay_ref = data.ay';
-
-jx_ref = data.jx';
-jy_ref = data.jy';
-
-delta_ref = data.delta';
-throttle_ref = data.throttle';
-
-delta_dot_ref = data.delta_dot';
-throttle_dot_ref = data.throttle_dot';
+% t_ref = data.time';
+% x_ref = data.x';
+% y_ref = data.y';
+% vx_ref = data.vx';
+% vy_ref = data.vy';
+% psi_ref = data.psi';
+% psi_dot_ref = data.psi_dot';
+% 
+% atx_ref = data.atx';
+% anx_ref = data.anx';
+% ax_ref = data.ax';
+% 
+% aty_ref = data.aty';
+% any_ref = data.any';
+% ay_ref = data.ay';
+% 
+% jx_ref = data.jx';
+% jy_ref = data.jy';
+% 
+% delta_ref = data.delta';
+% throttle_ref = data.throttle';
+% 
+% delta_dot_ref = data.delta_dot';
+% throttle_dot_ref = data.throttle_dot';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Plots
@@ -350,7 +350,8 @@ any_mpc = vx_mpc.*psi_dot_mpc;
 % % saveas(gcf,".\written_data\8tr&delta_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".png")
 % % saveas(gcf,".\written_data\8tr&delta_N"+string(N)+"_TMPC "+string(T_MPC)+"_Tf"+string(Tf)+".fig")
 
-% Calculate the jerks
+% Calculate the jerks -> maybe better to calculate only the derivative
+% fromt ax/ay total to estimate the jerk. 
 psi_ddot_mpc = derivative(psi_dot_mpc,Ts);
 jy_t = deriv2(vy_mpc,Ts);
 jy_n =  zeros(1,length(t_mpc));

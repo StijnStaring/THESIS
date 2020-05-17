@@ -4,12 +4,14 @@ clearvars
 close all 
 clc
 import casadi.*
-global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected iteration_throttle plot_MPC
+global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected iteration_throttle plot_MPC V0
 iteration_throttle = 1;
 files = {'DCA2_V22.22_L3.47.csv'};
 plot_MPC = 0;
 N = 50; % Control horizon of one optimization of the MPC.
 Tf = 40; % if want same length as reference lane change set Tf = 0
+V0 = 80/3.6;
+
 
 data = get_data(char(files(:,1)));
 update_casadi_function = 1; % in order to save time when developing
@@ -31,7 +33,7 @@ addpath(fullfile(getenv('AME'),'scripting','matlab','amesim'));
 ! AMECirChecker -g -q --nobackup --nologfile Dynamics.ame
 ! AMELoad Dynamics.ame
 % Adjusted this state manually
-ameputgpar('Dynamics', 'V0', 80/3.6) % this command only is not working --> have to set manual in amesim block in simulink
+ameputgpar('Dynamics', 'V0', V0) % this command only is not working --> have to set manual in amesim block in simulink
 sim_opt = amegetsimopt('Dynamics');
 amerunsingle('Dynamics', sim_opt);
 
