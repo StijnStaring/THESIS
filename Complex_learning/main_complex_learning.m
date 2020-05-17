@@ -78,8 +78,8 @@ solutions = cell(1,max_iterations);
 converged = 0;
 grad_prev = zeros(1,amount_features);
 
-% while converged ~= 1 && rec <= max_iterations
-while rec <= 1
+while converged ~= 1 && rec <= max_iterations
+% while rec <= 1
     
     dict_sol_list = cell(1,length(file_list));
     fprintf('\n')

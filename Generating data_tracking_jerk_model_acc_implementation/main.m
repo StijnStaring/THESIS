@@ -6,12 +6,11 @@ clc
 import casadi.*
 global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected iteration_throttle plot_MPC V0
 iteration_throttle = 1;
-files = {'DCA2_V22.22_L3.47.csv'};
+files = {'DCA2_V25.00_L6.94.csv'};
 plot_MPC = 0;
 N = 50; % Control horizon of one optimization of the MPC.
 Tf = 40; % if want same length as reference lane change set Tf = 0
-V0 = 80/3.6;
-
+V0 = 25.0;
 
 data = get_data(char(files(:,1)));
 update_casadi_function = 1; % in order to save time when developing
