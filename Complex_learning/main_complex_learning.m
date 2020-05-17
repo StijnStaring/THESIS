@@ -547,7 +547,7 @@ for k = 1:1: length(file_list)
     % Convert cell to a table and use first row as variable names
     T = array2table(M,'VariableNames',{'time','x','y','vx','vy','ax','ay','jx','jy','psi','psi_dot','psi_ddot','throttle','delta','throttle_dot','delta_dot','aty','a_ny','atx','anx'});
     % Write the table to a CSV file
-    writetable(T,convertStringsToChars(".\written_data\DCA2_V"+convertCharsToStrings(file(7:11))+"_L"+ convertCharsToStrings(file(14:17))+".csv"))
+    writetable(T,convertStringsToChars(".\written_data\CL_V"+convertCharsToStrings(file(7:11))+"_L"+ convertCharsToStrings(file(14:17))+".csv"))
     disp('CSV-file written')
     
 end

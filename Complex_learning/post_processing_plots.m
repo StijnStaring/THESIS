@@ -89,7 +89,7 @@ function post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_gr
     end
       
 saveas(gcf,".\written_data\12frel.png")
-saveas(gcf,".\written_data\12frel.png")
+saveas(gcf,".\written_data\12frel.fig")
  
 %plot current gradient
     figure("name","Current gradient")
@@ -176,7 +176,7 @@ saveas(gcf,".\written_data\12frel.png")
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
 saveas(gcf,".\written_data\13gradcurr.png")
-saveas(gcf,".\written_data\13gradcurr.png")
+saveas(gcf,".\written_data\13gradcurr.fig")
 
       % Weights 
     figure("name","Weights")
@@ -263,7 +263,7 @@ saveas(gcf,".\written_data\13gradcurr.png")
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
 saveas(gcf,".\written_data\14weights.png")
-saveas(gcf,".\written_data\14weights.png")
+saveas(gcf,".\written_data\14weights.fig")
     % Plotting diff of theta over iterations
     figure("name","Diff theta")
     subplot(2, 3,1)
@@ -348,7 +348,7 @@ saveas(gcf,".\written_data\14weights.png")
     end
      
 saveas(gcf,".\written_data\15updateweights.png")
-saveas(gcf,".\written_data\15updateweights.png")
+saveas(gcf,".\written_data\15updateweights.fig")
     % multiplication of gradient
     figure("name","his_multi_grads")
     subplot(2, 3,1)
@@ -433,7 +433,7 @@ saveas(gcf,".\written_data\15updateweights.png")
         scatter(k,temp(1,6),'o','MarkerFaceColor', 'b')
     end
 saveas(gcf,".\written_data\16multigrad.png")
-saveas(gcf,".\written_data\16multigrad.png")
+saveas(gcf,".\written_data\16multigrad.fig")
 % history of difference with the chose weights
     figure("name","Diff chosen weights")
     subplot(2, 3,1)
@@ -520,6 +520,6 @@ saveas(gcf,".\written_data\16multigrad.png")
     end
       
 saveas(gcf,".\written_data\17diffchosen.png")
-saveas(gcf,".\written_data\17diffchosen.png")
+saveas(gcf,".\written_data\17diffchosen.fig")
       
 end
