@@ -48,7 +48,7 @@ def optim_weights_ideal(theta,data_cl,iteration,N,plotting,axcom1a,axcom1b,axcom
     # Resampling mostly not needed with this data file
     N_old = data_cl['x_cl'].shape[1] - 1
     if N_old != N:
-        print("Error: N_old is not equal to N, make use of resampling of the observation.")
+        print("Error: N_old is not equal to N, make use of resampling of the observation or use a dataset with a different sampling time.")
         sys.exit(-1)
     time_guess = data_cl['time_cl'][0, -1]
     # x_guess = signal.resample_poly(data_cl['x_cl'], N, N_old, axis=1, padtype='line')

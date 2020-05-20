@@ -13,6 +13,7 @@ from figure_style_saving import figure_style_saving
 from import_data2 import import_data2
 from optim_weights_ideal import optim_weights_ideal
 import glob
+import time
 
 # Remarks
 # ########
