@@ -52,7 +52,7 @@ theta_tracker.("iteration_"+num2str(rec)) = theta;
 his_weights.("iteration_"+num2str(rec)) = theta;
 theta_chosen = [4.0,5.0,1.0,6.0,1.0,2.0];% This is the theta used to generate the data
 
-file_list = {'DCA2_V22.22_L3.47.csv','DCA2_V22.22_L6.94.csv','DCA2_V25.00_L3.47.csv','DCA2_V25.00_L6.94.csv','DCA2_V27.78_L3.47.csv'}; % With original bicycle model data
+file_list = {'DCA2_V22.22_L3.47.csv','DCA2_V25.00_L6.94.csv','DCA2_V27.78_L3.47.csv'}; % With original bicycle model data
 data_list  = cell(1,length(file_list));
 data_list_ID  = cell(1,length(file_list));
 for i = 1:1:length(file_list)
