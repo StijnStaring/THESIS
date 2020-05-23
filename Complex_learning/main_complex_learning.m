@@ -17,8 +17,8 @@ disp('Learning algorithm started!')
 global Ts Tf V0
 Ts = 0.01;
 Tf = 40;
-font = 14;
-font_ax = 12;    
+font = 16;
+font_ax = 14;    
 V0 = 1;
 
 % Defining weights
