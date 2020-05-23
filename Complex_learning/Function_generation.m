@@ -146,7 +146,7 @@ delta_dot = U(2,:);
 % Parameters
 x0 = opti.parameter(nx);
 ref = opti.parameter(nx+2,N);
-opti.set_value(x0,[0;0;vx_start;0;0;0;0.0249913580246913;0;ax_ref(1,1);ay_ref(1,1)]);
+opti.set_value(x0,[0;0;vx_start;0;0;0;throttle_ref(1,1);0;ax_ref(1,1);ay_ref(1,1)]);
 
 opti.set_value(ref,[x_ref(2:N+1);y_ref(2:N+1);vx_ref(2:N+1);vy_ref(2:N+1);psi_ref(2:N+1);psi_dot_ref(2:N+1);throttle_ref(2:N+1);delta_ref(2:N+1);throttle_dot_ref(1:N);delta_dot_ref(1:N);ax_ref(2:N+1);ay_ref(2:N+1)]);
 
