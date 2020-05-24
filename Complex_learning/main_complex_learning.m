@@ -284,7 +284,7 @@ figure(1)
 subplot(1, 2, 1) 
 set(gca,'fontsize',font_ax,'fontweight','bold')
 xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
-ylabel("Horizontal distance [m]", 'fontsize',font,'fontweight','bold')
+ylabel("Longitudinal distance [m]", 'fontsize',font,'fontweight','bold')
 grid on
 legend(legend_names)
 hold on
@@ -292,7 +292,7 @@ hold on
 subplot(1, 2, 2)   
 set(gca,'fontsize',font_ax,'fontweight','bold')
 xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
-ylabel("Vertical distance [m]", 'fontsize',font,'fontweight','bold')
+ylabel("Lateral distance [m]", 'fontsize',font,'fontweight','bold')
 grid on
 
 hold on;legend(legend_names);
@@ -304,8 +304,8 @@ saveas(gcf,".\written_data\1X_Y_N"+string(N)+"IT"+string(rec) + ".fig")
 % Path
 figure(2)
 set(gca,'fontsize',font_ax,'fontweight','bold')
-xlabel("Horizontal distance [m]", 'fontsize',font,'fontweight','bold')
-ylabel("Vertical distance [m]", 'fontsize',font,'fontweight','bold')
+xlabel("Longitudinal distance [m]", 'fontsize',font,'fontweight','bold')
+ylabel("Lateral distance [m]", 'fontsize',font,'fontweight','bold')
 grid on
 
 hold on;legend(legend_names);
@@ -319,7 +319,7 @@ figure(3)
 subplot(1, 2, 1)
 set(gca,'fontsize',font_ax,'fontweight','bold')
 xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
-ylabel("Horizontal velocity [m/s]", 'fontsize',font,'fontweight','bold')
+ylabel("Longitudinal velocity [m/s]", 'fontsize',font,'fontweight','bold')
 grid on
 
 hold on;legend(legend_names);
@@ -328,7 +328,7 @@ hold on;legend(legend_names);
 subplot(1, 2, 2)     
 set(gca,'fontsize',font_ax,'fontweight','bold')
 xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
-ylabel("Vertical velocity [m/s]", 'fontsize',font,'fontweight','bold')
+ylabel("Lateral velocity [m/s]", 'fontsize',font,'fontweight','bold')
 grid on
 
 hold on;legend(legend_names);
@@ -343,7 +343,7 @@ figure(4)
 subplot(1, 2, 1) 
 set(gca,'fontsize',font_ax,'fontweight','bold')
 xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
-ylabel("Horizontal acceleration [m/s淫", 'fontsize',font,'fontweight','bold')
+ylabel("Longitudinal acceleration [m/s淫", 'fontsize',font,'fontweight','bold')
 grid on
 
 hold on;legend(legend_names);
@@ -352,7 +352,7 @@ hold on;legend(legend_names);
 subplot(1, 2, 2)    
 set(gca,'fontsize',font_ax,'fontweight','bold')
 xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
-ylabel("Vertical acceleration [m/s淫", 'fontsize',font,'fontweight','bold')
+ylabel("Lateral acceleration [m/s淫", 'fontsize',font,'fontweight','bold')
 grid on
 
 hold on;legend(legend_names);
@@ -411,7 +411,7 @@ figure(7)
 subplot(1, 2, 1)
 set(gca,'fontsize',font_ax,'fontweight','bold')
 xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
-ylabel("Horizontal jerk [m/s設", 'fontsize',font,'fontweight','bold')
+ylabel("Longitudinal jerk [m/s設", 'fontsize',font,'fontweight','bold')
 grid on
 
 hold on;legend(legend_names);
@@ -419,7 +419,7 @@ hold on;legend(legend_names);
 subplot(1, 2, 2)  
 set(gca,'fontsize',font_ax,'fontweight','bold')
 xlabel("Time [s]", 'fontsize',font,'fontweight','bold')
-ylabel("Vertical jerk [m/s設", 'fontsize',font,'fontweight','bold')
+ylabel("Lateral jerk [m/s設", 'fontsize',font,'fontweight','bold')
 grid on
 
 hold on;legend(legend_names);
