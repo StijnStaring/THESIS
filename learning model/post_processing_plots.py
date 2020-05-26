@@ -4,10 +4,10 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     """
     import pylab as plt
     plt.rc('axes', linewidth=2)
-    plt.rc('legend',fontsize=16) # using a size in points
+    plt.rc('legend',fontsize=20) # using a size in points
     # plt.rcParams["legend.loc"] = 'best'
-    fontsize = 14
-    font = 16
+    fontsize = 20
+    font = 22
 
     # Create different figures for different files
     f_calc_rel_curr = []
@@ -27,7 +27,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("Normalized calculated feature 1 [-]", fontsize=14)
         plt.grid(True)
-        plt.title('Convergence of features 1', fontsize=font, fontweight = 'bold')
+        plt.title('Convergence of feature 1', fontsize=font, fontweight = 'bold')
 
         for tick in acf1.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -41,7 +41,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("Normalized calculated feature 2 [-]", fontsize=14)
         plt.grid(True)
-        plt.title('Convergence of features 2', fontsize=font, fontweight = 'bold')
+        plt.title('Convergence of feature 2', fontsize=font, fontweight = 'bold')
 
         for tick in acf2.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -55,7 +55,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("Normalized calculated feature 3 [-]", fontsize=14)
         plt.grid(True)
-        plt.title('Convergence of features 3', fontsize=font, fontweight = 'bold')
+        plt.title('Convergence of feature 3', fontsize=font, fontweight = 'bold')
 
         for tick in acf3.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -69,7 +69,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("Normalized calculated feature 4 [-]", fontsize=14)
         plt.grid(True)
-        plt.xlabel('Convergence of features 4', fontsize=font, fontweight = 'bold')
+        plt.xlabel('Convergence of feature 4', fontsize=font, fontweight = 'bold')
 
         for tick in acf4.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -83,7 +83,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("Normalized calculated feature 5 [-]", fontsize=14)
         plt.grid(True)
-        plt.xlabel('Convergence of features 5', fontsize=font, fontweight = 'bold')
+        plt.xlabel('Convergence of feature 5', fontsize=font, fontweight = 'bold')
 
         for tick in acf5.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -97,7 +97,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("Normalized calculated feature 5 [-]", fontsize=14)
         plt.grid(True)
-        plt.xlabel('Convergence of features 5', fontsize=font, fontweight='bold')
+        plt.xlabel('Convergence of feature 6', fontsize=font, fontweight='bold')
 
         for tick in acf6.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -124,7 +124,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("grad feature 1 [-]", fontsize=14)
         plt.grid(True)
-        plt.title('grad of features 1', fontsize=font, fontweight = 'bold')
+        plt.title('grad of feature 1', fontsize=font, fontweight = 'bold')
 
         for tick in acgc1.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -138,7 +138,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("gradfeature 2 [-]", fontsize=14)
         plt.grid(True)
-        plt.title('grad of features 2', fontsize=font, fontweight = 'bold')
+        plt.title('grad of feature 2', fontsize=font, fontweight = 'bold')
 
         for tick in acgc2.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -152,7 +152,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("grad feature 3 [-]", fontsize=14)
         plt.grid(True)
-        plt.title('grad of features 3', fontsize=font, fontweight = 'bold')
+        plt.title('grad of feature 3', fontsize=font, fontweight = 'bold')
 
         for tick in acgc3.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -166,7 +166,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("grad feature 4 [-]", fontsize=14)
         plt.grid(True)
-        plt.xlabel('grad of features 4', fontsize=font, fontweight = 'bold')
+        plt.xlabel('grad of feature 4', fontsize=font, fontweight = 'bold')
 
         for tick in acgc4.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -180,7 +180,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("grad feature 5 [-]", fontsize=14)
         plt.grid(True)
-        plt.xlabel('grad of features 5', fontsize=font, fontweight = 'bold')
+        plt.xlabel('grad of feature 5', fontsize=font, fontweight = 'bold')
 
         for tick in acgc5.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -194,7 +194,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
         # plt.xlabel("Iteration [-]", fontsize=14)
         # plt.ylabel("grad feature 5 [-]", fontsize=14)
         plt.grid(True)
-        plt.xlabel('grad of features 6', fontsize=font, fontweight='bold')
+        plt.xlabel('grad of feature 6', fontsize=font, fontweight='bold')
 
         for tick in acgc6.xaxis.get_major_ticks():
             tick.label1.set_fontsize(fontsize)
@@ -600,7 +600,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("diff theta 5 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('diff theta 5', fontsize=font, fontweight='bold')
+    plt.xlabel('diff theta 6', fontsize=font, fontweight='bold')
 
     for tick in acdw6.xaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)

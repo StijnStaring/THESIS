@@ -2,10 +2,10 @@ def comparing_features(data_cl,file_name):
     import pylab as plt
 
     plt.rc('axes', linewidth=2)
-    plt.rc('legend', fontsize=16)
+    plt.rc('legend', fontsize=20)
     # plt.rcParams["legend.loc"] = 'best'
-    fontsize = 14
-    font = 16
+    fontsize = 20
+    font = 22
 
     # Define plot to compare normalized features
     plt.figure("Comparing Normalized Features", figsize=(24,12))
