@@ -88,7 +88,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("Normalized calculated feature 5 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('Convergence of feature 5', fontsize=font, fontweight='bold')
+    plt.xlabel('Convergence of feature 6', fontsize=font, fontweight='bold')
 
     for tick in acf6.xaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
@@ -587,7 +587,7 @@ def post_processing_plots(his_f_calc_rel,his_weights,his_multi_grads,his_grad_cu
     # plt.xlabel("Iteration [-]", fontsize=14)
     # plt.ylabel("diff theta 5 [-]", fontsize=14)
     plt.grid(True)
-    plt.xlabel('diff theta 5', fontsize=font, fontweight='bold')
+    plt.xlabel('diff theta 6', fontsize=font, fontweight='bold')
 
     for tick in acdw6.xaxis.get_major_ticks():
         tick.label1.set_fontsize(fontsize)
