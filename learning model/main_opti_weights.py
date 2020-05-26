@@ -78,7 +78,7 @@ solutions = []
 converged = 0
 grad_prev = plt.zeros([amount_features])
 
-# while rec <= 3:
+# while rec <= 1:
 while converged != 1 and rec <= 300:
     converged = 0
     dict_sol_list = []

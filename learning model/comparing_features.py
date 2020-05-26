@@ -2,10 +2,10 @@ def comparing_features(data_cl,file_name):
     import pylab as plt
 
     plt.rc('axes', linewidth=2)
-    plt.rc('legend', fontsize=16)
+    plt.rc('legend', fontsize=20)
     # plt.rcParams["legend.loc"] = 'best'
-    fontsize = 14
-    font = 16
+    fontsize = 20
+    font = 22
 
     # Define plot to compare normalized features
     plt.figure("Comparing Normalized Features", figsize=(24,12))
@@ -69,7 +69,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 1)
     axcom1a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Horizontal distance [m]", fontsize=font,fontweight='bold')
+    plt.ylabel("Longitudinal distance [m]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('Comparison dataset 1 with calculated x(t) 1', fontsize=font,fontweight='bold')
 
@@ -83,7 +83,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom1b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Vertical distance [m]", fontsize=font,fontweight='bold')
+    plt.ylabel("Lateral distance [m]", fontsize=font,fontweight='bold')
     # plt.title('Comparison observed and calculated y(t)', fontsize=font,fontweight='bold')
     plt.grid(True)
 
@@ -118,7 +118,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 1)
     axcom3a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Horizontal velocity [m/s]", fontsize=font,fontweight='bold')
+    plt.ylabel("Longitudinal velocity [m/s]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('Vx(t) comparison', fontsize=font,fontweight='bold')
 
@@ -132,7 +132,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom3b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Vertical velocity [m/s]", fontsize=font,fontweight='bold')
+    plt.ylabel("Lateral velocity [m/s]", fontsize=font,fontweight='bold')
     # plt.title('Vy(t) comparison', fontsize=font,fontweight='bold')
     plt.grid(True)
 
@@ -149,7 +149,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 1)
     axcom4a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Horizontal acceleration [m/s^2]", fontsize=font,fontweight='bold')
+    plt.ylabel("Longitudinal acceleration [m/s²]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('Ax(t) comparison (total)', fontsize=font,fontweight='bold')
 
@@ -163,7 +163,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom4b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Vertical acceleration [m/s^2]", fontsize=font,fontweight='bold')
+    plt.ylabel("Lateral acceleration [m/s²]", fontsize=font,fontweight='bold')
     # plt.title('Ay(t) comparison (total)', fontsize=font,fontweight='bold')
     plt.grid(True)
 
@@ -181,7 +181,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 1)
     axcom5a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Horizontal jerk [m/s^3]", fontsize=font,fontweight='bold')
+    plt.ylabel("Longitudinal jerk [m/s³]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('jx(t) comparison (total)', fontsize=font,fontweight='bold')
 
@@ -195,7 +195,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom5b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Vertical jerk [m/s^3]", fontsize=font,fontweight='bold')
+    plt.ylabel("Lateral jerk [m/s³]", fontsize=font,fontweight='bold')
     # plt.title('jy(t) comparison (total)', fontsize=font,fontweight='bold')
     plt.grid(True)
 
@@ -213,7 +213,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 1)
     axcom6a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Yaw angle [degrees]", fontsize=font,fontweight='bold')
+    plt.ylabel("Yaw angle [°]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('Yaw angle ', fontsize=font,fontweight='bold')
 
@@ -227,7 +227,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom6b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Yaw angle/s [degrees/s]", fontsize=font,fontweight='bold')
+    plt.ylabel("Yaw angle/s [°/s]", fontsize=font,fontweight='bold')
     # plt.title('Yaw angle/s ', fontsize=font,fontweight='bold')
     plt.grid(True)
 
@@ -258,7 +258,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom7b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("delta [degrees]", fontsize=font,fontweight='bold')
+    plt.ylabel("delta [°]", fontsize=font,fontweight='bold')
     # plt.title('delta local', fontsize=font,fontweight='bold')
     plt.grid(True)
 
@@ -275,7 +275,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 1)
     axcom8a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font, fontweight='bold')
-    plt.ylabel("Axt [m/s^2]", fontsize=font, fontweight='bold')
+    plt.ylabel("Axt [m/s²]", fontsize=font, fontweight='bold')
     plt.grid(True)
     # plt.title('Axt ', fontsize=font,fontweight='bold')
 
@@ -289,7 +289,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom8b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font, fontweight='bold')
-    plt.ylabel("Axn [m/s^2]", fontsize=font, fontweight='bold')
+    plt.ylabel("Axn [m/s²]", fontsize=font, fontweight='bold')
     plt.grid(True)
     # plt.title('Ayn', fontsize=font,fontweight='bold')
 
@@ -307,7 +307,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 1)
     axcom9a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Axt [m/s^2]", fontsize=font,fontweight='bold')
+    plt.ylabel("Ayt [m/s²]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('Ayt ', fontsize=font,fontweight='bold')
 
@@ -321,7 +321,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom9b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Ayn [m/s^2]", fontsize=font,fontweight='bold')
+    plt.ylabel("Ayn [m/s²]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('Ayn', fontsize=font,fontweight='bold')
 
@@ -339,7 +339,7 @@ def comparing_features(data_cl,file_name):
     plt.tight_layout()
     axcom10 = plt.gca()
     plt.xlabel("Time [s]", fontsize=font,fontweight='bold')
-    plt.ylabel("Yaw acceleration [degrees/s^2]", fontsize=font,fontweight='bold')
+    plt.ylabel("Yaw acceleration [°/s²]", fontsize=font,fontweight='bold')
     plt.grid(True)
     # plt.title('Yaw acceleration ', fontsize=font,fontweight='bold')
 
@@ -356,7 +356,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 1)
     axcom11a = plt.gca()
     plt.xlabel("Time [s]", fontsize=font, fontweight='bold')
-    plt.ylabel("throttle_dot [1/s]", fontsize=font, fontweight='bold')
+    plt.ylabel("derivative(throttle) [1/s]", fontsize=font, fontweight='bold')
     plt.grid(True)
     # plt.title('throttle ', fontsize=font,fontweight='bold')
 
@@ -370,7 +370,7 @@ def comparing_features(data_cl,file_name):
     plt.subplot(1, 2, 2)
     axcom11b = plt.gca()
     plt.xlabel("Time [s]", fontsize=font, fontweight='bold')
-    plt.ylabel("delta_dot [degrees/s]", fontsize=font, fontweight='bold')
+    plt.ylabel("derivative(delta) [°/s]", fontsize=font, fontweight='bold')
     # plt.title('delta local', fontsize=font,fontweight='bold')
     plt.grid(True)
 
