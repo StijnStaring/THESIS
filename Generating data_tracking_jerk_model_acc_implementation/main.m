@@ -10,9 +10,9 @@ files = {'DCA2_V22.22_L3.47.csv'};
 plot_MPC = 0;
 N = 50; % Control horizon of one optimization of the MPC.
 Tf = 40; % if want same length as reference lane change set Tf = 0
-V0 = data.vx(1,1);
 
 data = get_data(char(files(:,1)));
+V0 = data.vx(1,1);
 update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
 iteration = 1;

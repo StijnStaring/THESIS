@@ -13,7 +13,9 @@ data = get_data(data_temp);
 update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
 iteration = 1;
-throttle_start = data.throttle(1,1);
+throttle_start = data.throttle(1,1); % maybe should be changed to cancel out aerodynamic drag of amesim model
+% doesn't had much influence on start oscillation --> solved by setting a
+% straight part in front of the lane change.
 
 % Simulation sampling time and duration
 % Ts = 0.01; % sampling rate Amesim - taken standard value
@@ -46,7 +48,7 @@ sim_out = sim('generating_data_lane_change','SrcWorkspace','current'); % This is
 t_mpc = sim_out.Results_States.time';
 t_max = 23;
 x_max = 550;
-x_mpc  = sim_out.Results_States.signals(1).values';  % Vector of 2551 points
+x_mpc  = sim_out.Results_States.signals(1).values';  % Vector of 4001 points
 y_mpc   = sim_out.Results_States.signals(2).values'; 
 vx_mpc  = sim_out.Results_States.signals(3).values';
 vy_mpc  = sim_out.Results_States.signals(4).values';
