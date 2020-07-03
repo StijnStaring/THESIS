@@ -13,6 +13,9 @@ function [del_w, exception, w_new, update_out] = RPROP(grad_curr,cas,length,upda
     % algorithm
     for i = 1:1:length
         
+        % A fixed value is tried in order to remove the scaling factor when
+        % learning the weights
+        
         % if i == index_fixed_value:
         %     w_new(i) = w_curr(i)
         % else:

@@ -3,7 +3,10 @@ function [data_s, sol_lambda] = optim_weights_ideal(theta,data_cl,iteration,N,fi
 
     width_road = data_cl.width;
     vx_start = data_cl.vx_start;
-
+    % Normalization factors should be recalculated when use real
+    % observations. A proposal is to calculate the features of a good, by a human produced example
+    % lane change and use them as normalization factors for the associated
+    % features.
     norm0 = 0.007276047781441449;
     norm1 = 2.6381715506137424;
     norm2 = 0.007276047781441449;
@@ -43,7 +46,8 @@ function [data_s, sol_lambda] = optim_weights_ideal(theta,data_cl,iteration,N,fi
     fprintf("The name of the file: %s", file)
     fprintf('\n')
     
-        % Resampling mostly not needed with this data file
+        % Resampling mostly not needed in this case because the
+        % observations come from demonstrations
     N_old = size(data_cl.x_cl,2) - 1;
     if N_old ~= N
         error("Error: N_old is not equal to N, make use of resampling of the observation.")
@@ -244,13 +248,8 @@ function [data_s, sol_lambda] = optim_weights_ideal(theta,data_cl,iteration,N,fi
     % Initial constraints
     % states: x, y, vx, vy, psi, psi_dot, throttle, delta, ax, ay
     opti.subject_to(X(1:6, 1) == [x_start; y_start; vx_start; vy_start; psi_start; psi_dot_start]);
-    % jx_start = JX_TOT(X(:,0),U(:,0))
-    % jy_start = JY_TOT(X(:, 0), U(:, 0))
-    % opti.subject_to(jx_start == 0)
-    % opti.subject_to(jy_start == 0)
     opti.subject_to(X(7, 1) == (Cr0 + Cr2 * vx_start ^ 2) / (2 * c))  % no longitudinal acc when drag force taken into account
     opti.subject_to(X(8, 1) == 0)  % driving straigth
-    % T_limit = 10
     opti.subject_to(T <= T_limit)
 
     % Terminal constraints
@@ -314,33 +313,19 @@ function [data_s, sol_lambda] = optim_weights_ideal(theta,data_cl,iteration,N,fi
     end
     % Comfort cost function: t0*ax^2+t1*ay^2+t2*jy^2+t3*(vx-vdes)^2+t4*(y-ydes)^2
     opti.minimize(theta(1) / norm0 * f0_cal + theta(2) / norm1 * f1_cal + theta(3) / norm2 * f2_cal + theta(4) / norm3 * f3_cal + theta(5) / norm4 * f4_cal + theta(6) / norm5 * f5_cal);
-    % opti.minimize(theta(0) / norm0 * f0_cal + theta(1) / norm1 * f1_cal + theta(4) / norm4 * f4_cal +theta(5) / norm5 * f5_cal)
-
+    
     fprintf('Absolute weights: %i %i %i %i %i %i', (theta ./ [norm0, norm1, norm2, norm3, norm4, norm5]))
     fprintf("\n")
     fprintf('Relative weights: %i %i %i %i %i %i', theta)
     fprintf("\n")
 
     % Implementation of the solver
-
-    % options = dict()
-    % options.expand = true
     opti.solver('ipopt');
     sol = opti.solve();
 
     % ----------------------------------
     %    Post processing
     % ----------------------------------
-%     x_sol = sol.value(x);
-%     y_sol = sol.value(y);
-%     vx_sol = sol.value(vx);
-%     vy_sol = sol.value(vy);
-%     psi_sol = sol.value(psi);
-%     psi_dot_sol = sol.value(psi_dot);
-%     throttle_sol = sol.value(throttle);
-%     delta_sol = sol.value(delta);
-%     throttle_dot_sol = sol.value(throttle_dot);
-%     delta_dot_sol = sol.value(delta_dot);
     T_sol = sol.value(T);
     dt_sol = T_sol / N;
     ax_tot_sol = zeros(1,N + 1);

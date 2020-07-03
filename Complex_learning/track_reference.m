@@ -1,5 +1,5 @@
 function data_mpc = track_reference(data_planned)
-% remember to take different delta_angle into account.
+
 disp('Tracking mpc started!')
 import casadi.*
 global x_sol_prev lam_prev tracking_lane_change iteration T_pl N data T_MPC iter_expected plot_MPC Ts Tf V0
@@ -13,8 +13,8 @@ data = get_data(data_temp);
 update_casadi_function = 1; % in order to save time when developing
 [x_sol_prev,lam_prev] = Function_generation(data,N,update_casadi_function);
 iteration = 1;
-throttle_start = data.throttle(1,1); % maybe should be changed to cancel out aerodynamic drag of amesim model
-% doesn't had much influence on start oscillation --> solved by setting a
+throttle_start = data.throttle(1,1); % maybe should be changed to cancel out aerodynamic drag of amesim model.
+% It didn't have much influence on start oscillation --> solved by setting a
 % straight part in front of the lane change.
 
 % Simulation sampling time and duration

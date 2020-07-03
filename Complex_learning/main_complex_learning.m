@@ -3,17 +3,14 @@
 % 
 % Matlab version used: R2018b
 % Amesim version used: 2019.2
-% Github stijn staring for more information
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clc
 close all
 clearvars
 
-% Remarks
-% No normalization necessary of gradient --> size doesn't matter in RPROP implementation.
-% Optimization objective is normalized in order to have dimensionless weights --> better start (+-equal size of optimization terms at start)
-
 disp('Learning algorithm started!')
+% Defining variables
+
 global Ts Tf V0
 Ts = 0.01;
 Tf = 40;
@@ -21,8 +18,6 @@ font = 18;
 font_ax = 16;    
 V0 = 1;
 
-% Defining weights
-%%%%%%%%%%%%%%%%%%
 his_diff_theta = struct();
 his_multi_grads = struct();
 his_grad_current = struct();
@@ -36,7 +31,7 @@ rec = 1;
 N = 1000;
 tol = 1e-3;
 max_iterations = 300;
-% Comfort cost function: ax**2+t1*ay**2+t2*jx**2+t3*jy**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
+% Comfort cost function: t0*ax**2+t1*ay**2+t2*jx**2+t3*jy**2+t4*(vx-vdes)**2+t5*(y-ydes)**2
 theta = [1.0,1.0,1.0,1.0,1.0,1.0];
 
 % RPROP variables
@@ -45,13 +40,12 @@ exception = zeros(1,amount_features);
 del_theta_prev = zeros(1,amount_features);
 update = del_0*ones(1,amount_features);
 
-% Other
-%%%%%%%%%%%%%%%%%
 theta_tracker = struct();
 theta_tracker.("iteration_"+num2str(rec)) = theta;
 his_weights.("iteration_"+num2str(rec)) = theta;
 theta_chosen = [4.0,5.0,1.0,6.0,1.0,2.0];% This is the theta used to generate the data
 
+% data
 file_list = {'DCA2_V22.22_L3.47.csv','DCA2_V22.22_L6.94.csv','DCA2_V25.00_L3.47.csv','DCA2_V25.00_L6.94.csv','DCA2_V27.78_L3.47.csv'}; % With original bicycle model data
 data_list  = cell(1,length(file_list));
 data_list_ID  = cell(1,length(file_list));
@@ -67,7 +61,7 @@ for i = 1:1:length(file_list)
     comparing_features(data_tracked)
 end
 
-%  Calculate the averaged
+%  Calculate the average
 av_features_data = zeros(1,amount_features);
 for k = 1:1:length(file_list)
     av_features_data = av_features_data + data_list{1,k}.features;
@@ -79,7 +73,10 @@ converged = 0;
 grad_prev = zeros(1,amount_features);
 
 while converged ~= 1 && rec <= max_iterations
-% while rec <= 1
+% When you use real observation data these will not be solutions of the
+% optimization and therefore very accurate feature matching of all the
+% lateral features is probably not possible. Have to add a criteria 'till
+% no improvement anymore = no better matching of features anymore'
     
     dict_sol_list = cell(1,length(file_list));
     fprintf('\n')
@@ -116,7 +113,7 @@ while converged ~= 1 && rec <= max_iterations
 
     % Normalization for plots
     f_calc_rel = av_features_calc./av_features_data;
-    grad_curr = ones(1,amount_features) - f_calc_rel; % now is the normalized version
+    grad_curr = ones(1,amount_features) - f_calc_rel; % is the normalized version of the gradient calculation
 
     fprintf('This is summed grad current: %i ', sum(abs(grad_curr)))
     fprintf('\n')

@@ -101,7 +101,6 @@ f = Function('f', {states,controls}, {rhs},{'states','controls'},{'rhs'});
 % -----------------------------------
 %    Discrete system x_next = F(x,u)
 % -----------------------------------
-% Integration is needed to know the next state of the vehicle.
 
 % Integrator options
 intg_options = struct;
@@ -147,7 +146,6 @@ delta_dot = U(2,:);
 x0 = opti.parameter(nx);
 ref = opti.parameter(nx+2,N);
 opti.set_value(x0,[0;0;vx_start;0;0;0;throttle_ref(1,1);0;ax_ref(1,1);ay_ref(1,1)]);
-
 opti.set_value(ref,[x_ref(2:N+1);y_ref(2:N+1);vx_ref(2:N+1);vy_ref(2:N+1);psi_ref(2:N+1);psi_dot_ref(2:N+1);throttle_ref(2:N+1);delta_ref(2:N+1);throttle_dot_ref(1:N);delta_dot_ref(1:N);ax_ref(2:N+1);ay_ref(2:N+1)]);
 
 % Gap-closing shooting constraints
@@ -159,7 +157,7 @@ end
 v_min = vx_start - 1;
 v_max = vx_start + 1;
 psi_max = 5*pi/180;
-opti.subject_to(-width_road/2 <= y <= width_road*3/2) % SPECIFIC
+opti.subject_to(-width_road/2 <= y <= width_road*3/2) % SPECIFIC --> path closing constraints are not really needed becaause you try to follow a feasible reference.
 opti.subject_to(0 <= x ) % vehicle has to drive forward
 opti.subject_to(v_min <= vx); %local axis [m/s] SPECIFIC 
 opti.subject_to(vx <= v_max); %local axis [m/s] SPECIFIC 
@@ -168,24 +166,12 @@ opti.subject_to(-psi_max <= psi <= psi_max);% SPECIFIC
 
 % Initial and terminal constraints
 opti.subject_to(X(:,1)==x0);
-% opti.subject_to((X(1,N+1) - ref(1,N+1))^2<=0.1);
-% opti.subject_to((X(2,N+1) - ref(2,N+1))^2<= 0.1);
-% opti.subject_to((X(3,N+1) - ref(3,N+1))^2<=1);
-% opti.subject_to((X(4,N+1) - ref(4,N+1))^2<=1);
-% opti.subject_to((X(5,N+1) - ref(5,N+1))^2<=1);
-% opti.subject_to((X(6,N+1) - ref(6,N+1))^2<= 1);
+
 %%
 % -----------------------------------------------
 %    Objective
 % -----------------------------------------------
-% mx = mean(x_ref);
-% my = mean(y_ref);
-% mpsi = mean(psi_ref);
-% mthrottle_dot = mean(throttle_dot_ref);
-% mdelta_dot = mean(delta_dot_ref);
-
 % Objective: vehicle tries to follow a moving point model: x(t) and y(t)
-% opti.minimize(10*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+100*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+10*(ax(2:N+1)-ref(11,1:N))*transpose((ax(2:N+1)-ref(11,1:N)))+(ay(2:N+1)-ref(12,1:N))*transpose((ay(2:N+1)-ref(12,1:N))));
 opti.minimize(10*(x(2:N+1)-ref(1,1:N))*transpose((x(2:N+1)-ref(1,1:N)))+10*(y(2:N+1)-ref(2,1:N))*transpose((y(2:N+1)-ref(2,1:N)))+30*(vx(2:N+1)-ref(3,1:N))*transpose((vx(2:N+1)-ref(3,1:N)))+(vy(2:N+1)-ref(4,1:N))*transpose((vy(2:N+1)-ref(4,1:N)))+100*(psi(2:N+1)-ref(5,1:N))*transpose((psi(2:N+1)-ref(5,1:N)))+(psi_dot(2:N+1)-ref(6,1:N))*transpose((psi_dot(2:N+1)-ref(6,1:N))) + 5*sumsqr(throttle_dot) + 0.01*sumsqr(delta_dot)+0.01*sumsqr(ax));
 
 % solve optimization problem
@@ -201,19 +187,9 @@ options.print_header = false;
 options.print_status = false;
 opti.solver('sqpmethod',options)
 
-% options.ipopt.print_level = 0;
-% opti.solver('ipopt',options)
-
-
 %% Initial guesses
-% states: x, y, vx, vy, psi, psi_dot
-% opti.set_initial(x, x_ref(1:N+1));
-% opti.set_initial(y, y_ref(1:N+1));
-opti.set_initial(vx, vx_ref(1:N+1));
-% opti.set_initial(vy, vy_ref(1:N+1));
-% opti.set_initial(psi,psi_ref(1:N+1));
-% opti.set_initial(psi_dot,psi_dot_ref(1:N+1));
 
+opti.set_initial(vx, vx_ref(1:N+1));
 tic
 sol = opti.solve();
 toc
@@ -233,6 +209,5 @@ if update_casadi_function == 1
     tracking_lane_change = opti.to_function('tracking_lane_change',inputs,outputs);
     tracking_lane_change.save('tracking_lane_change.casadi');
 end
-% when loading -> DM.set_precision(15)
 
 end

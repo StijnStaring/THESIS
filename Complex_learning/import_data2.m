@@ -3,7 +3,6 @@ function [data_cl] = import_data2(file,ak)
 % "time","x","y","vx","vy","ax","ay","jx","jy","psi","psi_dot","psi_ddot","throttle","delta","throttle_dot","delta_dot","aty","any","atx","anx"
 % Read data
 read = csvread(file,1);
-% Struct data: 1xN
 data_cl = struct();
 data_cl.time_cl = read(:,1)';
 N = size(data_cl.time_cl,2) -1;
@@ -24,7 +23,7 @@ data_cl.delta_cl = read(:,14)'; % delta is the angle of the front wheel
 throttle_dot_cl_temp = read(:,15)';
 data_cl.throttle_dot_cl = throttle_dot_cl_temp(1,1:end-1);
 delta_dot_cl_temp = read(:,16)';
-data_cl.delta_dot_cl = delta_dot_cl_temp(1,1:end-1); % delta is the angle of the front wheel
+data_cl.delta_dot_cl = delta_dot_cl_temp(1,1:end-1); 
 data_cl.aty_cl = read(:,17)';
 data_cl.any_cl= read(:,18)';
 data_cl.atx_cl = read(:,19)';

@@ -6,6 +6,9 @@ function [result] = TrackingFunction_lane_change(current_states)
 %     disp('-----------------------------')
 %     disp(current_states)
 %     fprintf('\n iteration: %i',iteration)
+
+% The jump is needed because the reference has a sampling of 0.025 s and
+% the mpc is called every 0.1 s
     jump = T_MPC/T_pl;
     current_ref = zeros(12,N);
     current_ref(1,1:N) = data.x(int64(jump*(iteration-1)+2):int64(N+(iteration-1)*jump+1));

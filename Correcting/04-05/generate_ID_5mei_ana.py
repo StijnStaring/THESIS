@@ -62,6 +62,7 @@ for N in N_list:
         print('--------------------------------------------------')
         print('N: ',N, 'and T_limit: ',T_limit)
         file_list = glob.glob("reading_dataset/*.csv")
+        # Uses the numerical solutions as initial guess of the calculation of the analytical solution
         for file in file_list:
             print('\n')
             print("The name of the file: ", file)
